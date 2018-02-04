@@ -1,0 +1,30 @@
+Nomenclature -- Raytheon format
+
+The wirelist is on a 9 Track, 800BPI tape,  consisting of blocked records
+with a single end of file mark.  
+      ;Writes EBCDIC tapes with 80-column records, 1600 bytes per block.
+      ;DCB=(RECFM=FB,LRECL=80,BLKSIZE=1600,LABEL=(,NL)) or words to that effect.
+
+Each card has the following fields:
+
+Column		Meaning
+------		-------
+1-14		(Blank)
+15-22		First pin
+23-30		Second pin
+31-67		Signal name (to be ignored)
+68		Level
+72-80		Sequence number (can be ignored)
+
+A pin is either a DIP socket pin, Edge connector pin, or flat-cable connector pin.
+
+DIP socket:	<letter><digits>	<digits>
+  which is	Row	column		Pin number
+
+Edge:		<letter>         	<digit><letter>
+  which is	Paddle		  	1or2,  pin-within-paddle
+
+Flat:		J<digits>>	 	<digits>
+  which is	connector		pin-number
+
+Use the RAYTH program on XX on <MOON>.

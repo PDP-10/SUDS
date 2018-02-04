@@ -1,0 +1,23 @@
+Nomenclature -- Augat format
+
+The From-To wirelist is on a 9 Track, EBCDIC, 1600BPI tape,  consisting of 80 character
+records, 80 records per block.
+
+Each card has the following fields:
+
+Column		Meaning
+------		-------
+1		Unused
+2-13		Signal name (to be ignored)
+20-28		From pin
+40-48		To pin
+55		Level
+72-80		Sequence number
+
+The pins on this wirelist have already been ordered.
+DO NOT reorder the runs, or change level assignment.
+The signal name is a COMMENT ONLY, it should not be
+used to group wires into a run.  You should assume that
+the signal names may not be unique - IGNORE THEM.
+
+Use the MTU program on XX or EE (or some other TOPS-20 with a 1600 bpi drive).
