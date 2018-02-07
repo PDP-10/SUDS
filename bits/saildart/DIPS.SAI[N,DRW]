@@ -1,0 +1,1100 @@
+begin "Dips"
+require 3000 string!space;
+require "SAI:BAYSAI.SAI" source!file;
+source!l(STRFIL);
+source!l(FILEOP);
+source!l(CALPRG);
+source!l(VERSIO);
+source!l(LINSER);
+source!l(PARSER);
+source!l(SWINI);
+source!l(TTYFN);
+source!l(SYMBOL);
+source!L(FILE);
+source!L(FILE2);
+source!L(FilDef);
+require "{~<>" delimiters;
+
+let channel=integer;
+!------------------------------------------------------------------
+!
+!  ABSTRACT:
+!	This program is the Dips of a program that accepts
+! command lines of the form INPUT _ OUTPUT/SWITCHES.
+!
+! KEYWORDS:
+! command scanner & program Dips
+!
+!---------------------------------------------------------------------;
+! bit definitions for pin functions;
+
+define
+	Pin!InLd = '400000000000,
+	Pin!OutLd= '200000000000,
+	Pin!NullD=  '100000000000,
+	Pin!Gnd =   '40000000000,
+	Pin!Pwr =   '20000000000,
+	Pin!Tri=    '10000000000,
+	Pin!Share=   '4000000000,
+	Pin!OpenC=   '2000000000,
+	Pin!Pull=    '1000000000,
+	Pin!ECL=      '400000000,
+	Pin!TTL=      '200000000,
+	Pin!Term=      '40000000,
+	Pin!FFout=     '20000000,
+	Pin!DrvReq=    '10000000;
+! Submodule: Dips.sai
+! Date:  7-Jul-81
+! Who: David Lamb
+! Fix bug where EOF and BRK were indexed by -1 in call to WantRead.  Change
+! WantXXX to OpenXXX.  Use CalPrg's GetMyCommands instead of RTMPFILE.
+! Make other mods for TOPS20 compatibility: RSCAN jsys, no RUNPROG calls.
+! 
+! 
+! ;
+! Submodule: Dips.sai
+! Date:  1-Jan-80
+! Who: David Lamb
+! Modifications for compatibility with AT.  Principally, each page
+! now begins with a blank line, so as to avoid interference with
+! AT's generated page header information.
+! 
+! ;
+! Submodule: Dips.sai
+! Date:  8-Nov-79
+! Who: David Lamb
+! Entry of Dips.SAI into database.
+! 
+! ;
+! Submodule: skelet.sai
+! Date:  1-Nov-78
+! Who: David Lamb
+! Initial Dips created
+! ;
+
+!-----------------------------------------------------------------
+!
+!  DESIGN:
+!
+!-----------------------------------------------------------------;
+
+define
+	HELPMSG = {"
+OUTPUT _ INPUT / SWITCHES
+or
+@FILENAME
+
+Switches are global unless starred (*):
+
+"~,
+MaxSwitches=2,
+SwitchNames = "",
+DefineSwitch(Name,Help)={
+    Redefine MaxSwitches = MaxSwitches+1;
+    Redefine HelpMsg = cvms(HelpMsg) & "&""Help
+""";
+    Redefine SwitchNames = cvms(SwitchNames) & ", ""Name""";
+    Redefine IdxName = "Idx"&"Name";
+    EvalDefine IdxName = MaxSwitches~,
+	InputCount=300;
+
+DefineSwitch(HELP,	</HELP		Print this message.>);
+DefineSwitch(BATCH,	</BATCH:bool   Set BATCH mode on; default is off>);
+DefineSwitch(DEBUG,     </DEBUG:bool   Set DEBUG mode on; default is off>);
+DefineSwitch(UPDATE,    </UPDATE:bool  Set Update mode on; default is off>);
+DefineSwitch(VERBOSE,	</VERBOSE:bool	Set VERBOSE mode on or off.  Default is ON.>);
+DefineSwitch(WARN,	</WARN:bool	Warn about superseding files if on.>);
+
+redefine SwitchNames = cvms(SwitchNames)[3 to inf];
+preload!with SwitchNames;
+safe string array SwitchArray[3:MaxSwitches];
+
+external integer RPGSW;		! TRUE iff entered via CCL linkage;
+integer
+    LINEBRK,	! line break table;
+    TABBREAK,	! tab break;
+    DOTBRK,	! . break;
+    SEMIBRK,	! semicolon break;
+    BogusChars,   ! Bogus chars strip table;
+    InputChannel,
+    DipChannel,
+    OutputChannel,
+    SLASHBRK,	! break table for /;
+    ARROWBRK,	! break table for =_;
+	CrunchBrk,	! Break table for crunch;
+	NullCrunchBrk,
+    COLONBRK;	! break table for :;
+
+boolean
+	NeedComparison,
+	Copying;
+
+define DVer=-3;		! D version;
+define nonsimple={~;
+string INFILE, OUTFILE, RPGCMD, CmdLine, BLANKS;
+safe integer array CHAN,BRCHAR,EOF,WordCount[0:15];
+
+boolean BatchSwitch,VerboseSwitch, WarnSwitch, UpdateSwitch, DebugSwitch;
+
+ifc bailing thenc external procedure BAIL; endc
+bail!simple string procedure cvoss(integer V,W);
+begin "cvoss"
+	integer F1,F2;
+	string S;
+	getformat(F1,F2);
+	setformat(W,0);
+	S := cvs(V);
+	setformat(F1,F2);
+	return(S);
+end "cvoss";
+bail!simple procedure Log(string S);
+begin "log"
+	out(OutputChannel,S);
+end "log";
+bail!simple procedure LogAndType(string S);
+begin "logAndType"
+	outstr(S);
+	Log(S);
+end "logAndType";
+
+! procedure GetCommandLine;
+!-------------------------------------------------
+!
+! ABSTRACT:
+!	Read the next command line, from a command file or
+! from the terminal, as appropriate.  A line from the terminal
+! beginning with an at-sign is interpreted as a request to take
+! commands from a file, whose name is contained in the rest of
+! the line.  This facility is ignored inside command files.
+! A line beginning with a semicolon is ignored.
+!
+! PARAMETERS:
+!
+! RESULTS:
+!
+! SIDE EFFECTS:
+!	The next command line, without the terminating linefeed
+! or formfeed or carriage-return, is placed in global variable
+! CmdLine.
+!
+! ERRORS:
+!
+! DESIGN:
+!	Global variable RPGCMD contains the entire contents of the
+! command file during command file processing.  If the program is
+! called in CCL mode, initialisation places the contents of the
+! TMPCOR file in RPGCMD.
+!
+!-------------------------------------------------;
+
+define
+
+READ!CCL!LINE=
+   {begin "CCL mode"
+    CmdLine  :=  scan(RPGCMD, LINEBRK, ZILCH);
+    if VerboseSwitch then print("**", CmdLine, crlf);
+    ifc TOPS10 thenc
+	if CmdLine[inf FOR 1] = "!" then
+	    begin "Run program"
+	    CallProgram(CmdLine[1 to inf-1], null,null);
+	    callexit
+	    end   "Run program"
+    endc
+    end   "CCL mode"~,
+
+READ!TERMINAL!LINE=
+   {begin "terminal input"
+    if RPGSW then callexit;
+    CtlOClear;
+    print("*"); CmdLine  :=  Get!Line("*");
+    CmdLine  :=  scan(CmdLine, LINEBRK, ZILCH);
+    if CmdLine = "@"
+        then
+	    begin "read command file"
+	    integer EOF, CHAN, BRK;
+
+	    ZILCH  :=  lop(CmdLine);
+	    if not OpenRead(CHAN := -1, InputCount, BRK, EOF, CmdLine,
+		        InteractAfter, ascii, "Command file", "CMD")
+	        then
+		    do
+		        begin
+		        RPGCMD  :=  RPGCMD & input(CHAN, LINEBRK); 
+		        if BRK then RPGCMD  :=  RPGCMD & BRK
+		        end
+		    until EOF;
+	    CmdLine  :=  null
+	    end   "read command file"
+    end   "terminal input"~;
+
+
+procedure GETCOMMANDLINE;
+    do
+	if fulstr(RPGCMD)
+	    then READ!CCL!LINE
+	    else READ!TERMINAL!LINE
+    until fulstr(CmdLine) and CmdLine neq ";";
+
+simple procedure INIT;
+!-------------------------------------------------
+!
+! ABSTRACT:
+!	Performs program initialisation.  Reads possible arguments
+! from the command line or from the command file (in CCL mode) and sets
+! various program variables.
+!
+! PARAMETERS:
+!
+! RESULTS:
+!
+! SIDE EFFECTS:
+!	If the program is called in CCL mode, the contents of the
+! command file are placed in RPGCMD.  If there were arguments on the
+! command line (separated from the program invocation by a semicolon),
+! they are placed in RPGCMD.  The break tables used by the program
+! are initialised, as are the global flags such as VERBOSE and WARN.
+!
+! ERRORS:
+!
+! DESIGN:
+!
+!-------------------------------------------------;
+    begin	"INIT"
+
+    simple boolean procedure BACKUP;
+	ifc TOPS10
+	    thenc
+		start!code "Check for available line"
+		TTCALL	'10,1;		! RESCAN - check possible null argument;
+		 TTCALL	'14,0;		! SKPINL;
+		  TDZA	1,1;		! no text - return false;
+		   SETO	1,;		! some text - return TRUE;
+		end "Check for available line";
+	    elsec
+		begin "RSCAN"
+		start!code
+		    setom   !skip!;
+		    hrrzi   1,!rsini;
+		    rscan#;
+		      setzm !skip!;
+		    end;
+		return (!skip!);
+		end "RSCAN";
+	endc
+
+    setbreak(LINEBRK:=getbreak,LF&FORMFEED,CR,"INS");
+	setbreak(CrunchBrk := getbreak,null,CR&LF&TAB&" "&0,"IS");
+	setbreak(NullCrunchBrk := getbreak,null,0,"IS");
+    setbreak(TABBREAK:=getbreak,TAB,null,"IS");
+    setbreak(SLASHBRK:=getbreak,"/",null,"IR");
+    setbreak(COLONBRK:=getbreak,":",null,"IS");
+    setbreak(ARROWBRK:=getbreak,"_=",null,"IS");
+    setbreak(DOTBRK:=getbreak,".",null,"IS");
+    setbreak(SEMIBRK:=getbreak,";",null,"IS");
+    
+	setbreak(BogusChars := getbreak,null," !@#$%^&*()_-+=`][|\:;""'{~<>,.?/","IS");
+    BLANKS:="        ";
+    VerboseSwitch := true;
+	BatchSwitch := false;
+    DebugSwitch := false;
+    WarnSwitch := true;
+
+    if RPGSW then RPGSW := GtMyCommands("DIP", RPGCMD);
+    if not RPGSW then
+	begin
+	if BACKUP then begin
+	    RPGCMD := inchwl;
+	    ifc TOPS10
+		thenc SDUM := scan(RPGCMD, SEMIBRK, DUM);
+		elsec
+		    SDum := NextSymbol(RPGCMD,NextSymToBlank);
+		    if upequ(SDum,"R") or upequ(SDum,"RUN")
+			then SDum := NextSymbol(RPGCMD,NextSymToBlank);
+	    endc
+	    if fulstr(RPGCMD)
+		then RPGSW := true
+		else print("Dips version ", VerString,
+			   crlf&"/H for help"&crlf)
+	    end
+	end
+    end "INIT";
+bail!simple string procedure Crunch(string S);
+	return(scan(S,CrunchBrk,Zilch));
+bail!simple string procedure NullCrunch(string S);
+	return(scan(S,NullCrunchBrk,Zilch));
+
+! simple procedure ON!OFF(reference boolean FLAG;
+!			  string NAME;
+!			  boolean TruthSense(true));
+!-------------------------------------------------
+!
+! ABSTRACT:
+!	Set or reset a global boolean flag based on the value of the
+! current command switch.
+!
+! PARAMETERS:
+!
+! Flag:		Variable representing the global flag.
+!
+! Name:		Full name of the flag, for error messages.
+!
+! TruthSense:	If TRUE, indicates that the global flag is ON if the
+!		corresponding variable is TRUE.  If FALSE, indicates
+!		that the global flag is ON if the corresponding variable
+!		is FALSE.
+!
+! RESULTS:
+!
+! SIDE EFFECTS:
+!	If the switch value is ON or TRUE, the global flag is turned
+! on.  If the switch value is OFF or FALSE, the global flag is turned
+! off.  If the switch value is empty, the global flag is set to
+! TruthSense.
+!
+! ERRORS:
+!	If the switch value is not in the set {TRUE, FALSE, ON, OFF~
+! an error message is printed and the global flag is untouched.
+!
+! DESIGN:
+!
+!-------------------------------------------------;
+
+string SWITCH, SWVAL;
+boolean STOP!COMMAND;
+
+
+simple procedure ON!OFF(reference boolean FLAG; string NAME; boolean TruthSense(true));
+    begin
+    if upequ(SWVAL, "OFF") or upequ(SWVAL, "FALSE") then FLAG _ not TruthSense
+    else if nulstr(SWVAL) or upequ(SWVAL, "ON") or upequ(SWVAL, "TRUE") then FLAG _ TruthSense
+    else print("Bad value """, SWVAL, """ for ", NAME, " ignored."&crlf)
+    end;
+
+bail!simple procedure ParseSwitches(string SwitchLine);
+!-------------------------------------------------
+!
+! ABSTRACT:
+!	Parse and handle a line full of switches.
+!
+! PARAMETERS:
+!
+! SwitchLine:	A string of the form "/switch:value/switch:value..."
+!		The ":value" is often optional.  Possible switches
+!		are given on page 3.
+!
+! RESULTS:
+!
+! SIDE EFFECTS:
+!	Global variables associated with the switches will be modified
+! as directed by the switch string.
+!
+! ERRORS:
+!
+! DESIGN:
+!
+!-------------------------------------------------;
+    repeat begin "Parse switches"
+	Switch _ NextSwitch(SwitchLine, SwVal);
+	case STABLOOK(SWITCH, SwitchArray, false, true) of
+	    begin "Cases"
+[0]		begin "Ambiguous switch"
+		print("Ambiguous switch """, SWITCH, """"&crlf);
+		STOP!COMMAND _ true
+		end;
+[1]		return;  ! no switches left;
+[2]		begin "Bogus switch"
+		print("Bad switch """, SWITCH);
+		if fulstr(SWVAL) then print(":", SWVAL);
+		print(""""&crlf);
+		STOP!COMMAND _ true
+		end "Bogus switch";
+[IdxHelp]	print(HELPMSG);
+[IdxUpdate]     ON!OFF(UpdateSwitch, "UPDATE", true);
+[IdxVerbose]	ON!OFF(VerboseSwitch, "VERBOSE", true);
+[IdxBatch]	ON!OFF(BatchSwitch,"BATCH",true);
+[IdxDebug]	ON!OFF(DebugSwitch, "DEBUG",true);
+[IdxWarn]	ON!OFF(WarnSwitch, "WARN", true)
+	    end "Cases"
+
+	end   "Parse switches";
+simple integer procedure GetWord(channel Chan);
+begin "GetWord"
+	WordCount[Chan] := WordCount[Chan] + 1;
+	return(WordIn(Chan));
+end "GetWord";
+simple procedure putWord(integer Word);
+begin "putword"
+	if Copying then WordOut(DipChannel,Word)
+end "putword";
+simple string procedure ReadASCIZ(channel Chan);
+begin "readASCIZ"
+	string ASCIZ,Chars;
+	integer Text;
+	ASCIZ := null;
+    repeat
+	begin "loop"
+	    Text := GetWord(Chan);
+	    chars := nullcrunch(cvstr(TEXT));
+	    ASCIZ := ASCIZ & chars;
+	    if length(chars) < 5 then
+	       begin "last word"
+		    return(ASCIZ);
+	       end "last word";
+	end "loop";
+end "readASCIZ";
+bail!simple procedure OutASCIZ(string S);
+begin "OutASCIZ"
+	integer Text;
+	while length(S)>0 do
+	   begin "write it"
+		Text := cvasc(S[1 for 5]);
+		PutWord(Text);
+		if length(S)  5 then
+		   begin
+			if length(S) } 5 then return;
+			PutWOrd(0);
+		   end;
+		S := S[6 to inf];
+	   end "write it";
+end "OutASCIZ";
+simple boolean procedure CopyText(channel InputChannel);
+! Copies an ASCIZ string from the InputChannel to the DipChannel.
+  If the first word that is read is 0, CopyText writes it out
+  and returns false.
+;
+begin "copytext"
+   integer Text;
+    boolean Any;
+    Any := false;
+    repeat
+	begin "copy loop"
+	    Text := GetWord(InputChannel);
+	    PutWord(Text);
+	    if length(crunch(cvstr(text))) < 5 then
+	       begin "last word"
+		    return(Any);
+	       end "last word";
+	    Any := true;
+	end "copy loop";
+end "copytext";
+bail!simple string procedure GenFileName(string DipName; boolean Report(true));
+begin "GenFileName"
+	string FName;
+	string OName;
+
+	OName := DipName;
+	Fname := scan(DipName,BogusChars,Zilch);
+	if equ(Fname[1 for 2],"74") then FName := FName[3 to inf];
+	if length(FName) > 6 
+	    then 
+		begin
+		FName := FName[1 to 6]&"."&FName[7 to inf];
+		if Report then
+		    Log("Dip "&OName&" written as '"&FName&"'"&CRLF);
+		end
+	    else FName := FName&".DIP";
+	return(FName);
+end "GenFileName";
+bail!simple boolean procedure CreateDipFile(string DipName);
+begin "createDipFile"
+	string FName;
+	NeedComparison := false;
+	FName := GenFileName(DipName);
+	if not MustRead(DipChannel := getchan,0,0,Dum,FName,Binary)
+	   then
+		begin "already"
+		! Dip file already exists;
+
+		if UpdateSwitch then
+		   begin "updating"
+			! plan to compare the two files;
+			release(DipChannel);
+			if WantWrite(DipChannel := getchan, EOF[DipChannel],
+				SDum := "DIPS.TMP",false,binary)
+			then
+			    begin
+				Log(DipName&": Unable to create DIPS.TMP: "&FilErr(EOF[DipChannel])&CRLF);
+				return(false);
+			    end;
+			NeedComparison := true;
+			return(true);
+		   end "updating"
+		else
+		   begin "superseding"
+			close(DipChannel);
+			release(DipCHannel);
+			if WantWrite(DipChannel := getchan,EOF[DipChannel],
+				FName,true,binary)
+			then
+			    begin
+				Log(DipName&": Unable to create "&FName&" "&FilErr(Eof[DipChannel])&CRLF);
+				return(false);
+			    end;
+		 end "superseding"
+		end "already"
+	   else
+		begin "new"
+		close(DipChannel);
+		release(DipChannel);
+		if WantWrite(DipChannel := getchan,EOF[DipChannel],
+				FName,false,binary)
+		   then 
+		    begin
+			Log(DipName&": Unable to create new file "&FName&FilErr(EOF[DipChannel])&CRLF);
+			return(false);
+		    end;
+		end "new";
+    return(true);
+end "createDipFile";
+simple string procedure cvsect(integer W);
+begin "cvsect"
+! This creates the section suffix to a pin number by taking
+  the encoded section bits and (for all sections not /0) shifting
+  left, recording the nonzero bit position.  The format is
+  that a "/" precedes the first section value and a "," precedes
+  the rest;
+	integer Sect;
+	string SecName,SecDelim;
+	W := W land '777777000000;
+	Sect := 0;
+	secName := null;
+
+	SecDelim := "/";
+	while W } 0 do
+	    begin
+		if W < 0 and Sect } 0 then 
+		    begin
+			SecName := SecName&SecDelim&cvs(Sect);
+			SecDelim := ",";
+		    end;
+		Sect := Sect + 1;
+		W := W lsh 1;
+	    end;
+	return(SecName);
+end "cvsect";
+bail!simple string procedure cvpinf(integer W0,W1,W2,W3);
+begin "cvpinf"
+    integer W;
+    string Logic;
+    Logic := "T";
+    W := W0 land '777777000000;
+    if W land Pin!ECL then Logic := "E";
+    W := W land (lnot (Pin!TTL+Pin!ECL));
+    if W = Pin!Gnd                           then return("gnd");
+    if W = Pin!Pwr                           then return("pwr");
+    if W = Pin!InLD + Pin!DrvReq             then return(Logic&"I");
+    if W = Pin!InLD + Pin!Share + Pin!DrvReq then return(Logic&"IS");
+    if W = Pin!InLD                          then return(Logic&"IP");
+    if W = Pin!InLD + Pin!Share              then return(Logic&"ISP");
+    if W = Pin!OutLD                         then return(Logic&"O");
+    if W = Pin!OutLD + Pin!TRI               then return(Logic&"OT");
+    if W = Pin!OutLD + Pin!OPenC             then return(Logic&"OC");
+    if W = Pin!OutLD + Pin!Pull              then return(Logic&"OP");
+    if W = Pin!OutLD + Pin!FFOut             then return(Logic&"OF");
+    if W = Pin!OutLD + Pin!FFOut + Pin!OpenC then return(Logic&"OCF");
+    if W = Pin!OutLD + Pin!FFOut + Pin!Pull  then return(Logic&"OPF");
+    if W = Pin!Term                          then return(Logic&"Z");
+    if W = Pin!NullD                         then return(Logic&"NC");
+    return("Unknown pin code '"&cvos(W lsh -18));
+end "cvpinf";
+bail!simple string procedure cvpin(integer W0,W1,W2,W3);
+begin "cvpin"
+	integer W;
+	W := W0 land '777777000000;
+    if (W land Pin!Gnd) } 0   then return("gnd");
+    if (W land Pin!Pwr) } 0   then return("pwr");
+    if (W land Pin!NullD) } 0 then return("nc");
+    return(cvs(W3 land '777777)&cvsect(W3));
+end "cvpin";
+bail!simple string procedure Despace(string DipName);
+begin "despace"
+	while (Dum := index1(DipName," ")) } 0 do
+	   begin
+		DipName := DipName[1 to Dum-1]&"_"&DipName[Dum+1 to inf];
+	    end;
+	return(DipName);
+end "despace";
+bail!simple string procedure cvload(integer D0,D1,D2,D3);
+begin "cvload"
+	real Scale;	! For Flounders;
+	integer F1, F2;
+	string S;
+	integer Hi,Lo;
+	start!code
+		hrre 1,D1;
+		movem 1,Lo;
+		hlre 1,D1;
+		movem 1,Hi;
+	end;
+
+	if (D0 land Pin!NullD) } 0 then
+		return(null);
+	if (D0 land Pin!Gnd) } 0 then
+		return(null);
+
+	getformat(F1,F2);
+	setformat(0,2);
+
+	if (D0 land Pin!Pwr) } 0 then
+	    begin "power"
+		S := cvf(Hi*0.01)&"ma/"&cvf(Lo*0.01)&"v";
+	    end "power"
+	else
+	    begin "other"
+		S := cvf(Hi*0.01)&"/"&cvf(Lo*0.01);
+	    end "other";
+
+	setformat(F1,F2);
+
+	return(S);
+end "cvload";
+bail!simple string procedure hilo(integer D0,D1,D2,D3);
+begin
+	return(cvload(D0,D1,D2,D3));
+end;
+bail!simple boolean procedure renameFile(Channel Chan; string NewName);
+begin "renamefile"
+    integer flag;
+    rename(Chan,NewName,0,flag);
+    if flag then
+	  begin
+		logandType("Rename failed; "&FilErr(Flag)&CRLF);
+		return(false);
+	   end;
+    return(true);
+end "renamefile";
+nonsimple procedure DoComparison(string DipName);
+begin "DoComparison"
+     channel OldChannel, NewChannel;
+	integer Pins;
+	integer OVal, NVal;
+	integer I;
+	string OProp, NProp;
+	string OName,NName;
+	boolean SawDifferent;
+	integer Old, WNew;
+	integer O0, O1, O2, O3, N0, N1, N2, N3;
+	integer Wh0, Wh1, Wh2, Wh3;
+	boolean Warned;
+boolean procedure TellUser(string DipName; integer Where,Old,WNew);
+begin "telluser"
+	boolean IsDifferent;
+	IsDifferent := false;
+	if Old } WNew then
+		begin "different"
+		if not Warned then
+		    begin "warn"
+			Log(DipName&": ");
+		    LogAndType("Definitions are different"&CRLF);
+		    Warned := true;
+		    if DebugSwitch then
+			begin "debug info"
+			    LogAndType("-Where- -----Old----  -----New----"&CRLF);
+			end "debug info";
+		    end "warn";
+		if DebugSwitch then
+		   begin "show"
+			LogAndType(
+			"'"&cvoss(Where,-6)&" "&
+				cvoss(Old,12)&" "&cvoss(WNew,12));
+		   end "show";
+
+		IsDifferent := SawDifferent := true;
+		end "different";
+	return(IsDifferent);
+end "telluser";
+
+
+	if VerboseSwitch then outstr("=?");
+	Warned := false;
+	SawDifferent := false;
+	if OpenRead(OldChannel := Getchan,0,0,EOF[OldChannel],
+			SDUM := GenFileName(DipName,false), InteractAfter,binary,
+			"Old DIP definition: ",null)
+	    then
+	    begin
+		Log(DipName&": ");
+		LogAndType("Unable to do comparison"&CRLF);
+		return;
+	    end;
+	WordCount[OldChannel] := -1;
+	if OpenRead(NewChannel := GetChan,0,0,EOF[NewChannel],
+			SDUM := "DIPS.TMP", InteractNever, binary,
+			"New DIP definition: ",null)
+	    then
+	    begin
+		release(OldChannel);
+		Log(DipName&": ");
+		LogAndType("Unable to do comparison: can't find DIPS.TMP"&CRLF);
+		return;
+	    end;
+	WordCount[NewChannel] := -1;
+
+! We now have both files open---they should be bitwise identical;
+! Read the file headers;
+	Old := GetWord(OldChannel);
+	WNew := GetWord(NewChannel);
+
+	if   Old } DVer then
+	   begin
+		Log(DipName&": ");
+		LogAndType("File format error: first word of the old file is not "&cvs(DVer)&CRLF);
+		release(OldChannel);
+		release(NewChannel);
+	    	return;
+	    end;
+	if   WNew } DVer then
+	   begin
+		Log(DipName&": ");
+		LogAndType("File format error: first word of the temporary file is not "&cvs(DVer)&CRLF);
+		release(OldChannel);
+		release(NewChannel);
+	    	return;
+	    end;
+! We have read the header---read the pins;
+
+	Old := Pins := GetWord(OldChannel);
+	WNew := GetWord(NewChannel);
+	if Old } WNew then
+	    begin
+		Log(DipName&": ");
+		LogAndType("Pin count mismatch for device "&despace(DipName)&
+			": Existing defintion claims "&cvs(Old)&" pins;  new definition claims "&cvs(WNew)&CRLF);
+		release(OldChannel);
+		release(NewChannel);
+		return;
+	    end;
+! Read DipName;
+	OName := ReadASCIZ(OldChannel);
+	NName := ReadASCIZ(NewChannel);
+	if not EQU(OName,NName) then
+	    begin
+		LogAndType("Name mismatch: existing file '"&DipName&"' calls it '"&OName&"; new file calls it '"&NName&"'"&CRLF);
+		SawDifferent := true;
+	    end;
+! Read properties;
+	repeat
+	   begin "props"
+		OProp := ReadASCIZ(OldChannel);
+		NProp := ReadASCIZ(NewChannel);
+		if length(OProp)=0 and length(NProp) = 0 then done "props";
+		if not EQU(OProp, NProp) then
+		   begin "different"
+			Log(DipName&": ");
+			LogAndType("Properties differ: '"&Oprop&"','"&NProp&"'"&CRLF);
+			SawDifferent := true;
+		   end "different";
+	end "props";
+	repeat
+	   begin "vprops"
+		OProp := ReadASCIZ(OldChannel);
+		NProp := ReadASCIZ(NewChannel);
+		if length(OProp)=0 and length(NProp) = 0 then done "vprops";
+		OVal := GetWord(OldChannel);
+		NVal := GetWord(NewChannel);
+		if not EQU(OProp, NProp) then
+		   begin "different"
+			Log(DipName&": ");
+			LogAndType("Properties differ: '"&Oprop&"'="&cvs(OVal)&
+						 ",'"&NProp&"'="&cvs(NVal)&CRLF);
+			SawDifferent := true;
+		   end "different";
+	end "vprops";
+
+! Now we can read the pin definitions;
+for I := 1 thru Pins do
+	begin "pins"
+	O0 := GetWord(OldChannel);
+	N0 := GetWord(NewChannel);
+	Wh0 := WordCount[NewChannel];
+	O1 := GetWord(OldChannel);
+	N1 := GetWord(NewChannel);
+	Wh1 := WordCount[NewChannel];
+	O2 := GetWord(OldChannel);
+	N2 := GetWord(NewChannel);
+	Wh2 := WordCount[NewChannel];
+	O3 := GetWord(OldChannel);
+	N3 := GetWord(NewChannel);
+	Wh3 := WordCount[NewChannel];
+	if TellUser(DipName,Wh0,O0,N0) then 
+	    begin
+		LogAndType(" pin "&cvs(I)&" old function "&cvpinf(O0,O1,O2,O3)&", new function "&cvpinf(N0,N1,N2,N3)&CRLF);
+	    end;
+	if TellUser(DipName,Wh1,O1,N1) then
+	    begin
+		LogAndType(" pin "&cvpin(O0,O1,O2,O3)&": load "&hilo(O0,O1,O2,O3)&"; new "&hilo(N0,N1,N2,N3)&CRLF);
+	    end;
+	if TellUser(DipName,Wh2,O2,N2) then
+	   begin
+		LogAndType(" pin "&cvs(I)&"("&cvpin(O0,O1,O2,O3)&"): old use '"&cv6str(O2)&"'; new use '"&cv6str(N2)&"'"&CRLF);
+	   end;
+	if TellUser(DipName,Wh3,O3,N3) then
+	   begin
+		LogAndType(" pin "&cvs(I)&": old assignment "&cvpin(O0,O1,O2,O3)&", new assignment "&cvpin(N0,N1,N2,N3)&CRLF);
+	    end;
+    end "pins";
+
+! See if we saw any differences;
+if SawDifferent then
+	begin
+! Now here we prompt for the action to be taken:
+	O (Old) - leave existing definition alone...just release
+		  the channels
+	N (New) - use the new definition...delete OldChannel,
+			rename NewChannel to the old filename
+	M (Manual) - do it later, after checking the data.
+			System will name the file to be
+			<dipname>.NEW, unless the filename already
+			contains a dot.  In this case, it tries
+			some other name I haven't yet decided on.
+
+	The /batch switch suppresses the query and takes the
+		Manual action, so a batch job can be run.
+;
+	if not BatchSwitch then
+	   begin "prompt"
+		outstr("Disposition: use New (N), Old (O) or Decide Later (L) [L]: ");
+		Sdum := INCHWL;
+		
+	    end "prompt"
+	else
+		SDum := "L";
+	! Now here we do something;
+	if SDum = "O" then
+		begin
+		release(NewChannel);
+		release(OldChannel);
+		Log("New definition discarded, old one retained"&CRLF);
+		return;
+		end;
+	if SDum = "N" then
+		begin
+		string NName;
+		! This deletes the old file;
+		if not renameFile(OldChannel,null) then
+		   begin
+		    string NewName;
+		    string D,F,E,P;
+		    boolean OK;
+		    LogAndType("Unable to delete old definition, will try to save as new definition"&CRLF);
+		    NewName := GenFileName(DipName,false);
+		    TearFileApart(NewName,D,F,E,P);
+		    E := "NEW";
+		    NewName := PutFileTogether(D,F,E,P);
+		    OK := renameFile(NewChannel,NewName);
+		    if OK then
+		    LogAndType("New definition retained as file "&NewName&CRLF)
+		    else
+		    LogAndType("Rename of scratch file failed, new definition discarded"&CRLF);
+		    return;
+		   end
+		else
+		begin "killold"
+		NName := GenFileName(DipName,false);
+		if renameFile(NewChannel,NName) then
+		    begin "ok"
+			LogAndType("Old definition discarded, new one retained"&CRLF);
+		    end "ok"
+		else
+		   begin "bad"
+			LogAndType("Unable to rename new definition; both definitions lost"&CRLF);
+		   end "bad";
+		end "killold";
+		release(NewChannel);
+		release(OldChannel);
+		end;
+	if SDum = "L" or true then	! "or true" means if above two tests failed this one always works!;
+		begin
+		string NewName;
+		string D,F,E,P;
+		boolean OK;
+		NewName := GenFileName(DipName,false);
+		TearFileApart(NewName,D,F,E,P);
+		E := "NEW";
+		NewName := PutFileTogether(D,F,E,P);
+		OK := renameFile(NewChannel,NewName);
+		release(NewChannel);
+		release(OldChannel);
+		if OK then
+		    begin
+			if BatchSwitch then
+			  begin
+				Log("Batch action taken, ");
+			   end;
+			LogAndType("New definition retained as file "&NewName&CRLF)
+		    end
+		else
+		LogAndType("Rename of scratch file failed, new definition discarded"&CRLF);
+		return;
+		end;
+	end;
+
+
+
+! If we get here, files are identical;
+
+	release(NewChannel);
+	release(OldChannel);
+	if VerboseSwitch then outstr(" Y");
+end "DoComparison";
+
+procedure ProcessFiles;
+!-------------------------------------------------
+!
+! ABSTRACT:
+!	Main file processing.  On entry to this routine, the
+! main input and output files have been opened.  The caller is
+! responsible for closing InputChannel and OutputChannel.
+!
+! PARAMETERS:
+!
+! The global variables InputChannel and OutputChannel are implicit
+! parameters to this routine.
+!
+! RESULTS:
+!
+! SIDE EFFECTS:
+!
+! ERRORS:
+!
+! DESIGN:
+!
+!-------------------------------------------------;
+    begin
+	integer Word;
+	integer I;
+	integer W0, W1, W2, W3;
+	integer Pins;
+	integer WHere;
+	integer Text;
+	string DipName;
+	! Read in the file header...if not DVER, complain;
+
+	Word := GetWord(InputChannel);
+	if Word } DVer then
+	    begin
+		LogAndType("First word of file is not "&cvs(DVer)&"; bad format"&CRLF);
+		return;
+	    end;
+
+! Now, for each dip, read in its description;
+
+	while not EOF[InputChannel] do
+	  begin "ReadDip"
+		! Read in the # of pins;
+	       do
+		begin "scan to pins"
+		Pins := GetWord(InputChannel);
+		if Pins < 0 then
+		    begin
+			LogAndType("File format/interpretation error; file location '"&cvos(WordCount[InputChannel])&"; pin count ="&cvs(Pins)&CRLF);
+			ifc Bailing thenc BAIL; endc
+			return;
+		    end;
+		if Pins = 0 then
+		    begin
+			LogAndType("Null word found when looking for pin count, EOF assumed"&CRLF);
+			return;
+		    end;
+		Where := WordCount[InputChannel];
+		end "scan to pins"
+		   until Pins } 0 or EOF[InputChannel];
+		if EOF[InputChannel] then return;
+		! Read in the Dip name;
+		DipName := ReadASCIZ(InputChannel);
+		if DebugSwitch then OutStr(CRLF&"["&cvos(Where)&": ["&cvs(Pins)&"] ") else OutStr(" ");
+		if VerboseSwitch then outstr(Despace(DipName));
+		! Now create a file for that dip;
+		Copying := CreateDipFile(DipName);
+		PutWord(DVER);
+		PutWord(Pins);
+		OutASCIZ(DipName);
+		! Read in the properties which have no values;
+		repeat
+		   begin "props"
+			if not CopyText(InputChannel) then done "props";
+			if DebugSwitch then outstr("p");
+		   end "props";
+
+	! Now read in the properties which have values;
+		repeat
+		   begin "vprops"
+			if not CopyText(InputChannel) then done "vprops";
+			if DebugSwitch then outstr("v");
+		    end "vprops";
+	! Now read in the 4-tuples for the pin defs;
+
+		for I := 1 thru Pins do
+		   begin "pins"
+			W0 := GetWord(InputChannel);
+			PutWord(W0);		! word 0;
+			PutWord(W1 := GetWord(InputChannel));	! word 1;
+			PutWord(W2 := GetWord(InputChannel));	! word 2;
+			PutWord(W3 := GetWord(InputChannel));	! word 3;
+			if DebugSwitch then
+			    begin
+				outstr(" "&cvpin(W0,W1,W2,W3));
+			    end;
+		   end "pins";
+	    close(DipChannel);
+	    release(DipChannel);
+		if NeedComparison then DoComparison(DipName);
+	    if DebugSwitch then outstr("]");
+	  end "ReadDip";
+    end;
+
+! Exported procedure Dips;
+
+!-------------------------------------------------
+!
+! ABSTRACT:
+!	This is the main body of Dips.
+!
+! PARAMETERS:
+!
+! RESULTS:
+!
+! SIDE EFFECTS:
+!
+! ERRORS:
+!
+! DESIGN:
+!
+!-------------------------------------------------;
+
+INIT;
+ParseSwitches(GetSwitchIni("Dips"));
+repeat
+    begin "Command loop"
+    GETCOMMANDLINE;
+
+    comment	Set per-command defaults;
+
+    STOP!COMMAND := false;
+
+    comment	Parse command line;
+
+    OUTFILE := scan(CmdLine, ARROWBRK, DUM);
+    if DUM } "_"  and  DUM } "="
+	then begin CmdLine := OUTFILE; OUTFILE := null end;
+    INFILE := scan(CmdLine, SLASHBRK, DUM);
+
+    ParseSwitches(CmdLine);
+    if STOP!COMMAND or nulstr(INFILE) then continue "Command loop";
+    if OpenRead(InputChannel:=GetChan, InputCount, BRCHAR[InputChannel],
+		EOF[InputChannel], INFILE, InteractAfter, binary,
+		"Input file:","DIP")
+	then continue "Command loop";
+	WordCount[InputChannel] := -1;
+    if nulstr(OUTFILE) then OUTFILE := scan(INFILE, DOTBRK, DUM);
+
+    if OpenWrite(OutputChannel:=GetChan, EOF[OutputChannel], OUTFILE,
+	    InteractAfter, WarnSwitch, ascii, "Log file","LOG")
+	then begin release(InputChannel); continue "Command loop" end;
+    ProcessFiles;
+    release(InputChannel);  
+    release(OutputChannel);
+
+    end   "Command loop"
+end "Dips"
+    

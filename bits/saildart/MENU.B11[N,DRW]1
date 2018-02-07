@@ -1,0 +1,724 @@
+00100	MODULE MENU=
+00200	begin
+00300	    REQUIRE BSG.DCL[A630GS00];
+00400	    REQUIRE GRADEF.B11[A630GS00];
+00500	
+00600	
+00700	    LINKAGE REG0=BLISS(REGISTER=0,STACK);
+00800	
+00900	    Global MENUDSP;
+01000	    Global MenuActive;
+01100	    OWN MENUINUSE;
+01200	    Global XTAB,YTAB;
+01300	    OWN USERDSP;
+01400	    OWN CurEntry;
+01500	    OWN DSPORIGIN,INDEX,INDEXmax;
+01600	
+01700	    BIND
+01800	    MenuSize=-1,
+01900	    DSPLOC=0,
+02000	    PrintImmediately=1,
+02100	    Immediate=2,
+02200	    UPASCIZ=3,
+02300	    DownAsciz=4,
+02400	    DSPSTART=5;
+02500	
+02600	
+02700	
+02800	    BIND MENU0A=PLIT
+02900	    (0,
+03000	    0,
+03100	    PLIT (ASCII"XCLEAR?M?JX-CURSOR?M?JXCURSOR ",#215),
+03200	    0,
+03300	    0,
+03400	    MVEC(-42,-5),
+03500	    ASCIZ"CLEAR ALL");
+03600	
+03700	
+03800	    BIND MENU0B=PLIT
+03900	    (0,
+04000	    0,
+04100	    PLIT ASCIZ"",
+04200	    0,
+04300	    0,
+04400	    MVEC(-36,-5),
+04500	    ASCIZ"SCALE UP");
+04600	
+04700	
+04800	    BIND MENU0C=PLIT
+04900	    (0,
+05000	    0,
+05100	    PLIT ASCIZ"*",
+05200	    0,
+05300	    0,
+05400	    MVEC(-48,-5),
+05500	    ASCIZ"SCALE DOWN");
+05600	
+05700	
+05800	    BIND MENU0D=PLIT
+05900	    (0,
+06000	    0,
+06100	    PLIT ASCIZ"_",
+06200	    0,
+06300	    0,
+06400	    MVEC(-42,-5),
+06500	    ASCIZ"MOVE LEFT");
+06600	
+06700	
+06800	    BIND MENU0E=PLIT
+06900	    (0,
+07000	    0,
+07100	    PLIT ASCIZ"",
+07200	    0,
+07300	    0,
+07400	    MVEC(-48,-5),
+07500	    ASCIZ"MOVE RIGHT");
+07600	
+07700	
+07800	    BIND MENU0F=PLIT
+07900	    (0,
+08000	    0,
+08100	    PLIT ASCIZ"",
+08200	    0,
+08300	    0,
+08400	    MVEC(-42,-5),
+08500	    ASCIZ"MOVE DOWN");
+08600	
+08700	
+08800	    BIND MENU0G=PLIT
+08900	    (0,
+09000	    0,
+09100	    PLIT ASCIZ"^",
+09200	    0,
+09300	    0,
+09400	    MVEC(-33,-5),
+09500	    ASCIZ"MOVE UP");
+09600	
+09700	
+09800	    BIND MENU0H=PLIT
+09900	    (0,
+10000	    0,
+10100	    PLIT ASCIZ"W",
+10200	    0,
+10300	    0,
+10400	    MVEC(-52,-5),
+10500	    ASCIZ"SAVE P FILE");
+10600	
+10700	
+10800	    BIND MENU0I=PLIT
+10900	    (0,
+11000	    0,
+11100	    PLIT ASCIZ"W",
+11200	    0,
+11300	    0,
+11400	    MVEC(-56,-5),
+11500	    ASCIZ"SAVE WL FILE");
+11600	
+11700	
+11800	    BIND MENU0J=PLIT
+11900	    (0,
+12000	    0,
+12100	    PLIT ASCIZ"W",
+12200	    0,
+12300	    0,
+12400	    MVEC(-52,-5),
+12500	    ASCIZ"SAVE D FILE");
+12600	
+12700	
+12800	    BIND MENU0K=PLIT
+12900	    (0,
+13000	    0,
+13100	    PLIT ASCIZ"I",
+13200	    0,
+13300	    0,
+13400	    MVEC(-42,-5),
+13500	    ASCIZ"READ FILE");
+13600	
+13700	
+13800	    BIND MENU0L=PLIT
+13900	    (0,
+14000	    0,
+14100	    PLIT (ASCII"XHELP ",#215),
+14200	    0,
+14300	    0,
+14400	    MVEC(-42,-5),
+14500	    ASCIZ"LIST CMDs");
+14600	
+14700	
+14800	    BIND MENU0M=PLIT
+14900	    (0,
+15000	    0,
+15100	    PLIT ASCIZ"B",
+15200	    0,
+15300	    0,
+15400	    MVEC(-42,-5),
+15500	    ASCIZ"BODY MODE");
+15600	
+15700	
+15800	    BIND MENU0N=PLIT
+15900	    (0,
+16000	    0,
+16100	    PLIT ASCIZ "P",
+16200	    0,
+16300	    0,
+16400	    MVEC(-48,-5),
+16500	    ASCIZ"POINT MODE");
+16600	
+16700	
+16800	    BIND MENU0O=PLIT
+16900	    (0,
+17000	    0,
+17100	    PLIT ASCIZ "S",
+17200	    0,
+17300	    0,
+17400	    MVEC(-38,-5),
+17500	    ASCIZ"SET MODE");
+17600	
+17700	
+17800	    BIND MENU0P=PLIT
+17900	    (0,
+18000	    0,
+18100	    PLIT ASCIZ "L",
+18200	    0,
+18300	    0,
+18400	    MVEC(-42,-5),
+18500	    ASCIZ"LINE MODE");
+18600	
+18700	
+18800	    BIND MENU1A=PLIT
+18900	    (0,
+19000	    0,
+19100	    PLIT ASCIZ "L",
+19200	    0,
+19300	    0,
+19400	    MVEC(-52,-5),
+19500	    ASCIZ"LIST BODIES");
+19600	
+19700	
+19800	    BIND MENU1B=PLIT
+19900	    (0,
+20000	    0,
+20100	    0,
+20200	    0,
+20300	    PLIT ASCIZ "D",
+20400	    MVEC(-52,-5),
+20500	    ASCIZ"DELETE BODY");
+20600	
+20700	    BIND MENU1C=PLIT
+20800	    (0,
+20900	    0,
+21000	    PLIT (ASCII"XGETLIB?M?JBODLIB[X335DP00] ",#215),
+21100	    0,
+21200	    0,
+21300	    MVEC(-33,-5),
+21400	    ASCIZ"GET ICs");
+21500	
+21600	
+21700	    BIND MENU1D=PLIT
+21800	    (0,
+21900	    0,
+22000	    0,
+22100	    0,
+22200	    PLIT ASCIZ "R",
+22300	    MVEC(-58,-5),
+22400	    ASCIZ"REPLACE BODY");
+22500	
+22600	
+22700	    BIND MENU1E=PLIT
+22800	    (0,
+22900	    0,
+23000	    0,
+23100	    0,
+23200	    PLIT ASCIZ "O",
+23300	    MVEC(-52,-5),
+23400	    ASCIZ"ROTATE BODY");
+23500	
+23600	    BIND MENU1F=PLIT
+23700	    (0,
+23800	    0,
+23900	    0,
+24000	    PLIT ASCIZ " ",
+24100	    PLIT ASCIZ "N",
+24200	    MVEC(-56,-5),
+24300	    ASCIZ"MOVE LOC TXT");
+24400	
+24500	    BIND MENU1G=PLIT
+24600	    (0,
+24700	    0,
+24800	    0,
+24900	    0,
+25000	    PLIT ASCIZ "N",
+25100	    MVEC(-48,-5),
+25200	    ASCIZ"ASSIGN LOC");
+25300	
+25400	    BIND MENU1H=PLIT
+25500	    (0,
+25600	    0,
+25700	    0,
+25800	    PLIT ASCIZ " ",
+25900	    PLIT ASCIZ "M",
+26000	    MVEC(-42,-5),
+26100	    ASCIZ"MOVE BODY");
+26200	
+26300	
+26400	    BIND MENU1I=PLIT
+26500	    (0,
+26600	    0,
+26700	    0,
+26800	    0,
+26900	    PLIT ASCIZ "P",
+27000	    MVEC(-52,-5),
+27100	    ASCIZ"INSERT BODY");
+27200	
+27300	
+27400	    BIND MENU2A=PLIT
+27500	    (0,
+27600	    PLIT (ASCIZ'The pen starts and extends lines.
+27700		Type "-" to attach the line to the closest point.
+27800		Type <escape> to end the line.
+27900		Type <space> to change the sense of the angle.
+28000	'),
+28100	    0,
+28200	    0,
+28300	    PLIT ASCIZ "+",
+28400	    MVEC(-48,-5),
+28500	    ASCIZ"DRAW LINES");
+28600	
+28700	
+28800	    BIND MENU2B=PLIT
+28900	    (0,
+29000	    0,
+29100	    PLIT ASCIZ "A",
+29200	    0,
+29300	    0,
+29400	    MVEC(-56,-5),
+29500	    ASCIZ"ATCH to LINE");
+29600	
+29700	
+29800	    BIND MENU2C=PLIT
+29900	    (0,
+30000	    0,
+30100	    0,
+30200	    PLIT ASCIZ " ",
+30300	    PLIT ASCIZ "M",
+30400	    MVEC(-48,-5),
+30500	    ASCIZ"MOVE POINT");
+30600	
+30700	
+30800	    BIND MENU2D=PLIT
+30900	    (0,
+31000	    0,
+31100	    0,
+31200	    0,
+31300	    PLIT ASCIZ "T",
+31400	    MVEC(-52,-5),
+31500	    ASCIZ"INSERT TEXT");
+31600	
+31700	
+31800	    BIND MENU2E=PLIT
+31900	    (0,
+32000	    0,
+32100	    0,
+32200	    0,
+32300	    PLIT ASCIZ "N",
+32400	    MVEC(-42,-5),
+32500	    ASCIZ"CONNECTOR");
+32600	
+32700	
+32800	    BIND MENU2F=PLIT
+32900	    (0,
+33000	    0,
+33100	    0,
+33200	    0,
+33300	    PLIT ASCIZ "K",
+33400	    MVEC(-52,-5),
+33500	    ASCIZ"DELETE TEXT");
+33600	
+33700	
+33800	
+33900	    BIND MENU2G=PLIT
+34000	    (0,
+34100	    0,
+34200	    0,
+34300	    0,
+34400	    PLIT ASCIZ "D",
+34500	    MVEC(-56,-5),
+34600	    ASCIZ"DELETE POINT");
+34700	
+34800	
+34900	    BIND MENUBODY=PLIT			!BODY MODY MENU ENTRIES
+35000	    (MENU0A,
+35100	    MENU0B,
+35200	    MENU0C,
+35300	    MENU0D,
+35400	    MENU0E,
+35500	    MENU0F,
+35600	    MENU0G,
+35700	    MENU0H,
+35800	    MENU0I,
+35900	    MENU0J,
+36000	    MENU0K,
+36100	    MENU0L,
+36200	    MENU1A,
+36300	    MENU1B,
+36400	    MENU1C,
+36500	    MENU1D,
+36600	    MENU1E,
+36700	    MENU1F,
+36800	    MENU1G,
+36900	    MENU1H,
+37000	    MENU1I,
+37100	    MENU0N);
+37200	
+37300	
+37400	    BIND MENUPOINT=PLIT			!POINT MODY MENU ENTRIES
+37500	    (MENU0A,
+37600	    MENU0B,
+37700	    MENU0C,
+37800	    MENU0D,
+37900	    MENU0E,
+38000	    MENU0F,
+38100	    MENU0G,
+38200	    MENU0H,
+38300	    MENU0I,
+38400	    MENU0J,
+38500	    MENU0K,
+38600	    MENU0L,
+38700	    MENU2A,
+38800	    MENU2B,
+38900	    MENU2C,
+39000	    MENU2D,
+39100	    MENU2E,
+39200	    MENU2F,
+39300	    MENU2G,
+39400	    MENU0M);
+39500	
+39600	
+39700	    BIND		!FOR MenuData
+39800	    MXmin=0,
+39900	    MYmin=1,
+40000	    MXmax=2,
+40100	    MEXmax=-388,
+40200	    MYmax=3,
+40300	    MEYmax=400,
+40400	    ContentsAddress=4,
+40500	    MXdelta=5,
+40600	    MYdelta=6;
+40700	
+40800	
+40900	    Global BIND MenuData=UPLIT		!MENU LOWER LEFT ; UPPER RIGHT (X1,Y1;X2,Y2)
+41000	    (-512,		!X1
+41100	    -200,		!Y1
+41200	    -388,		!X2
+41300	    400,		!Y2
+41400	    MENUBODY,		!Address OF ENTRIES IN MENU
+41500	    0,			!deltaX BETWEEN MENU ENTRIES (CALCULATED IN DRAWMENU)
+41600	    0);			!deltaY BETWEEN MENU ENTRIES (CALCULATED IN DRAWMENU)
+41700	
+41800	
+41900	    BIND MENUS1=PLIT
+42000	    (ASCII "B ",
+42100	    ASCII "P ",
+42200	    0);
+42300	
+42400	
+42500	    BIND MENUS2=PLIT
+42600	    (MENUBODY,
+42700	    MENUPOINT,
+42800	    0);
+     	     	00100	    ROUTINE ERRRET=						!ERROR ROUTINE
+00200		begin
+00300		    OPCODE HALT;
+00400		    HALT()
+00500		end;
+00600	
+00700	
+     	00100	    Global Routine DELMENU=				!DELETE THE EXISTING MENU and CLEAR
+00200	    !							!EXISTING CURRENT ENTRY.
+00300		begin
+00400		    Local TMP1DSP,TMP2DSP;
+00500		    (.USERDSP)[3]_GNOP;
+00600		    TMP2DSP_.(.USERDSP)[2] and ( not (GJMS()));
+00700		    (.USERDSP)[2]_GNOP;
+00800		    TMP1DSP_.(.USERDSP)[1] and ( not (GXQT()));
+00900		    (.USERDSP)[1]_GNOP;
+01000		    If ((.MENUINUSE neq -1) and (.MenuActive neq -1))
+01100			then
+01200			    begin
+01300				Incr TMP from 1 to (.(.MenuData[ContentsAddress])[-1]) do		!FOR EACH MENU ENTRY
+01400				    begin
+01500					GIVSPC((.(.TMP2DSP)[.TMP] and ( not (GXQT())))[-1]);
+01600				    end;
+01700				GIVSPC((.TMP2DSP)[-1]);
+01800				GIVSPC((.TMP1DSP)[-1]);
+01900				CurEntry_-1;
+02000				MENUINUSE_-1
+02100			    end
+02200		end;
+02300	
+02400	
+     	00100	    Global Routine MENUTEST=			!RETURN  -1 If not OVER MENU, else WHICH MENU ENTRY
+00200		begin
+00300		    If (.XTAB leq .MenuData[MXmax])and(.YTAB leq .MenuData[MYmax])and(.XTAB geq .MenuData[MXmin])and(.YTAB geq .MenuData[MYmin])
+00400			then
+00500			    begin
+00600				If .MenuData[MXdelta] eql 0
+00700				    then ((.YTAB-.MenuData[MYmin])/.MenuData[MYdelta])
+00800				    else ((.XTAB-.MenuData[MXmin])/.MenuData[MXdelta])
+00900			    end
+01000			else
+01100			    begin
+01200				-1
+01300			    end
+01400		end;
+01500	
+01600	
+     	00100	    Global Routine PenUp=					!THIS Routine GETS CALLED WHEN
+00200	    !								!WHEN THE PEN CHANGES from THE DOWN to
+00300	    !								!UP POSITION.
+00400		begin
+00500		    If ((.CurEntry neq -1) and (.MenuData[ContentsAddress] neq -1) and (.MENUINUSE neq -1))
+00600			then
+00700			    begin
+00800				If .(.(.MenuData[ContentsAddress])[.CurEntry])[UPASCIZ] neq 0
+00900				    then
+01000					begin
+01100				STRSLP(.(.(.MenuData[ContentsAddress])[.CurEntry])[UPASCIZ])
+01200					end
+01300			    end
+01400			else
+01500			    begin
+01600				SLPONE(#12)
+01700			    end
+01800		end;
+01900	
+02000	
+     	00100	    Global Routine PenDown=					!THIS Routine GETS CALLED WHEN
+00200	    !								!WHEN THE PEN CHANGES from THE UP to
+00300	    !								!DOWN POSITION.
+00400		begin
+00500		    Local MenuEntry;
+00600		    If ((.MenuData[ContentsAddress] neq -1) and ((MenuEntry_MENUTEST()) neq -1) and (.MENUINUSE neq -1))
+00700			then
+00800			    begin
+00900				(.USERDSP)[3]_(.(.(.MenuData[ContentsAddress])[.MenuEntry])[DSPLOC]);
+01000				If (.(.(.MenuData[ContentsAddress])[.MenuEntry])[PrintImmediately] neq 0)
+01100				    then
+01200					begin
+01300					    OutPll(.(.(.MenuData[ContentsAddress])[.MenuEntry])[PrintImmediately])
+01400					end;
+01500				If (.(.(.MenuData[ContentsAddress])[.MenuEntry])[Immediate] neq 0)
+01600				    then
+01700					begin
+01800					    STRSLP(.(.(.MenuData[ContentsAddress])[.MenuEntry])[Immediate])
+01900					end;
+02000				CurEntry_.MenuEntry
+02100			    end
+02200			else
+02300			    begin
+02400				If .CurEntry neq -1
+02500				    then
+02600					begin
+02700					    If .(.(.MenuData[ContentsAddress])[.CurEntry])[DownAsciz] neq 0
+02800						then
+02900						    begin
+03000					    STRSLP(.(.(.MenuData[ContentsAddress])[.CurEntry])[DownAsciz]);
+03100						    end
+03200					end
+03300				    else
+03400					begin
+03500					    SLPONE(#12)
+03600					end
+03700			    end
+03800		end;
+03900	
+04000	
+04100	
+04200	
+     	00100	    Routine INSDSP(WordToEnter)=	!INSERT WordToEnter AT DSPORIGIN+INDEX
+00200	    !								!    PUT TERM AT end OF LIST
+00300	    !								!    and CHECK OVERFLOW OF BUFFER
+00400		begin
+00500		    If .INDEX+1 leq .INDEXmax
+00600			then
+00700			    begin
+00800				(.DSPORIGIN)[.INDEX+1]_TERM;
+00900				(.DSPORIGIN)[.INDEX]_.WordToEnter;
+01000				INDEX_.INDEX+1
+01100			    end
+01200			else 
+01300			    begin
+01400				OUTSTR("ATTEMPT to ENTER TOO MANY WORDS IN DISPLAY LIST.
+01500	")
+01600			    end
+01700		end;
+01800	
+01900	
+     	00100	    Routine DRAWMENU=			!GETS GRAPHICS SPACE and DRAWS AN EMPTY
+00200	    !						  MENU DISCRIBED BY .MenuData
+00300		begin
+00400		    Local deltaX,deltaY;
+00500		    Local TMPX,TMPY;
+00600		    INDEXmax_22+4*.(.MenuData[ContentsAddress])[MenuSize]+1;	!22+4*(# OF ENTRIES IN MENU)+1(FOR DELETION)
+00700		    DSPORIGIN_(GTGRSP(.INDEXmax));
+00800		    INDEX_1;
+00900		    deltaX_(.MenuData[MXmax]-.MenuData[MXmin]);
+01000		    deltaY_(.MenuData[MYmax]-.MenuData[MYmin]);
+01100		    INSDSP(LCMD(0));
+01200		    INSDSP(LSCA(8));
+01300		    INSDSP(ION);
+01400		    INSDSP(LILA(10));
+01500		    INSDSP(GSETXY);
+01600		    INSDSP(.MenuData[MXmin]);			!INITIAL Y
+01700		    INSDSP(.MenuData[MYmin]);			!INITIAL X
+01800		    INSDSP(LONG);
+01900		    If .deltaX gtr .deltaY
+02000			then
+02100			    begin
+02200				TMPX_(.deltaX)/.(.MenuData[ContentsAddress])[MenuSize];
+02300				TMPY_0;
+02400				MenuData[MXmax]_.MenuData[MXmin]+.TMPX
+02500			    end						!TMPX_.deltaX/(#ENTRIES IN MENU)
+02600			else
+02700			    begin
+02800				TMPY_(.deltaY)/.(.MenuData[ContentsAddress])[MenuSize];
+02900				TMPX_0;
+03000				MenuData[MYmax]_.MenuData[MYmin]+.TMPY
+03100			    end;						!TMPY_.deltaY/(#ENTRIES IN MENU)
+03200		    MenuData[MXdelta]_.TMPX;
+03300		    MenuData[MYdelta]_.TMPY;
+03400		    INSDSP(IALT);
+03500		    Incr TMP1 from 1 to (.(.MenuData[ContentsAddress])[MenuSize]-1) do	!from 1 to (#ENTRIES IN MENU) do
+03600			begin
+03700			    If .TMPX eql 0 
+03800				then	
+03900				    begin
+04000					INSDSP(.TMPY);
+04100					INSDSP(.deltaX);
+04200					INSDSP(0);
+04300					INSDSP(-.deltaX);
+04400					MenuData[MYmax]_.MenuData[MYmax]+.TMPY
+04500				    end
+04600				else	
+04700				    begin
+04800					INSDSP(.deltaY);
+04900					INSDSP(.TMPX);
+05000					INSDSP(-.deltaY);
+05100					INSDSP(0);
+05200					MenuData[MXmax]_.MenuData[MXmax]+.TMPX;
+05300				    end;
+05400			end;
+05500		    INSDSP(GSETXY);
+05600		    INSDSP(.MenuData[MXmin]);			!INITIAL Y
+05700		    INSDSP(.MenuData[MYmin]);			!INITIAL X
+05800		    INSDSP(0);					!VECTOR to X2,Y1
+05900		    INSDSP(deltaX_.MenuData[MXmax]-.MenuData[MXmin]);				!VECTOR to X2,Y1
+06000		    INSDSP(deltaY_.MenuData[MYmax]-.MenuData[MYmin]);				!VECTOR to X2,Y2
+06100		    INSDSP(0);					!VECTOR to X2,Y2
+06200		    INSDSP(0);					!VECTOR to X1,Y2
+06300		    INSDSP(-.deltaX);				!VECTOR to X1,Y2
+06400		    INSDSP(-.deltaY);				!VECTOR to X1,Y1
+06500		    INSDSP(0);					!VECTOR to X1,Y1
+06600		    RETURN (.DSPORIGIN)[1]
+06700		end;
+06800	
+06900	
+07000	
+     	00100	    Global Routine DRAWENTRY(ENTRYINFOAddress)=
+00200		begin
+00300		    INSDSP(ION);
+00400		    INSDSP(MEDIUM);
+00500		    INSDSP(LCMD(0));
+00600		    INSDSP(IOF1);
+00700		    INSDSP(.(.ENTRYINFOAddress)[DSPSTART]);
+00800		    INSDSP(LCMD(1));
+00900		    INSDSP(SHORT);
+01000		    Incr DSPCHAR from DSPSTART+1 to .(.ENTRYINFOAddress)[MenuSize]-1 do
+01100			begin
+01200			    INSDSP(.(.ENTRYINFOAddress)[.DSPCHAR])
+01300			end
+01400		end;
+01500	
+01600	
+     	00100	    Routine FILLMENU=	!FILLS THE MENU
+00200		begin
+00300		    Local MENUContentsADR,MENUGRAPHContents;
+00400		    MENUGRAPHContents_GTGRSP(.(.MenuData[ContentsAddress])[MenuSize]+2+1);	!FOR JMS'S+DELETION
+00500		    Incr TMP1 from 0 to .(.MenuData[ContentsAddress])[MenuSize]-1 do		!from 1 to # OF ENTRIES IN MENU
+00600			begin
+00700			    INDEXmax_.(.(.MenuData[ContentsAddress])[.TMP1])[MenuSize]+12-DSPSTART+1;		!+1(FOR DELETION)
+00800			    DSPORIGIN_GTGRSP(.INDEXmax);
+00900			    INDEX_1;
+01000			    INSDSP(GSETXY);
+01100			    If .MenuData[MXdelta] eql 0
+01200				then 
+01300				    begin
+01400					INSDSP((.MenuData[MXmax]-.MenuData[MXmin])/2+.MenuData[MXmin]);
+01500					INSDSP(.MenuData[MYmin]+.TMP1*.MenuData[MYdelta]+.MenuData[MYdelta]/2);
+01600				    end
+01700				else 
+01800				    begin
+01900					INSDSP(.MenuData[MXmin]+.TMP1*.MenuData[MXdelta]+.MenuData[MXdelta]/2);
+02000					INSDSP((.MenuData[MYmax]-.MenuData[MYmin])/2+.MenuData[MYmin]);
+02100				    end;
+02200			    DRAWENTRY(.(.MenuData[ContentsAddress])[.TMP1]);
+02300			    INSDSP(TERM);
+02400			    (.MENUGRAPHContents)[.TMP1+2]_GXQT((.DSPORIGIN)[1]);
+02500			    (.(.MenuData[ContentsAddress])[.TMP1])[DSPLOC]_GXQT((.DSPORIGIN)[1])
+02600			end;
+02700		    (.MENUGRAPHContents)[.(.MenuData[ContentsAddress])[MenuSize]+2]_GJMP((.MENUGRAPHContents)[1]);
+02800		    RETURN (.MENUGRAPHContents)[1]
+02900		end;
+03000	
+     	00100	    Global Routine SETUPDSP=			!SET UP USERDSP  (MAIN BLOCK OF DISPLAY Routine)
+00200	    !						SET UP MENUS
+00300		begin
+00400		    USERDSP_(GTGRSP(5));
+00500		    (.USERDSP)[1]_GNOP;				!MenuData	STRUCTURE
+00600		    (.USERDSP)[2]_GNOP;				!MenuData	Contents
+00700		    (.USERDSP)[3]_GNOP;				!BLINK PRESENT INSTRUCTION SELECTED IN MENU
+00800		    (.USERDSP)[4]_(GJMP(.USERDSP));	!RETURN from SOUBRoutine
+00900		    MENUDSP_(GJMS(.USERDSP));
+01000		    CurEntry_-1;
+01100		    MenuActive_-1;
+01200		    MENUINUSE_-1
+01300		end;
+01400	
+01500	
+     	00100	    Global Routine SETUPMENU=				
+00200		begin
+00300		    If ((.MenuData[ContentsAddress] neq -1) and (.MenuActive neq -1))
+00400			then
+00500			    begin
+00600		    MenuData[MXmax]_MEXmax;
+00700		    MenuData[MYmax]_MEYmax;
+00800		    (.USERDSP)[1]_(GXQT(DRAWMENU()));
+00900		    (.USERDSP)[2]_(GJMS(FILLMENU()));
+01000		    MENUINUSE_0
+01100			    end
+01200		end;
+01300	
+01400	
+     	00100	    Global Routine REG0 NEWMENU(MODE)=				!DISPLAY THE NEW MENU If THE
+00200	    !								!MENU IS ENABLED. else JUST
+00300	    !								!UPDATA MenuData[ContentsAddress]
+00400		begin
+00500		    DELMENU();
+00600		    MenuData[ContentsAddress]_-1;
+00700		    Incr PossibleMode from 0 to .MENUS1[MenuSize]-1 do
+00800			begin
+00900			    If .MENUS1[.PossibleMode] eql .MODE
+01000				then
+01100				    begin
+01200					MenuData[ContentsAddress]_.MENUS2[.PossibleMode]
+01300				    end
+01400			end;
+01500		    If ((.MenuData[ContentsAddress] neq -1) and (.MenuActive neq -1))
+01600			then
+01700			    begin
+01800				SETUPMENU()
+01900			    end;
+02000			RETURN .MODE
+02100		end;
+02200	end ELUDOM
+  

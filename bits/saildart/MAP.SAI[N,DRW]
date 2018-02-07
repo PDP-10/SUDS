@@ -1,0 +1,599 @@
+00100	begin "MAP"
+00200	
+00300	REQUIRE("BAYSAI.SAI[A710SA00]")SOURCE!FILE;
+00400	source!L(FALSES.SAI); ! FALSESTART;
+00500	source!L(strfil);
+00600	source!L(CSWIT.SAI);
+00700	require "{~<>" delimiters;
+00800	
+00900	define BAILING={(COMPILER!SWITCH!B}0)~;
+01000	ifc BAILING thenc
+01100			define BAIL!SIMPLE={~;
+01200	elsec
+01300			define BAIL!SIMPLE={simple~;
+01400	endc
+01500	!		Change log
+01600	!	Date		! Change
+01700	!-----------------------!----------------------------------------------
+01800	!	20-Dec-78	! Increased ARRYSIZ. Fixed some mismatched
+01900	!			! block names. [JN11]
+02000	!			! Used symbolic names for breaktables!!!!
+02100	!			! Now handle defaulting of file extensions.
+02200	!			! Added Bail!simple declarations so we can
+02300	!			! use BAIL for debugging.
+02400	!			! Save all errors in ERRLOG for printing with
+02500	!			! the final output
+02600	!			! BOGOSITY!!!!! The MAKENUM procedure converts
+02700	!			! AA=0 and the first time a package is at location
+02800	!			! AA, the ROW is 0 and the bounds check happens.
+02900	!			! I've changed it to say ROW_...+1 and will
+03000	!			! try this one out!
+03100	!			! THere are so many absurdities in this
+03200	!			! program that it is only safe to assume
+03300	!			! that it was being modified when the
+03400	!			! modifier quit.  The fact that it
+03500	!			! could not compile is suspicious.  More
+03600	!			! damn stupid errors in it than one can
+03700	!			! imagine.  No concept of robustness.
+03800	!			! WHO DID THIS???
+03900	!			! Generalized MAKENUM to be a routine
+04000	!			! CVPINXY(string PIN,ROW,COLUMN)
+04100	!	24-Jan-79	! Added recognizer for board types, added
+04200	!			! code to support UG157 boards
+04300	!			! Nrows, Ncols determined by board type
+04400	!       9-Jan-80        ! Increase ARRYSIZ to 1000
+     	00100	; ! end of change log;
+00200	  define	ARRYSIZ=1000;
+00300	! these are max values!!! ;
+00400	  define	DNCOLS=	49,	
+00500			DNROWS=	62;
+00600	integer
+00700			NROWS,
+00800			NCOLS;
+00900	define		ALPH=  {"ABCDEFGHJKLMNPRST"~;
+01000	
+01100	  define FF='14, VT='13,  LS='23;
+01200	
+01300	define	DASHES(X)={"--------------------------------------------------------------------------------"[1 For X]~,
+01400		SPACES(X)={"                                                                                "[1 For X]~;
+01500	
+01600	Integer ARRAY OUTARRY[-6:DNCOLS*2,1:DNROWS*2-1];
+01700	String ARRAY DIPSARRY[1:ARRYSIZ];
+01800	Integer ARRAY NPINS[1:ARRYSIZ],NSECTS[1:ARRYSIZ];
+01900	Boolean ARRAY FLGARRY[0:DNCOLS-1,0:DNROWS+1];
+02000	String LSDFIL,WLUFIL,MAPFIL;
+02100	Integer CHLSD,BRCHLSD,EOFLSD,LKUPFLGLSD;
+02200	Integer CHWLU,BRCHWLU,EOFWLU,LKUPFLGWLU;
+02300	Integer CHMAP,BRCHMAP,EOFMAP,ENTFLGMAP;
+02400	string DEFOUTFILE;
+02500	
+02600	integer ULineBrk,	! upper case shift + LineBrk;
+02700		LineBrk, 	! reads to FF or LF;
+02800		LSLASHBRK, 	! reads to /;
+02900		TABBRK;		! reads to TAB;
+03000	
+03100	String ERRLOG;		! error log for final output;
+03200	
+03300	forward bail!simple procedure ERRSTR(string S);
+03400	forward simple string procedure CVALPH(integer V);
+03500	forward bail!simple procedure LOGUSERERR(integer I,J; string S);
+03600	forward bail!simple procedure CVPINXY(string PIN; reference integer ROW, COLUMN);
+03700	forward bail!simple integer procedure MAKENUM(string LOC);
+03800	
+03900	! board type info;
+04000	
+04100	integer	BOARD!TYPE;
+04200	
+04300	define	NO!BOARD=0,
+04400		AUGHEX=1,
+04500		AUGDBL=2;
+04600	
+04700	preset!with
+04800		! name	internal id	Nrows	NCols;	
+04900		null,		"1",	"62",	"49",
+05000		"AUGHEX",	"1",	"62",	"49",
+05100		"8136-UG157",	"2",	"60",	"16" ;
+05200	own string array BTYPES[1:3,0:3];
+05300	
+05400	define Bname=0,
+05500		BValue=1,
+05600		BNrows=2,
+05700		BNCols=3;
+05800	
+05900	!  BTYPES[e,BString] matches => CVD(BTYPES[e,BValue]) ;
+06000	
+06100	define LBtypes={ARRINFO(BTYPES,1)~,
+06200		UBtypes={ARRINFO(BTYPES,2)~;
+06300	
+06400	
+06500	define  !!LB(ary,ix)={ARRINFO(ary,1+2*(ix-1))~,
+06600		!!UB(ary,ix)={ARRINFO(ary,2+2*(ix-1))~;
+06700	
+06800	string HEADING;
+06900	
+     	00100	simple string procedure CVSS(integer V, W);
+00200	begin
+00300		string S;
+00400		integer F1, F2;
+00500	
+00600		getformat(F1,F2);
+00700		setformat(W,0);
+00800		S_CVS(V);
+00900		setformat(F1,F2);
+01000		return(S);
+01100	end;
+     	00100	Bail!simple Integer procedure DIPLOOKUP(String NAME);
+00200	begin Integer INDX;
+00300	For INDX_1 thru ARRYSIZ do
+00400	    If EQU(DIPSARRY[INDX],NAME) then return(INDX)
+00500	      else If LENGTH(DIPSARRY[INDX]) = 0 then return(-1);
+00600	return(-1);
+00700	end "DIPLOOKUP";
+     	00100	Bail!simple Integer procedure GetEntry(String NAME);
+00200	begin "GetEntry"
+00300		Integer INDX;
+00400		For INDX_1 thru ARRYSIZ do
+00500		    If EQU(DIPSARRY[INDX],NAME) then return(INDX)
+00600		      else If LENGTH(DIPSARRY[INDX]) = 0
+00700			     then begin
+00800				DIPSARRY[INDX]_NAME;
+00900				return(INDX);
+01000				end;
+01100		USERERR(0,1,"DIPSARRY (size "&CVS(ARRYSIZ)&" full!  GetEntry("&NAME&")");
+01200	
+01300	end "GetEntry";
+     	00100	Simple procedure SCANLSD;
+00200	begin String LINE,CHIP;
+00300	Integer ENTRY,PINS,SECTIONS,I;
+00400	
+00500	
+00600	
+00700	do begin
+00800	    LINE_input(CHLSD,LineBrk);
+00900	    If EQU(LINE[1 For 15],"DIP DEFINITIONS")
+01000	      then begin
+01100	        OUTSTR("#");
+01200	        CHIP_LINE[44 TO INF];
+01300	        SZILCH_input(CHLSD,LineBrk); SZILCH_input(CHLSD,LineBrk);
+01400	        LINE_input(CHLSD,LineBrk);
+01500	        If NOT EQU(CHIP,LINE[1 For LENGTH(CHIP)])
+01600	          then USERERR(0,1,"Format problems in DIPS file!"&CRLF&LINE&CRLF&CHIP);
+01700	        ENTRY_GetEntry(CHIP);
+01800	        SZILCH_SCAN(LINE,TABBRK,ZILCH);
+01900	        PINS_NPINS[ENTRY]_INTSCAN(LINE,ZILCH);
+02000	        If NOT EQU(LINE," PINS") then USERERR(0,1,"Problem in scanning number of pins"&CRLF&LINE);
+02100	        SECTIONS_0;
+02200	        SZILCH_input(CHLSD,LineBrk);
+02300	        For I_1 thru PINS do
+02400	            begin
+02500	            SZILCH_input(CHLSD,LineBrk);
+02600	            LINE_input(CHLSD,LineBrk);
+02700	            SZILCH_SCAN(LINE,LSLASHBRK,BRCHLSD);
+02800	            If BRCHLSD = "/" then SECTIONS_SECTIONS MAX CVD(LINE[1 For 2]);
+02900	            end;
+03000	        NSECTS[ENTRY]_SECTIONS+1;
+03100	        end;
+03200	    end until EOFLSD;
+03300	
+03400	
+03500	end "SCANLSD";
+     	00100	bail!simple procedure CVPINXY(string PIN; reference integer ROW, COLUMN);
+00200	begin "cvpinxy"
+00300		case
+00400		BOARD!TYPE of
+00500		begin "boards"
+00600		[AUGHEX]	begin
+00700				ROW_MAKENUM(PIN[1 for 2])+1;
+00800				COLUMN_CVD(PIN[3 for 2]);
+00900				end;
+01000		[AUGDBL]	begin
+01100				ROW_16-MAKENUM(PIN[1 for 1]);
+01200				COLUMN_CVD(PIN[2 for 2]);
+01300				end
+01400		end "boards";
+01500	end "cvpinxy";
+01600	
+     	00100	simple string procedure CVXYPIN(integer ROW, COLUMN);
+00200	begin "cvxypin"
+00300		case BOARD!TYPE of
+00400		    begin "boards"
+00500		[AUGHEX]	begin
+00600				return(CVALPH(ROW)&CVSS(COLUMN,-2));
+00700				end;
+00800		[AUGDBL]	begin
+00900				return(CVALPH(16-ROW)&CVSS(COLUMN,2));
+01000	
+01100				end
+01200		    end "boards"
+01300	end "cvxypin";
+     	00100	Bail!simple Integer procedure FIND(String WHAT,INWHOM);
+00200	begin Integer INDEX;
+00300	For INDEX_1 thru LENGTH(INWHOM) do
+00400	    If EQU(WHAT[1 TO 1],INWHOM[INDEX For 1]) then return(INDEX-1);
+00500	return(-1);
+00600	end;
+     	00100	Bail!simple Integer procedure MAKENUM( String STR);
+00200	begin Integer TEMP;
+00300	String STRT;
+00400	! TAKES ALPHABETICAL FIELD and CONVERTS TO A NUMBER .
+00500	! String STR MUST CONTAIN ONLY LETERS IN ALPH;
+00600	
+00700	TEMP _ 0; STRT _STR;
+00800	
+00900	while LENGTH(STRT) } 0 do
+01000	    begin
+01100	    DUM_FIND(LOP(STRT),ALPH);
+01200	    If DUM = -1 then USERERR(0,1,"Characters """&STR&""" not in alphabet!");
+01300	    TEMP_TEMP*LENGTH(ALPH)+DUM;
+01400	    end;
+01500	If TEMP > 15 then TEMP_TEMP-1;
+01600	return(TEMP);
+01700	end "MAKENUM";
+     	00100	Bail!simple Boolean procedure Legal(String PinID);
+00200	begin "Legal"
+00300		case BOARD!TYPE of
+00400		begin "boards"
+00500		    [AUGHEX]	begin "hex"
+00600				return(PinID[1 TO 1] = "*"	
+00700				  or (PinID[1 For 1] = "J" and PinID[2 For 1]  "9")
+00800				  or (FIND(PinID[1 For 1],ALPH) } -1 and FIND(PinID[2 For 1],ALPH) } -1));
+01100				end "hex";
+01200		    [AUGDBL]	begin "dbl"
+01300				return( PinID[1 to 1] = "*"
+01400				   or (PinID[1 for 1] = "J" and PinID[2 for 1]  "9")
+01500				   or (FIND(PinID[1 for 1],ALPH) } -1))
+01600				end "dbl"
+01700			end "boards";
+01800	end "Legal";
+     	00100	Simple String procedure CVALPH(Integer NUM);
+00200	begin String RES;
+00300	Integer I,N;
+00400	! THIS CONVERTS FROM A NUMBER TO AN ALPHABETIC REPRESENTATION,
+00500	EG AUGHEX:   0 => AA, 1 => AB, 28 => BC
+00600	   AUGDBL:    0 => A, 1 => B, ...
+00700	;
+00800	
+00900	
+01000	If NUM > 15 then NUM_NUM+1;
+01100	RES _ ""; N _NUM;
+01200	
+01300	case BOARD!TYPE of
+01400	     begin "boards"
+01500		[AUGHEX]  begin
+01600		    For I _ 1  thru  2 do
+01700			    begin
+01800			    RES _ ALPH[(N MOD LENGTH(ALPH))+1 For 1] & RES;
+01900			    N _ N DIV LENGTH(ALPH);
+02000			    end;
+02100			   end;
+02200		[AUGDBL]  begin
+02300			  RES_ALPH[(15-(N mod length(ALPH))+1) for 1];
+02400			  end
+02500		end "boards";
+02600	
+02700	return(RES);
+02800	end "CVALPH";
+     	00100	Bail!simple procedure MARKPINS(String LOC,TYP);
+00200	begin
+00300	Integer INDX,WIDTH,PINS,ROW,COL;
+00400	! OUTSTR("MARKPINS("&LOC&","&TYP&")"&CRLF);
+00500	
+00600	INDX_DIPLOOKUP(TYP);
+00700	If INDX = -1 then 
+00800		begin
+00900		ERRSTR("Non-existant DIP type "&TYP&"!"&CRLF);
+01000		return;
+01100		end;
+01200	PINS_NPINS[INDX];
+01300	
+01400	CVPINXY(LOC,ROW,COL);
+01500	
+01600	If PINS MOD 2 then 
+01700		begin
+01800		LOGUSERERR(0,1,"Odd number of pins ("&CVS(PINS)&") "&LOC&"/"&TYP&"!");
+01900		return;
+02000		end;
+02100	If ROW < 1 or ROW  NCOLS 
+02200	    then 
+02300		begin
+02400		LOGUSERERR(0,1,"Bounds check!  ROW="&CVS(ROW)&"; "&LOC&"/"&TYP);
+02500		return;
+02600		end;
+02700	
+02800	For INDX_COL thru COL+(PINS/2-1) do
+02900	    begin
+03000	    If INDX > NROWS 
+03100	      then 
+03200		begin
+03300	        LOGUSERERR(0,1,"Bounds check!  "&CVS(INDX)&">NROWS("&CVS(NROWS)&"); "&LOC&"/"&TYP);
+03400		return;
+03500		end;
+03600	    If FLGARRY[ROW,INDX] 
+03700		then ERRSTR("ERROR! More than one DIP at pin "&CVXYPIN(ROW,COL)&CRLF);
+03800	    FLGARRY[ROW,INDX]_TRUE;
+03900	
+04000		! we know that ROW < NCOLS, so the following test is safe;
+04100	
+04200	    If FLGARRY[ROW-1,INDX] 
+04300		then ERRSTR("ERROR! More than one DIP at pin "&CVXYPIN(ROW,COL)&CRLF);
+04400	    FLGARRY[ROW-1,INDX]_TRUE;  ! Mark the middle of double-width or high-order pins of single width;
+04500	
+04600	    If PINS  24 then
+04700	        begin
+04800	        If ROW-2 < 0
+04900		    then ERRSTR("Dip off end of board!"&" "&LOC&"/"&TYP&CRLF)
+05000		    else
+05100			begin
+05200			If FLGARRY[ROW-2,INDX]
+05300			  then ERRSTR("ERROR! More than one DIP at loc "&CVXYPIN(ROW-2,COL)&CRLF)
+05400			  else FLGARRY[ROW-2,INDX]_TRUE;
+05500			end;
+05600	        end;
+05700	    end;
+05800	
+05900	If (if COL  1 then false else FLGARRY[ROW,COL-1])
+06000	  ! or (if ROW<1 or COL<1 then false else FLGARRY[ROW-1,COL-1]);
+06100	  or (if COL+PINS%2 > NCOLS then false else FLGARRY[ROW,COL+PINS DIV 2])
+06200	  or (if ROW<1 or COL+PINS%2>NCOLS then false else FLGARRY[ROW-1,COL+PINS DIV 2])
+06300	  then ERRSTR("WARNING! Possible improper spacing of chips. "&TYP&"/"&LOC&CRLF);
+06400	If PINS  24
+06500	  then If (if ROW<2 or COL<1 then false else FLGARRY[ROW-2,COL-1])
+06600	         or (if ROW<2 or COL+PINS%2>NCOLS then false else FLGARRY[ROW-2,COL+PINS DIV 2])
+06700	         then ERRSTR("WARNING! Possible improper spacing of chips. "
+06800	                    &TYP&"/"&LOC&CRLF);
+06900	end "MARKPINS";
+     	00100	Simple procedure INIT!ARRY;
+00200	begin Integer I,J;
+00300	ERRLOG_null;
+00400	For I_ 0 thru NCOLS*2 do
+00500	    For J_ 1 thru NROWS*2-1 do
+00600	        If I MOD 2 and J MOD 2
+00700	          then OUTARRY[I,J]_(if not ((J-1)  mod 10) then ":" else ".")
+00800	          else OUTARRY[I,J]_" ";
+00900	end;
+     	00100	Simple procedure DUMP!ARRY;
+00200	begin 
+00300	    Integer I,J;
+00400		OUT(CHMAP,HEADING&CRLF);
+00500	    For I_ 0 thru NCOLS*2 do
+00600		begin
+00700		OUT(CHMAP,(if I mod 2 = 1 then CVALPH(I%2)&"-->" else SPACES(length(CVALPH(I%2)))&"   "));
+00800		For J_ 1 thru NROWS*2-1 do OUT(CHMAP,OUTARRY[I,J]);
+00900		OUT(CHMAP,crlf);
+01000		end;
+01100	    if length(ERRLOG)>0 then
+01200		    begin "errors"
+01300			    OUT(CHMAP,FF&ERRLOG&CRLF&CRLF);
+01400		    end "errors";
+01500	end;
+     	00100	Bail!simple procedure PUTSTR(Integer ROW,COL; String LINE);
+00200	begin Integer I;
+00300	For I_1 thru LENGTH(LINE) do
+00400	  begin
+00500		if ROW<!!LB(OUTARRY,1) then return;
+00600		if ROW>!!UB(OUTARRY,1) then return;
+00700		if COL+I-1 > !!UB(OUTARRY,2) then return;
+00800		if COL+I-1 < !!LB(OUTARRY,2) then return;
+00900		OUTARRY[ROW,COL+I-1]_LINE[I For 1];
+01000	    end;
+01100	end;
+     	00100	bail!simple procedure LOGUSERERR(integer I,J; string S);
+00200	begin "logerr"
+00300		USERERR(I,J,S);
+00400		ERRLOG_ERRLOG&CRLF&S&CRLF;
+00500	end "logerr";
+     	00100	bail!simple procedure ERRSTR(string S);
+00200	begin "errstr"
+00300		OUTSTR(S);
+00400		ERRLOG_ERRLOG&S;
+00500	end "errstr";
+     	00100	Bail!simple String procedure CONTAINS(String LINE;Integer LENTH);
+00200	begin String TEMP;
+00300	
+00400	LENTH_LENTH-3;
+00500	If LENGTH(LINE) > LENTH 
+00600	    then 
+00700		LOGUSERERR(0,1,"String too long! Contains("&LINE&","&CVS(LENTH)&")");
+00800	
+00900	TEMP_"!"&LINE&SPACES(LENTH-LENGTH(LINE))&"!";
+01000	
+01100	return(TEMP);
+01200	end "CONTAINS";
+     	00100	Bail!simple procedure PRETTYPIC(String LOC,TYP;Integer SECTS);
+00200	begin Integer ENTRY,PINS,AVAIL,ROW,COL;
+00300	
+00400	ENTRY_DIPLOOKUP(TYP);
+00500	If ENTRY = -1 
+00600	    then 
+00700		begin
+00800		ERRSTR("Unknown DIP type in routine PRETTYPIC!"&CRLF
+00900	  &LOC&TAB&TYP&CRLF);
+01000		return;
+01100	        end;
+01200	PINS_NPINS[ENTRY];
+01203	if PINS=0 or (PINS mod 2) then
+01206	   begin "barf1"
+01209		LOGUSERERR(0,1,"Illegal number of pins ("&CVS(PINS)&") for diptype "&TYP&CRLF);
+01212	    	return;
+01215	    end "barf1";
+01300	AVAIL_NSECTS[ENTRY];
+01400	
+01500	CVPINXY(LOC,ROW,COL);
+01600	ROW_ROW*2-1;
+01700	COL_COL*2-1;
+01800	
+01900	SETFORMAT(1,0);
+02000	If PINS  24
+02100	  then begin
+02200	    PUTSTR(ROW-5,COL,DASHES(PINS-1));
+02300	    PUTSTR(ROW-4,COL,CONTAINS(TYP,PINS));
+02400	    PUTSTR(ROW-3,COL,CONTAINS(LOC,PINS));
+02500	    PUTSTR(ROW-2,COL,CONTAINS(" "&CVS(SECTS)&"/"&CVS(AVAIL)&
+02600	      (If SECTS < AVAIL then "  *" else ""),PINS));
+02700	    PUTSTR(ROW-1,COL,CONTAINS("",PINS));
+02800	    PUTSTR(ROW,COL,CONTAINS("",PINS));
+02900	    PUTSTR(ROW+1,COL,"\"&DASHES(PINS-2));
+03000	    end
+03100	  else begin
+03200	    PUTSTR(ROW-3,COL,DASHES(PINS-1));
+03300	    PUTSTR(ROW-2,COL,CONTAINS(TYP,PINS));
+03400	    PUTSTR(ROW-1,COL,CONTAINS(LOC,PINS));
+03500	    PUTSTR(ROW,COL,CONTAINS(" "&CVS(SECTS)&"/"&CVS(AVAIL)&
+03600	      (If SECTS < AVAIL then "  *" else ""),PINS));
+03700	    PUTSTR(ROW+1,COL,"\"&DASHES(PINS-2));
+03800	    end;
+03900	
+04000	end "PRETTYPIC";
+     	00100	bail!simple procedure SawType(integer I);
+00200	begin "SawType"
+00300		OUTSTR("%Board type "&Btypes[I,BName]&CRLF);
+00400	end "SawType";
+     	00100	simple procedure SetType(Integer I);
+00200	begin "settype"
+00300	
+00400		BOARD!TYPE_CVD(Btypes[I,BValue]);
+00500		NCOLS_CVD(Btypes[I,BNcols]);
+00600		NROWS_CVD(Btypes[I,BNrows]);
+00700	end "settype";
+00800	
+     	00100	bail!simple string procedure CheckType(string T);
+00200	begin "checktype"
+00300	!
+00400		See if any of the non-null values of BTYPES can be
+00500		found in the string.  If none, return, otherwise
+00600		set board type accordingly
+00700	;
+00800	
+00900		integer I;
+01000	
+01100		For I_ LBtypes thru UBtypes do
+01200		    begin "didsee"
+01300			if length(Btypes[I,BName])=0 then continue "didsee";
+01400	
+01500			if INDEX2(T,Btypes[I,BName]) then 
+01600				begin "setit"
+01700				SawType(I);
+01800				SetType(I);
+01900				done "didsee";
+02000				end "setit";
+02100			
+02200		    end "didsee";
+02300	end "checktype";
+     	00100	Simple procedure MAKMAP;
+00200	begin Integer SECTION;
+00300	String LINE,SAVLIN,NAME,CURRENT,DIPTYP;
+00400	
+00500	HEADING_input(CHWLU,LineBrk);				! heading line;
+00600	do CheckType(input(CHWLU,LineBrk)) until BRCHWLU=FormFeed;  ! SKIP PAGE 1 ;
+00700	SZILCH_input(CHWLU,LineBrk);
+00800	
+00900	do begin
+01000	    LINE_input(CHWLU,ULineBrk);
+01100	    SAVLIN_LINE;
+01200	If BRCHWLU=FormFeed then SZILCH_input(CHWLU,LineBrk)
+01300	  else
+01400	If EQU(LINE[1 For 10],"CONNECTORS")
+01500	  then begin 
+01600	       MARKPINS(CURRENT,DIPTYP);
+01700	       PRETTYPIC(CURRENT,DIPTYP,SECTION);
+01800	       Done;
+01900	       end
+02000	  else If EQU(LINE[1 For 11],"LOC"&TAB&"DIPTYPE")
+02100	      then begin
+02200	        OUTSTR("#");
+02300	        SZILCH_input(CHWLU,LineBrk);	! THROW AWAY HEADING;
+02400	        SZILCH_input(CHWLU,LineBrk);	! THROW AWAY HEADING;
+02500	        end
+02600	      else If LINE[1 For 1] } TAB and Legal(LINE)
+02700	             then begin
+02800	                NAME_SCAN(LINE,TABBRK,ZILCH);
+02900	                If EQU(NAME,CURRENT) then SECTION_SECTION+1
+03000	                  else begin
+03100	                    If LENGTH(CURRENT)
+03200	                      then begin
+03300	                        MARKPINS(CURRENT,DIPTYP);
+03400	                        PRETTYPIC(CURRENT,DIPTYP,SECTION);
+03500	                        end;
+03600	                    CURRENT_NAME;
+03700	                    SECTION_1;
+03800	                    DIPTYP_SCAN(LINE,TABBRK,ZILCH);
+03900	                    If DIPLOOKUP(DIPTYP) = -1
+04000	                      then ERRSTR("Undefined DIP: "&DIPTYP&CRLF&SAVLIN&CRLF);
+04100	                    end;
+04200	                end;
+04300	    end until EOFWLU;
+04400	end "MAKMAP";
+     	00100	Bail!simple procedure GETFILE(Integer CHAN; REFERENCE String FILNAM; string DEFAULT);
+00200	begin Integer FLAG;
+00300		integer EXT,PPN,FIL;
+00400	while TRUE do
+00500	    begin
+00600	    LOOKUP(CHAN,FILNAM,FLAG);
+00700	    If NOT FLAG then return;
+00800		FIL_cvfil(FILNAM,EXT,PPN);
+00900		if EXT}0 then
+01000		    begin "foo"
+01100		    OUTSTR("LOOKUP failure! File="&FILNAM&CRLF);
+01200		    OUTSTR("FILE: ");FILNAM_INCHWL;
+01300		   end "foo"
+01400		else
+01500		    begin "newname"
+01600			FILNAM_CV6STR(FIL)&"."&DEFAULT&(if PPN=0 
+01700							then null
+01800							else "["&CVOS(PPN lsh -18)&","&CVOS(PPN land '777777)&"]");
+01900		    end "newname";
+02000	    end;
+02100		FIL_CVFIL(FILNAM,ZILCH,ZILCH);
+02200	end "GETFILE";
+     	00100	simple procedure NameLSD;
+00200	begin "namelsd"
+00300		CALL(CVSIX("MAPLSD"),"SETNAM");
+00400	end "namelsd";
+     	00100	SETBREAK(LSLASHBRK_getbreak,"/"&FormFeed&LF,CR,"INS");
+00200	SETBREAK(LineBrk_getbreak,LF&FormFeed,CR,"INS");
+00300	SETBREAK(ULineBrk_getbreak,LF&FormFeed,CR,"INSK");
+00400	SETBREAK(TABBRK_getbreak,TAB,"","INS");
+00500	OPEN(CHLSD_GETCHAN,"DSK",0,2,0,128,BRCHLSD,EOFLSD);
+00600	OUTSTR("LSD FILE:"); LSDFIL_INCHWL;
+00700	GETFILE(CHLSD,LSDFIL,"LSD");
+00800	SCANLSD;
+00900	RELEASE(CHLSD);
+01000	NameLSD;
+01100	FALSESTART;  ! Causes state saving and program halts with Save Me message;
+01200	
+01300	! Program restarts here;
+01400	OUTSTR("WLU FILE [.WLU]:"); WLUFIL_INCHWL;
+01500	BOARD!TYPE_NO!BOARD;
+01600	begin "switches"
+01700		while (DUM_index1(WLUFIL,"/"))}0 do
+01800		    begin "sw"
+01900			BOARD!TYPE_cvd(WLUFIL[DUM+1 for 1]);
+02000			WLUFIL_WLUFIL[1 to DUM-1];
+02100		    end "sw";
+02200	end "switches";
+02300	if BOARD!TYPE=NO!BOARD then BOARD!TYPE_AUGHEX;
+02400	
+02500	OPEN(CHWLU_GETCHAN,"DSK",0,2,0,128,BRCHWLU,EOFWLU);
+02600	OPEN(CHMAP_GETCHAN,"DSK",0,0,2,128,BRCHMAP,EOFMAP);
+02700	GETFILE(CHWLU,WLUFIL,"WLU");
+02800	DEFOUTFILE_CV6STR(DUM_CVFIL(WLUFIL,ZILCH,ZILCH))&".MAP";
+02900	
+03000	ENTFLGMAP_TRUE;
+03100	while ENTFLGMAP do
+03200	    begin
+03300	    OUTSTR("OUTPUT FILE ["&DEFOUTFILE&"]:"); MAPFIL_INCHWL;
+03400		if length(MAPFIL)=0 then MAPFIL_DEFOUTFILE;
+03500	
+03600	    ENTER(CHMAP,MAPFIL,ENTFLGMAP);
+03700	    end;
+03800	
+03900	NROWS_DNROWS;  NCOLS_DNCOLS;	! maximum size;
+04000	INIT!ARRY;
+04100	MAKMAP;
+04200	DUMP!ARRY;
+04300	
+04400	
+04500	RELEASE(CHWLU);
+04600	RELEASE(CHMAP);
+04700	
+04800	end "MAP";

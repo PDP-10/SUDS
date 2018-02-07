@@ -1,0 +1,1911 @@
+00100	begin  "GRAPH"
+00200	require 3000 string!space;
+00300	require 20 pnames;
+00400	require 2000 new!items;
+00500	require "SAI:BAYSAI.SAI" source!file;
+00600	require "PROCES.DEF[A700SA00]" source!file;
+00700	source!l(STRFIL);
+00800	source!l(FILE);
+00900	source!l(FILE2);
+01000	source!L(CMUPPN);
+01100	source!l(TMPFIL);
+01200	source!l(VERSION);
+01300	source!l(LINSER);
+01400	source!l(PARSER);
+01500	source!l(SWINI);
+01600	source!l(Date);
+01700	require "{~<>" delimiters;
+01800	
+01900	let channel=integer;
+02000	let byte = integer,
+02100	    word = integer;
+02200	let breaktable=integer;
+02300	!------------------------------------------------------------------
+02400	!
+02500	!  ABSTRACT:
+02600	!	Program to create Z80 format load tape from binary CROSS output
+02700	!
+02800	! KEYWORDS:
+02900	! Microcomputer
+03000	!
+03100	!---------------------------------------------------------------------
+03200	!		Change log
+03300	!	Date		! Change
+03400	!-----------------------+----------------------------------------------
+03500	!	29-May-80	! Created
+03600	!	25-May-80	! Added multifont capability
+03700	!	12-Jul-80	! Added Spline capability
+     	00100	
+00200	end of change log;
+00300	!-----------------------------------------------------------------
+00400	!
+00500	!  DESIGN:
+00600	!
+00700	!-----------------------------------------------------------------;
+00800	
+00900	define
+01000	
+01100	
+01200		HELPMSG = {"
+01300	OUTPUT _ INPUT / SWITCHES
+01400	or
+01500	@FILENAME
+01600	
+01700	Switches are global unless starred (*):
+01800	
+01900	"~,
+02000	MaxSwitches=2,
+02100	SwitchNames = "",
+02200	DefineSwitch(Name,Help)={
+02300	    Redefine MaxSwitches = MaxSwitches+1;
+02400	    Redefine HelpMsg = cvms(HelpMsg) & "&""Help
+02500	""";
+02600	    Redefine SwitchNames = cvms(SwitchNames) & ", ""Name""";
+02700	    Redefine IdxName = "Idx"&"Name";
+02800	    EvalDefine IdxName = MaxSwitches~,
+02900		InputCount=300;
+03000	
+03100	DefineSwitch(ANADEX,	< /ANADEX:bool	Set ANADEX mode on or off.  Default is OFF.>);
+03200	DefineSwitch(BANDS,	< /BANDS:integer Set the number of bands in Anadex mode>);
+03300	DefineSwitch(CLEAR,	< /CLEAR:bool	Set CLEAR mode on or off.  Default is OFF.>);
+03400	DefineSwitch(CONCEPT,	< /CONCEPT:bool	Set CONCEPT mode on or off.  Default is ON.>);
+03500	DefineSwitch(FONTS,	< /FONTS:f,f,... List the set of fonts in the order they are to be used.  Default is 1,2,3.>);
+03600	DefineSwitch(FULLFONT,	< /FULLFONT:bool	Set FULLFONT mode on or off.  Default is OFF.>);
+03700	DefineSwitch(GRAPHICS,	< /GRAPHICS:num	Select num lines for graphics display.>);
+03800	DefineSwitch(HELP,	< /HELP		Print this message.>);
+03900	DefineSwitch(REALTIME,	< /REALTIME:bool	Set REALTIME mode on or off.  Default is OFF.>);
+04000	DefineSwitch(WARN,	< /WARN:bool	Warn about superseding files if on.>);
+04050	DefineSwitch(XON,	< /XON:bool	Use XON/XOFF protocol for printer>);
+04100	DefineSwitch(CHARPLOT,	<*/CHARPLOT:bool	Set CHARPLOT debugging  mode on or off.  Default is OFF.>);
+04200	DefineSwitch(DEBUG,	<*/DEBUG:bool	Set DEBUG mode on or off.  Default is OFF.>);
+04300	DefineSwitch(MESSAGE,	<*/MESSAGE:bool	Set MESSAGE debugging  mode on or off.  Default is OFF.>);
+04400	
+04500	redefine SwitchNames = cvms(SwitchNames)[3 to inf];
+04600	preload!with SwitchNames;
+04700	safe string array SwitchArray[3:MaxSwitches];
+04800	
+04900	external integer RPGSW;		! TRUE iff entered via CCL linkage;
+05000	breaktable
+05100	    LINEBRK,	! line break table;
+05200		QuoteBreak,	! ' break;
+05300	    DOTBRK,	! . break;
+05400	    SLASHBRK,	! break table for /;
+05500	    ARROWBRK,	! break table for =_;
+05600	    COLONBRK,	! break table for :;
+05700	    COMMABRK,	! break table for ,;
+05800	    NoParens,	! strips ();
+05900	    SEMIBRK;	! semicolon break;
+06000	channel
+06100	    InputChannel,
+06200		MessageChannel,
+06300	    OutputChannel;
+06400	
+06500	string INFILE, OUTFILE, RPGCMD, CMDLINE, BLANKS, InputLine, DefaultDevice;
+06600	string DefaultOutExt;
+06700	safe integer array ChannelStack,BreakChar,EOF[0:15];
+06800	safe string array LineStack,FileStack[0:15];
+06900	boolean 
+07000		Error,
+07100		VerboseSwitch,
+07200		CharPlotTrace,
+07300		FullFont,
+07400		MessageTrace,
+07500		ClearSwitch,
+07550		XONswitch,
+07600		RealTime,
+07700		Concept,
+07800		Anadex,
+07900		WarnSwitch;
+08000	define debug={memory['135]~;
+08100	
+08200	
+08300	! Process variables;
+08400	
+08500	itemvar ReaderHandle, 
+08600	     PointPlotterHandle, 
+08700	     CharPlotterHandle, 
+08800	     Char!mgrHandle,
+08900	     BandSchedulerHandle,
+09000	     BandPlotterHandle,
+09100	     BandWriterHandle,
+09103	     SplineHandle,
+09200	     WriterHandle;
+09300	
+09400	
+09500	item	MESSAGE!BOX,		! Mailbox for MESSAGE process;
+09600		POINTS!BOX,		! Mailbox for PointPlotter input;
+09700		CHAR!BOX,		! Mailbox for CharPlotter input;
+09800		CHAR!mgr!Box,		! Mailbox for Char!Manager input;
+09900		Band!Box,		! Mailbox for Band Writer;
+09903		Spline!Box,		! Mailbox for Spline handler;
+10000		Writer!Box;			! Mailbox for Writer input;
+10100	define sign(x)={(if (x) < 0 then -1 else 1)~;
+10200	
+10300	define Lowest=15;
+10400	
+10500	define NotEOF=0,
+10600		IsEOF=1,
+10700		VectorOp=2,
+10800		SetOrigin=3,
+10900		PlotOp=4,
+11000		FinishedBand=5,
+11050		SetSplineOp=6,
+11075		DrawSplineOp=7;
+11100	
+11200	let
+11300		MessageType=integer,
+11400		Process = procedure;
+11500	
+11600	! Concept-100 control codes;
+11700	define L32(X)={((X)+32)~;
+11800	define L64(X)={((X)+64)~;
+11900	define MC={"}"~;
+12000	
+12100	integer ItemCount;
+12200	
+12300	integer Bands;
+12400	integer BandSize;
+12500	
+12600	forward integer array itemvar procedure PlotterMessage(MessageType K; integer X1,Y1,X2,Y2);
+12700	define PI={3.1415927~;
+     	00100	
+00200	own integer
+00300		WX,		! plot window X-origin;
+00400		WY,		! plot window Y-origin;
+00500		WL,		! plot window lines;
+00600		WC,		! plot window columns;
+00700	
+00800		SX,		! scroller X-origin;
+00900		SY,		! scroller Y-origin;
+01000		SL,		! scroller lines;
+01100		SC;		! scroller columns;
+01200	
+01300	own integer LastChar;	! last character allocated in font;
+01400	own integer FontID;
+01500	own integer FontBase;	! start allocating here in fonts;
+01600	define MaxFont=3;
+01700	
+     	00100	record!class char!rep! (
+00200			integer position!;
+00300			integer FontName!;
+00400			integer BitsInUse!;
+00500			integer array BitMap!);
+00600	! values for BitMap;
+00700	
+00800	define Bit!Set=1,
+00900		Bit!Clear=0,
+01000		Bit!New=2;
+01100	
+01200	
+01300	define
+01400		position(x)={char!rep!:position![x]~,
+01500		FontName(x)={char!rep!:FontName![x]~,
+01600		BitsInUse(x)={char!rep!:BitsInUse![x]~,
+01700		BitMap(x)={char!rep!:BitMap![x]~;
+01800	
+01900	define
+02000		char!rep={record!pointer(char!rep!)~;
+     	00100	record!class band!message! (
+00200		integer BandID!;
+00300		set BandSet!);
+00400	
+00500	define
+00600		BandID(x)={band!message!:BandID![x]~,
+00700		BandSet(x)={band!message!:Bandset![x]~;
+00800	
+00900	define band!message={record!pointer(band!message!)~;
+     	00100	define
+00200		NoWindow=0,
+00300		PlotterWindow=1,
+00400		ScrollerWindow=2,
+00500		ErrorWindow=3;
+00600	
+00700	integer
+00800		LastWindow;
+00900	
+01000	integer Pending;
+01100	integer MTime;
+     	00100	integer procedure ShowType(itemvar ITM);
+00200	begin "ShowType"
+00300		return(TypeIt(ITM));
+00400	end "ShowType";
+     	00100	simple string procedure OpName(integer Op);
+00200	begin "opname"
+00300		case Op of
+00400		   begin "decode"
+00500		[NotEof] return("NotEOF");
+00600		[IsEOF]  return("EOF");
+00700		[VectorOp] return("Vector");
+00750		[SetSplineOp] return("SetSpline");
+00775		[DrawSplineOp] return("DrawSpline");
+00800		[SetOrigin] return("SetOrigin");
+00900		[FinishedBand]	return("FinishedBand");
+01000		[PlotOp]	return("Plot")
+01100		   end "decode";
+01200	end "opname";
+     	00100	simple string procedure cvss(integer V,W);
+00200	begin "cvss"
+00300		integer F1,F2;
+00400		string S;
+00500		getformat(F1,F2);
+00600		setformat(W,0);
+00700		S_cvs(V);
+00800		setformat(F1,F2);
+00900		return(S);
+01000	end "cvss";
+     	00100	simple string procedure Me;
+00200	begin "me"
+00300		return(cvis(MYPROC,zilch));
+00400	end "me";
+     	00100	procedure Created(itemvar Pr; string Who; itemvar What);
+00200	begin "created"
+00300		MTime _ MTime+1;
+00400		if Pending } -1 then out(MessageChannel,CRLF);
+00500		out(MessageChannel,cvss(MTime,5)&"> -"&cvs(ItemCount)&"- "&Who&" in "&cvis(Pr,zilch)&" created #"&cvs(cvn(What)));
+00600		Pending _ cvn(What);
+00700	end "created";
+     	00100	procedure Deleted(itemvar Pr; string Who; itemvar What);
+00200	begin "deleted"
+00300		MTime _ MTime+1;
+00400		if Pending } -1 and Pending } cvn(What) then
+00500			out(MessageChannel,CRLF);
+00600		if Pending } cvn(What) then
+00700		    begin "other"
+00800			out(MessageChannel,cvss(MTime,5)&"< -"&cvs(ItemCount)&"- ");
+00900		    end "other";
+01000		out(MessageChannel," "&Who&" in "&cvis(Pr,zilch)&" deleted #"&cvs(cvn(What))&CRLF);
+01100		Pending _ -1;
+01200	end "deleted";
+     	00100	simple procedure DefineWindow(integer X,Y,Lines,Columns);
+00200	begin "definewindow"
+00300	if (X+Columns) > 80 or (Y+lines)>25 then
+00400		begin "ouch"
+00500		outstr("X("&cvs(X)+")+Columns("&cvs(columns)&")="&cvs(X+Columns)&" or Y("&CVS(Y)&")+lines("&cvs(Y)&")="&cvs(Y+lines)&crlf);
+00600		end "ouch";
+00700	
+00800		OUTSTR(MC&"v"&L32(Y)&L32(X)&L32(Lines)&L32(Columns));
+00900	end "definewindow";
+     	00100	simple string procedure SetCursor(integer X,Y);
+00200	begin "setcursor"
+00300	    return(MC&"a"&L32(Y)&L32(X));
+00400	end "setcursor";
+     	00100	simple string procedure SetProgrammer;
+00200	begin
+00300		return(MC&"U");
+00400	end;
+     	00100	simple string procedure SetFont(integer Font);
+00200	begin "setfont"
+00300		return(MC&"j"&L32(Font));
+00400	end "setfont";
+     	00100	simple string procedure TransparentOn;
+00200		return(MC&"T");
+     	00100	simple string procedure TransparentOff;
+00200		return(MC&"t");
+     	00100	define	BP(N,X,P)={point(N,X,35-(P))~;
+00200	
+00300	define	READWORD(CH,W)={(READBYTE(CH,W&"1") lor (READBYTE(CH,W&"2") lsh 8))~;
+00400	
+00500	define	DEBUG!READBYTE=false;
+     	00100	string procedure CVR(integer I, BASE);
+00200	begin "cvh"
+00300		integer WID; string T, S;
+00400	
+00500		string FILL;
+00600	
+00700		recursive string procedure CVHINT(string S; integer I);
+00800		    begin "cvhint"
+00900			integer J;
+01000		    	if I=0 then return("0"&S);
+01100			J_I mod BASE;
+01200			if J<10 then J_"0"+J else J_"A"+J-10;
+01300			return(CVHINT(J&S,I%BASE));
+01400		    end "cvhint";
+01500	
+01600		GETFORMAT(WID,ZILCH);
+01700		S_null;
+01800		if I<0 then begin I_abs(I); S_"-" end;
+01900		T_S&CVHINT(null,I);
+02000		FILL_if WID<0 then "0" else " "; WID_abs(WID);
+02100		while length(T)>1 do if T="0" then ZILCH_lop(T) else done;
+02200		while length(T)<WID do T_FILL&T;
+02300		return(T);
+02400	end "cvh";
+02500	
+     	00100	simple string procedure CVH(integer I); return(CVR(I,16));
+00200	
+00300	
+     	00100	simple string procedure CVRS(integer VALUE, RADIX, WIDTH);
+00200	begin "cvrs"
+00300		integer F1, F2;
+00400		string S;
+00500	
+00600		GETFORMAT(F1,F2);
+00700		SETFORMAT(WIDTH,0);
+00800		S_CVR(VALUE,RADIX);
+00900		SETFORMAT(F1,F2);
+01000		return(S);
+01100	end "cvrs";
+     	00100	simple string procedure CVHEX(integer VALUE,WIDTH);
+00200		return(CVRS(VALUE,16,WIDTH));
+     	00100	! procedure GetCommandLine;
+00200	!-------------------------------------------------
+00300	!
+00400	! ABSTRACT:
+00500	!	Read the next command line, from a command file or
+00600	! from the terminal, as appropriate.  A line from the terminal
+00700	! beginning with an at-sign is interpreted as a request to take
+00800	! commands from a file, whose name is contained in the rest of
+00900	! the line.  This facility is ignored inside command files.
+01000	! A line beginning with a semicolon is ignored.
+01100	!
+01200	! PARAMETERS:
+01300	!
+01400	! RESULTS:
+01500	!
+01600	! SIDE EFFECTS:
+01700	!	The next command line, without the terminating linefeed
+01800	! or formfeed or carriage-return, is placed in global variable
+01900	! CMDLINE.
+02000	!
+02100	! ERRORS:
+02200	!
+02300	! DESIGN:
+02400	!	Global variable RPGCMD contains the entire contents of the
+02500	! command file during command file processing.  If the program is
+02600	! called in CCL mode, initialisation places the contents of the
+02700	! TMPCOR file in RPGCMD.
+02800	!
+02900	!-------------------------------------------------;
+03000	
+03100	define
+03200	
+03300	READ!CCL!LINE=
+03400	   {begin "CCL mode"
+03500	    CMDLINE _ scan(RPGCMD, LINEBRK, ZILCH);
+03600	    if VerboseSwitch then print("**", CMDLINE, crlf);
+03700	    if CMDLINE[inf FOR 1] = "!"
+03800		then
+03900		    begin "Run program"
+04000		    RUNPROG(CMDLINE[1 to inf-1], 1);
+04100		    callexit
+04200		    end   "Run program"
+04300	    end   "CCL mode"~,
+04400	
+04500	READ!TERMINAL!LINE=
+04600	   {begin "terminal input"
+04700	    if RPGSW then callexit;
+04800	    SkpInl;		! clear ^O;
+04900	    print("*"); CMDLINE _ Get!Line("*");
+05000	    CMDLINE _ scan(CMDLINE, LINEBRK, ZILCH);
+05100	    if CMDLINE = "@"
+05200	        then
+05300		    begin "read command file"
+05400		    integer EOF, CHAN, BRK;
+05500	
+05600		    ZILCH _ lop(CMDLINE);
+05700		    if WANTREAD(CHAN_-1, InputCount, BRK, EOF,
+05800			        CMDLINE, ascii, "Command file: ", "CMD")
+05900		        then
+06000			    do
+06100			        begin
+06200			        RPGCMD _ RPGCMD & input(CHAN, LINEBRK); 
+06300			        if BRK then RPGCMD _ RPGCMD & BRK
+06400			        end
+06500			    until EOF;
+06600		    CMDLINE _ null
+06700		    end   "read command file"
+06800	    end   "terminal input"~;
+06900	
+07000	
+07100	procedure GETCOMMANDLINE;
+07200	    do
+07300		if fulstr(RPGCMD)
+07400		    then READ!CCL!LINE
+07500		    else READ!TERMINAL!LINE
+07600	    until fulstr(CMDLINE) and CMDLINE neq ";";
+     	00100	simple boolean  procedure SetGraphics(integer Lines);
+00200	begin "setgraphics"
+00300		if Lines > 20 then return(false);
+00400		WX_0;
+00500		WY_0;
+00600		WC_80;
+00700		WL_Lines;
+00800	
+00900		SX_0;
+01000		SY_WY+WL;
+01100		SC_80;
+01200		SL_24-WL;
+01300		return(true);
+01400	end "setgraphics";
+     	00100	simple procedure INIT;
+00200	    begin	"INIT"
+00300	
+00400	    define DeviceCharacteristics = {('001047000000 lor (1 lsh ascii))~;
+00500	
+00600	    simple boolean procedure BACKUP;
+00700		start!code "Check for available line"
+00800		TTCALL	'10,1;		! RESCAN - check possible null argument;
+00900		 TTCALL	'14,0;		! SKPINL;
+01000		  TDZA	1,1;		! no text - return false;
+01100		   SETO	1,;		! some text - return TRUE;
+01200		end "Check for available line";
+01300	
+01400	    if (calli(cvsix("SCRAT"),4) land DeviceCharacteristics)
+01500		= DeviceCharacteristics
+01600		then DefaultDevice := "TTY"
+01700		else DefaultDevice := "TTY";
+01800	
+01900	    setbreak(LINEBRK := getbreak,LF&FORMFEED,CR,"INS");
+02000	    setbreak(NoParens := Getbreak,null,"()","ISN");
+02100	    setbreak(QuoteBreak := getbreak,"'",null,"IS");
+02200	    setbreak(SLASHBRK := getbreak,"/",null,"IR");
+02300	    setbreak(COLONBRK := getbreak,":",null,"IS");
+02400	    setbreak(ARROWBRK := getbreak," _=",null,"IS");
+02500	    setbreak(DOTBRK := getbreak,".",null,"IS");
+02600	    setbreak(SEMIBRK := getbreak,";",null,"IS");
+02700	    setbreak(COMMABRK := getbreak,",",null,"IS");
+02800	    
+02900	    Bands := 60;
+03000	    BandSize := 6;
+03100	    BLANKS := "        ";
+03200	
+03300	    VerboseSwitch := false;
+03400	    WarnSwitch := true;
+03500		FullFont := false;
+03600	    Concept := true;
+03700	    Anadex := false;
+03800		FontBase := " ";
+03900	
+04000	
+04100	    if RPGSW then RPGSW := RTMPFILE("GRA", RPGCMD);
+04200	    if  RPGSW then
+04300		begin
+04400		if BACKUP then begin
+04500		    RPGCMD := INCHWL;  SDUM := scan(RPGCMD, SEMIBRK, DUM);
+04600		    if fulstr(RPGCMD)
+04700			then RPGSW := true
+04800			else print("GRAPH version ", VerString,
+04900				   crlf&"/H for help"&crlf)
+05000		    end
+05100		end;
+05200		MKEVTT(MESSAGE!BOX);
+05300		MKEVTT(Band!Box);
+05303		MKEVTT(Spline!Box);
+05400		MKEVTT(POINTS!BOX);
+05500		MKEVTT(CHAR!BOX);
+05600		MKEVTT(CHAR!Mgr!BOX);
+05700		MKEVTT(Writer!Box);
+05800	! default plot box and scroller;
+05900	
+06000		SetGraphics(8);
+06100		ItemCount := 0;
+06200		MTime := 0;
+06300	    end "INIT";
+     	00100	! simple procedure OnOff(reference boolean FLAG;
+00200	!			  string NAME;
+00300	!			  boolean TruthSense(true));
+00400	!-------------------------------------------------
+00500	!
+00600	! ABSTRACT:
+00700	!	Set or reset a global boolean flag based on the value of the
+00800	! current command switch.
+00900	!
+01000	! PARAMETERS:
+01100	!
+01200	! Flag:		Variable representing the global flag.
+01300	!
+01400	! Name:		Full name of the flag, for error messages.
+01500	!
+01600	! TruthSense:	If TRUE, indicates that the global flag is ON if the
+01700	!		corresponding variable is TRUE.  If FALSE, indicates
+01800	!		that the global flag is ON if the corresponding variable
+01900	!		is FALSE.
+02000	!
+02100	! RESULTS:
+02200	!
+02300	! SIDE EFFECTS:
+02400	!	If the switch value is ON or TRUE, the global flag is turned
+02500	! on.  If the switch value is OFF or FALSE, the global flag is turned
+02600	! off.  If the switch value is empty, the global flag is set to
+02700	! TruthSense.
+02800	!
+02900	! ERRORS:
+03000	!	If the switch value is not in the set {TRUE, FALSE, ON, OFF~
+03100	! an error message is printed and the global flag is untouched.
+03200	!
+03300	! DESIGN:
+03400	!
+03500	!-------------------------------------------------;
+03600	
+03700	string SWITCH, SwitchValue;
+03800	boolean STOP!COMMAND;
+03900	
+04000	
+04100	bail!simple procedure OnOff(reference boolean FLAG; string NAME; boolean TruthSense(true));
+04200	    begin
+04300	    if upequ(SwitchValue, "OFF") or upequ(SwitchValue, "FALSE") then FLAG _ not TruthSense
+04400	    else if nulstr(SwitchValue) or upequ(SwitchValue, "ON") or upequ(SwitchValue, "TRUE") then FLAG _ TruthSense
+04500	    else print("Bad value """, SwitchValue, """ for ", NAME, " ignored."&crlf)
+04600	    end;
+     	00100	simple procedure SetFile(reference integer Dev,File,PPN);
+00200	begin "setfile"
+00300		string SDev;
+00400	
+00500		SDev_GetDev(SwitchValue,null);
+00600		Dev_cvsix(SDev);
+00700	
+00800		File_CVFil(SwitchValue,ZILCH,PPN);
+00900	end "setfile";
+     	00100	procedure RecordFonts(string S);
+00200	begin "record"
+00300		outstr("RecordFonts: """&S&""""&CRLF);
+00400	end "record";
+     	00100	
+00200	bail!simple procedure ParseSwitches(string SwitchLine);
+00300	!-------------------------------------------------
+00400	!
+00500	! ABSTRACT:
+00600	!	Parse and handle a line full of switches.
+00700	!
+00800	! PARAMETERS:
+00900	!
+01000	! SwitchLine:	A string of the form "/switch:value/switch:value..."
+01100	!		The ":value" is often optional.  Possible switches
+01200	!		are given on page 3.
+01300	!
+01400	! RESULTS:
+01500	!
+01600	! SIDE EFFECTS:
+01700	!	Global variables associated with the switches will be modified
+01800	! as directed by the switch string.
+01900	!
+02000	! ERRORS:
+02100	!
+02200	! DESIGN:
+02300	!
+02400	!-------------------------------------------------;
+02500	    do  begin "ParseSwitches"
+02600		Switch := NextSwitch(SwitchLine, SwitchValue);
+02700		case STABLOOK(SWITCH, SwitchArray, false, true) of
+02800		    begin "Cases"
+02900	[0]		begin "Ambiguous switch"
+03000			print("Ambiguous switch """, SWITCH, """"&crlf);
+03100			STOP!COMMAND := true
+03200			end "Ambiguous switch";
+03300	[1]		return;  ! no switches left;
+03400	[2]		begin "Bogus switch"
+03500			print("Bad switch """, SWITCH);
+03600			if fulstr(SwitchValue) then print(":", SwitchValue);
+03700			print(""""&crlf);
+03800			STOP!COMMAND := true
+03900			end "Bogus switch";
+04000	[IdxHelp]	print(HELPMSG);
+04100	[IdxBands]	Bands := cvd(SwitchValue);
+04200	[IdxAnadex]	begin
+04300			OnOff(Anadex,"ANADEX",true);
+04400			if Anadex then Concept := false;
+04500			if Anadex then SetGraphics(BandSize+1);
+04600			end;
+04650	[IdxXON]	OnOff(XONswitch,"XON",true);
+04700	[IdxConcept]	begin
+04800			OnOff(Concept,"CONCEPT",true);
+04900			if Concept then Anadex := false;
+05000			end;
+05100	[IdxFullFont]	begin
+05200			Onoff(FullFont,"FullFont",true);
+05300			FontBase := if FullFont then '16 else " ";
+05400			end;
+05500	[IdxFonts]	begin
+05600				RecordFonts(SwitchValue);
+05700			end;
+05800	[IdxGraphics]	begin
+05900			SetGraphics(cvd(SwitchValue));
+06000			end;
+06100	[IdxDebug]	OnOff(Debug, "DEBUG", true);
+06200	[IdxClear]	OnOff(ClearSwitch, "Clear", true);
+06300	[IdxCharPlot]	begin
+06400			OnOff(CharPlotTrace, "CHARPLOT", true);
+06500			outstr("[Character plotter trace ");
+06600			if CharPlotTrace
+06700			    then
+06800				outstr("on")
+06900			     else
+07000				outstr("off");
+07100			outstr("]"&CRLF);
+07200			end;
+07300	[IdxMessage]	begin
+07400			OnOff(MessageTrace, "Message", true);
+07500			outstr("[Message trace ");
+07600			if MessageTrace
+07700			    then
+07800				outstr("on")
+07900			     else
+08000				outstr("off");
+08100			outstr("]"&CRLF);
+08200			end;
+08300	[IdxRealTime]	OnOff(RealTime,"REALTIME",true);
+08400	[IdxWarn]	OnOff(WarnSwitch, "WARN", true)
+08500		    end "Cases"
+08600	
+08700		end   "ParseSwitches"
+08800	    until SwitchLine neq "/";
+     	00100	process writer;
+00200	begin "writer"
+00300		integer RX,RY;
+00400		boolean Dual;
+00500		outstr(SetProgrammer);
+00600		if (Dual := debug or not Anadex) then
+00700		   begin "dual windows"
+00800			DefineWindow(WX,WY,WL,WC);
+00900			outstr(FF);
+01000			DefineWindow(SX,SY,SL,SC);
+01100			outstr(FF);
+01200			outstr("Window at ["&cvs(SX)&","&cvs(SY)&","&cvs(SL)&","&cvs(SC)&"]"&CRLF);
+01300		    end "dual windows";
+01400		RX_0;
+01500		RY_2;
+01600		if debug then outstr("["&Me&": Running]"&CRLF);
+01700		LastWindow_NoWindow;
+01800	
+01900		while true do
+02000		    begin "writechar"
+02100			string itemvar S;
+02200			integer C;
+02300			S_INTERROGATE(Writer!Box,WAIT);
+02400			C_lop(Datum(S));
+02500			case C of
+02600			    begin "cases"
+02700		[PlotterWindow]		begin
+02800			    if Dual then
+02900				begin "have plot"
+03000				    if LastWindow } PlotterWindow 
+03100					then DefineWindow(WX,WY,WL,WC);
+03200				    outstr(Datum(S));
+03300			        end "have plot";
+03400			    end;
+03500		[ScrollerWindow]	begin
+03600			if LastWindow } ScrollerWindow and Dual 
+03700			    then 
+03800				begin
+03900				DefineWindow(SX,SY,SL,SC);
+04000				outstr(SetCursor(RX,RY));
+04100				end;
+04200			outstr(Datum(S));
+04300			RY_(RY+1) min (SL-1);
+04400			end;
+04500		[ErrorWindow] begin
+04600			end
+04700			end "cases";
+04800			LastWindow _ C;
+04900			if MessageTrace then Deleted(MYPROC,"Writer",S);
+05000			DELETE(S);
+05100			ItemCount_ItemCount-1;
+05200		    end "writechar";
+05300	end "writer";
+     	00100	procedure WritePlot(string S);
+00200	begin "writeplot"
+00300		string itemvar SI;
+00400		S_PlotterWindow&S;
+00500		SI_new(S);
+00600		ItemCount_ItemCount+1;
+00700		If MessageTrace then Created(MYPROC,"WritePlot",SI);
+00800		CAUSE(Writer!Box,SI,TELLALL+RESCHEDULE);
+00900	end "writeplot";
+     	00100	procedure WriteScroller(string S);
+00200	begin "WriteScroller"
+00300		itemvar SI;
+00400		S_ScrollerWindow&S;
+00500		SI_new(S);
+00600		ItemCount_ItemCount+1;
+00700		if MessageTrace then Created(MYPROC,"WriteScroller",SI);
+00800		CAUSE(Writer!Box,SI,TELLALL+RESCHEDULE);
+00900	end "WriteScroller";
+     	00100	! These are the parameters to the Transmit messge protocol:
+00200	
+00300		BaseAddress - the address of the first location of
+00400			      font RAM (nominally font 0)...thus
+00500				baseAddress+2K = font1
+00600				baseAddress+4K = font2
+00700				baseAddress+6K = font3
+00800				baseAddress+8 K= font4 (overstrike)
+00900	
+01000		LoadCode - the character which indicates that a
+01100				font is about to be loaded
+01200	
+01300	The font load request consists of an escape code followed by
+01400	a LoadCode, followed by one record of data in Zilog
+01500	standard load format.
+01600	;
+01700	define BaseAddress=0;
+01800	define LoadCode ={"9"~;
+01900	
+02000	define FontMsgX=18;
+02100	define FontMsgY=0;
+     	00100	simple string procedure LoadString(integer font; integer Char; integer array TheBitMap);
+00200	begin "LoadString"
+00300		! LoadString to C100 ROM simulator here;
+00400		integer Address, checksum;
+00500		string msg;
+00600		integer I,J;
+00700		integer FirstRow, LastRow;
+00800	
+00900		Address _ BaseAddress + Font * 2048 + Char * 16;
+01000		FirstRow_15;
+01100		LastRow_0;
+01200		for j _ 0 thru 15 do
+01300		    for i _ 0 thru 9 do
+01400			begin "check it"
+01500			if TheBitMap[i,j] land Bit!New 
+01600			   then
+01700				begin "new"
+01800				FirstRow _ FirstRow min j;
+01900				LastRow _ LastRow max j;
+02000				TheBitMap[i,j] _ TheBitMap[i,j] land lnot Bit!New;
+02100				end "new"
+02200			end "check it";
+02300		Address _ Address + FirstRow;
+02400		if FirstRow>LastRow then return(null);
+02500		msg _ ":"&cvhex(LastRow-FirstRow+1,-2)&cvhex(Address,-4)&"00";
+02600		checksum_(LastRow-FirstRow+1)+(Address lsh -8)+(Address land '377)+00;
+02700		for j _ FirstRow  thru LastRow do
+02800		     begin "assemble"
+02900			integer V;
+03000			V _ 0;
+03100			if j > 11
+03200			    then 
+03300				V_0
+03400			    else
+03500				for i_0 thru 7 do
+03600				begin "pack it"
+03700				    integer Bit;
+03800				    if TheBitMap[I,J] } Bit!Clear or
+03900					(i=7 and (TheBitMap[I+1,J] } Bit!Clear or
+04000						  TheBitMap[I+2,J] } Bit!Clear))	
+04100					then Bit_1 else Bit_0;
+04200				    V_V lsh 1 + Bit;
+04300				end "pack it";
+04400			V _ V xor '377;	! complement for C100;
+04500			msg _ msg&cvhex(V,-2);
+04600			checksum _ checksum + V;
+04700		    end "assemble";
+04800		msg _ msg&cvhex((-checksum) land '377,-2);
+04900	    return(MC&LoadCode&msg);
+05000	
+05100	end "LoadString";
+     	00100	procedure FlushChar(Char!rep C);
+00200	begin "flush char"
+00300		if debug then WriteScroller("["&Me&": Character '"&cvos(Position(C))&", """&Position(C)&""" flushed]"&CRLF);
+00400		begin
+00500		integer i,j;
+00600		! Here, we change all new!set bits to set!bits, and all
+00700		  New!Clear bits to !Clear;
+00800		 for i _ 0 thru 9 do
+00900		    for j _ 0 thru 11 do
+01000			begin
+01100			end;
+01200		end;
+01300		WriteScroller(LoadString(FontName(C),Position(C),BitMap(C))&CRLF);
+01400	end "flush char";
+     	00100	char!rep procedure NewChar;
+00200	begin "newchar"
+00300		char!rep C;
+00400	
+00500		integer P;
+00600	
+00700		P_(LastChar_LastChar+1);
+00800		if P>'176 then 
+00900		    begin
+01000			FontID_FontID+1;
+01100			P_LastChar_FontBase+1;
+01200			if FontID>MaxFont then return(null!record);
+01300		    end;
+01400		if debug then WriteScroller("["&Me&": Allocated character '"&cvos(P)&", """&P&""" in font "&cvs(FontID)&"]"&CRLF);
+01500	
+01600		C_new!Record(char!rep!);
+01700		position(C)_P;
+01800		FontName(C)_FontID;
+01900		BitsInUse(C)_0;
+02000		begin
+02100		external integer procedure ArMak(integer LB1,UB1,LB2,UB2,ND);
+02200		Memory[Location(BitMap(C))] _ ARMAK(0,9,0,15,2);
+02300		end;
+02400	    return(C);
+02500	end "newchar";
+     	00100	process char!manager;
+00200	begin "char!manager"
+00300		char!rep array Characters[0:WC,0:WL];
+00400		char!rep ActiveChar;
+00500		define	cx={Datum(Plot!Message)[1]~,
+00600			cbx={Datum(Plot!Message)[2]~,
+00700			cy={Datum(Plot!Message)[3]~,
+00800			cby={Datum(Plot!Message)[4]~;
+00900		if debug then WriteScroller("["&Me&": Running]"&CRLF);
+01000		begin
+01100		    integer i,j;
+01200	
+01300			for i_0 thru WC do
+01400			    for j_0 thru WL do
+01500				Characters[i,j]_null!record;
+01600		end;
+01700		ActiveChar_null!record;
+01800	
+01900		while true do
+02000		    begin "service"
+02100			integer array itemvar Plot!Message;
+02200	
+02300			Plot!Message_Interrogate(Char!mgr!Box,WAIT);
+02400			if Datum(Plot!Message)[0]=IsEOF then 
+02500			     begin "eof"
+02600				FlushChar(ActiveChar);
+02700				if MessageTrace then Deleted(MYPROC,"Char!mgr: EOF",Plot!Message);
+02800				Delete(Plot!Message);
+02900			 	ItemCount_ItemCount-1;
+03000				done "service";
+03100			    end "eof";
+03200			if debug or CharPlotTrace  then WriteScroller("["&Me&": Plot char at "&
+03300					cvs(cx)&","&
+03400					cvs(cy)&
+03500					", bits x="&
+03600					cvs(cbx)&",y="&
+03700					cvs(cby)&"]"&CRLF);
+03800			if ActiveChar } null!record 
+03900			    then
+04000				begin "still same?"
+04100				if Characters[cx,cy] } null!record 
+04200						then
+04300				begin
+04400			  	if
+04500				   Position(ActiveChar) } Position(Characters[cx,cy])
+04600				    then
+04700					begin
+04800					FlushChar(ActiveChar);
+04900					ActiveChar_null!record;
+05000					end;
+05100				end
+05200			    else
+05300				begin
+05400					FlushChar(ActiveChar);
+05500					ActiveChar_null!record;
+05600				end;
+05700				end "still same?";
+05800			if ActiveChar = null!record 
+05900			  then
+06000				ActiveChar_Characters[Datum(plot!message)[1],Datum(plot!message)[3]];
+06100			! either we have one or we don't;
+06200			if ActiveChar = null!record then
+06300			    begin
+06400			    ActiveChar _ NewChar;
+06500			    if ClearSwitch then 
+06600				begin
+06700				    integer j;
+06800				    for j_0 thru 15 do
+06900					BitMap(ActiveChar)[0,j] _ Bit!New;
+07000				    FlushChar(ActiveChar);
+07100				end;
+07200			    Characters[cx,cy]_ActiveChar;
+07300			    WritePlot(SetCursor(cx,cy)&SetFont(fontname(ActiveChar))&
+07400					(if Position(ActiveChar)<'40 then TransparentOn else null)&
+07500					Position(ActiveChar)&
+07600					(if Position(ActiveChar)<'40 then TransparentOff else null)&
+07700					SetFont(0));
+07800			    end;
+07900			if ActiveChar = null!record then
+08000			    begin
+08100				WriteScroller("%No more characters to allocate"&CRLF);
+08200			    end
+08300			else
+08400			    begin "fill it"
+08500				if BitMap(ActiveChar)[cbx,cby]}bit!set 
+08600				    then
+08700					begin
+08800					BitMap(ActiveChar)[cbx,cby]_bit!new lor Bit!set;
+08900					BitsInUse(ActiveChar)_BitsInUse(ActiveChar)+1;
+09000					end;
+09100			    end "fill it";
+09200			if RealTime then FlushChar(ActiveChar);
+09300			if MessageTrace then Deleted(MYPROC,"Char!mgr",Plot!Message);
+09400			Delete(Plot!Message);
+09500			ItemCount_ItemCount-1;
+09600		    end "service";
+09700		if debug then WriteScroller("["&Me&": done]"&CRLF);
+09800	end "char!manager";
+     	00100	integer array itemvar  procedure SetPoint(MessageType K; integer cx, cxb, cy, cyb);
+00200	begin "setpoint"
+00300		own integer array Message[0:4];
+00400		integer array itemvar M;
+00500	
+00600		Message[0] _ K;
+00700		Message[1]_cx;
+00800		Message[2]_cxb;
+00900		Message[3]_cy;
+01000		Message[4]_cyb;
+01100	
+01200		ItemCount_ItemCount+1;
+01300		M _  New(Message);
+01400		if MessageTrace then Created(MYPROC,"SetPoint",M);
+01500		return(M);
+01600	end "setpoint";
+     	00100	process CharPlotter;
+00200	begin "charplotter"
+00300		integer cx, cy, cxb, cyb;
+00400		integer Array Itemvar CharMessage;
+00500		if debug or CharPlotTrace  then WriteScroller("["&Me&": Running]"&CRLF);
+00600		while true do
+00700		    begin "readpoints"
+00800			CharMessage _ Interrogate(Char!Box,WAIT);
+00900			if debug or CharPlotTrace  then WriteScroller("["&Me&": received ["&
+01000						(if Datum(CharMessage)[0] = IsEof then "EOF" else
+01100						(cvs(Datum(CharMessage)[1])&","&
+01200						cvs(Datum(CharMessage)[2])&"]"))&
+01300						"]"&CRLF);
+01400			Case Datum(CharMessage)[0] of 
+01500			     begin "decode"
+01600			[ IsEOF]  
+01700			    begin
+01800				if MessageTrace then Deleted(MYPROC,"CharPlotter: EOF",CharMessage);
+01900				Delete(CharMessage);
+02000				ItemCount_ItemCount-1;
+02100				done "readpoints";
+02200			    end;
+02300			[PlotOp]	begin "PlotOp"
+02400				cx _ Datum(CharMessage)[1] % 10;
+02500				cxb _ Datum(CharMessage)[1] mod 10;
+02600				cy _ Datum(CharMessage)[2] % 12;
+02700				cyb _ Datum(CharMessage)[2] mod 12;
+02800				if 0cx80 and 0cyWL then
+02900				    CAUSE(Char!mgr!Box,SetPoint(NotEof,cx,cxb,cy,cyb),TELLALL+RESCHEDULE)
+03000					end "PlotOp"
+03100				end "decode";
+03200			if MessageTrace then Deleted(MYPROC,"CharPlotter",CharMessage);
+03300			Delete(CharMessage);
+03400			ItemCount_ItemCount-1;
+03500		    end "readpoints";
+03600		CAUSE(char!mgr!Box,SetPoint(IsEof,0,0,0,0),TELLALL+RESCHEDULE);
+03700		if debug or CharPlotTrace then WriteScroller("["&Me&": done]"&CRLF);
+03800	end "charplotter";
+     	00100	integer array itemvar procedure CharMessage(MessageType K; integer X,Y);
+00200	begin "charmsg"
+00300		own integer array Message[0:2];
+00400		integer array itemvar M;
+00500	
+00600		Message[0] _ k;
+00700		Message[1]_X;
+00800		Message[2]_Y;
+00900	
+01000		ItemCount_ItemCount+1;
+01100		M _  New(Message);
+01200		if MessageTrace then Created(MYPROC,"CharMsg",M);
+01300		return(M);
+01400	end "charmsg";
+     	00100	procedure Plot(integer X,Y);
+00200	begin "plot"
+00300		if debug then WriteScroller("["&Me&": Plot "&cvs(X)&","&cvs(Y)&"]"&CRLF);
+00400		CAUSE(Char!Box,CharMessage(PlotOp,X,Y),TELLALL+RESCHEDULE);
+00500	end "plot";
+     	00100	!	procedure DDA(integer X1,Y1,X2,Y2);
+00200	!	begin "DDA"
+00300	!		integer DX, DY;
+00400	!		integer x, y;
+00500	!		integer i;
+00600	!		integer e;
+00700	!	
+00800	!		DX _ X1 - X2;
+00900	!		DY _ Y1 - Y2;
+01000	!		X _ X1;
+01100	!		Y _ Y1;
+01200	!	
+01300	!		e _ 2 * DY - DX;
+01400	!	
+01500	!		for i _ sign(DX) step sign(DX) until  DX do
+01600	!		    begin
+01700	!			Plot(x,y);
+01800	!			if e > 0 then 
+01900	!			    begin
+02000	!				y _ y + sign(DY);
+02100	!				e _ e +(2 * DY - 2 * DX);
+02200	!			    end
+02300	!			else
+02400	!			    e _ e + 2 * DY;
+02500	!			x _ x + sign(DX);
+02600	!		    end;
+02700	!	end "DDA";
+     	00100	procedure DDA(integer X1,Y1,X2,Y2);
+00200	begin "DDA"
+00300		integer L, i;
+00400		real x, y, dx, dy;
+00500	
+00600		L _ abs(X2-X1);
+00700		if abs(Y2-Y1) > L then L _ abs(Y2-Y1);
+00800		dx _ (X2-X1)/L;
+00900		dy _ (Y2-Y1)/L;
+01000		x _ X1 + 0.5;
+01100		y _ Y1 + 0.5;
+01200		for i _ 1 thru L do
+01300		    begin
+01400			Plot(x,y);
+01500			x _ x + dx;
+01600			y _ y + dy;
+01700		    end;
+01800	end "DDA";
+     	00100	process PointPlotter;
+00200	begin "pointplotter"
+00300		integer Array Itemvar PointMessage;
+00400		integer OffsetX, OffsetY;
+00500	
+00600		OffsetX_OffsetY_0;
+00700		if debug then WriteScroller("["&Me&": Running"&CRLF);
+00800		while true do
+00900		    begin "plotting"
+01000			PointMessage _ Interrogate(Points!Box,WAIT);
+01100			if debug then WriteScroller("["&Me&": received ["&
+01200						(if Datum(PointMessage)[0]=IsEof then "EOF" else
+01300						(OpName(Datum(PointMessage)[0])&": "&cvs(Datum(PointMessage)[1])&","&
+01400						cvs(Datum(PointMessage)[2])&","&
+01500						cvs(Datum(PointMessage)[3])&","&
+01600						cvs(Datum(PointMessage)[4])&"]"))&
+01700						"]"&CRLF);
+01800			case Datum(PointMessage)[0] of
+01900			begin "decode"
+02000			[IsEof] begin "eof"
+02100				if MessageTrace then Deleted(MYPROC,"PointPlotter: EOF",PointMessage);
+02200				Delete(PointMessage);
+02300				ItemCount_ItemCount-1;
+02400				done "plotting";
+02500				end "eof";
+02600			[SetOrigin] begin "setorigin"
+02700					OffsetX_Datum(PointMessage)[1];
+02800					OffsetY_Datum(PointMessage)[2];
+02900				    end "setorigin";
+03000			[VectorOp]  begin "vector"
+03100			DDA(Datum(PointMessage)[1]+OffsetX,
+03200			    Datum(PointMessage)[2]+OffsetY,
+03300			    Datum(PointMessage)[3]+OffsetX,
+03400			    Datum(PointMessage)[4]+OffsetY);
+03500				end "vector"
+03600			end "decode";
+03700			if MessageTrace then Deleted(MYPROC,"PointPlotter",PointMessage);
+03800			Delete(PointMessage);
+03900			ItemCount_ItemCount-1;
+04000		    end "plotting";
+04100		CAUSE(Char!Box,CharMessage(IsEOF,0,0),TELLALL+RESCHEDULE);
+04200		if debug then WriteScroller("["&Me&": done]"&CRLF);
+04300	end "pointplotter";
+     	00100	band!message itemvar procedure BandMessage(integer Band; set MyBandSet);
+00200	begin "BandMessage"
+00300		own band!message BM;
+00400		band!message itemvar BMM;
+00500	
+00600		BM := new!record(band!message!);
+00700		BandSet(BM) := MyBandSet;
+00800		BandID(BM) := Band;
+00900		BMM := new(BM);
+01000		ItemCount := ItemCount+1;
+01100		if MessageTrace then Created(MYPROC,"BandMessage",BMM);
+01200		return(BMM);
+01300	end "BandMessage";
+     	00100	procedure RecordIndent(integer Val, BandV);
+00200	begin "recordindent"
+00300		WritePlot(SetCursor(0,BandSize)&";"&cvss(Val,-3)&", band "&cvs(BandV));
+00400	end "recordindent";
+     	00100	procedure RecordColumn(integer X,  Bits);
+00200	begin "recordcolumn"
+00300		integer I;
+00400		if X>WC then return;
+00500		for I := 0 thru BandSize do
+00600		    begin "convert"
+00700			if (Bits lsh -I) land 1 then
+00800			    begin "havebit"
+00900				WritePlot(SetCursor(X,BandSize-I-1)&"*");
+01000			    end "havebit";
+01100		    end "convert";
+01200	end "recordcolumn";
+     	00100	procedure ClearColumns;
+00200	begin "clearcolumns"
+00300		WritePlot(FF);
+00400	end "clearcolumns";
+     	00100	string procedure CvAnadex(integer array X; integer BandV);
+00200	begin "cvanadex"
+00300	! Convert the raster represented in X to Anadex output format;
+00400	    string S;
+00500	    integer I, FirstVal, LastVal;
+00600		S := 24;	! Cancel any open print record, for safety;
+00650		if XONswitch then S := S&'21;	 ! XON protocol;
+00700		S := S & 28;	! Enter graphics mode (no indent);
+00800		FirstVal := ARRINFO(X,2);
+00900		LastVal := ARRINFO(X,1);
+01000		for I := ARRINFO(X,1)  thru ARRINFO(X,2) do
+01100		    begin "scanit"
+01200			if X[I] } 0 then LastVal := LastVal max I;
+01300		    end "scanit";
+01400		for I := ARRINFO(X,2) downto ARRINFO(X,1) do
+01500		    begin "scanit"
+01600			if X[I] } 0 then FirstVal := FirstVal min I;
+01700		    end "scanit";
+01800		if FirstVal } 0 then S := S & ";" & cvss(FirstVal,-3);
+01900		if debug then RecordIndent(FirstVal,BandV);
+02000		for I := FirstVal thru LastVal do
+02100		    begin "convert"
+02200			S := S & (X[I] lor '100);
+02300			if debug then RecordColumn(I-FirstVal,X[I]);
+02400		    end "convert";
+02500		S := S & "6";
+02550		if XONswitch then S := S&'23;	! XOFF;
+02600	    return(S);
+02700	end "cvanadex";
+     	00100	process BandPlotter;
+00200	begin "bandplotter"
+00300		define MaxX = 72*8;
+00400		integer array Band[0:MaxX];
+00500		procedure ClearBand;
+00600		    begin "clearband"
+00700			integer I;
+00800			for I := 0 thru MaxX do Band[I] := 0;
+01000		    end "clearband";
+01100		if debug then WriteScroller("["&Me&": Running"&CRLF);
+01200		ClearBand;
+01300		while true do
+01400		    begin "mapbits"
+01500			integer array itemvar PlotMessage;
+01600	
+01700			PlotMessage := Interrogate(Char!Box,WAIT);
+01800	
+01900			case Datum(PlotMessage)[0] of
+02000			   begin "cases"
+02100			[IsEOF]
+02200			    begin
+02300				if MessageTrace then Deleted(MYPROC,"BandPlotter: EOF",PlotMessage);
+02400				Delete(PlotMessage);
+02500				ItemCount := ItemCount-1;
+02600				done "mapbits";
+02700			    end;
+02800			[PlotOp] begin
+02900				 integer Bit;
+03000				 Bit := '40 lsh - (Datum(PlotMessage)[2] mod BandSize);
+03100				 if 0  Datum(PlotMessage)[1]  MaxX then 
+03200					begin "valid bit"
+03300					Band[Datum(PlotMessage)[1]] := Band[Datum(PlotMessage)[1]] lor Bit;
+03400					if debug or CharPlotTrace then
+03500					     WriteScroller("["&Me&": bit map position "&cvs(Datum(PlotMessage)[1])&" is '"&cvos(Band[Datum(PlotMessage)[1]])&"]"&CRLF);
+03600					end "valid bit";
+03700				end;
+03800			[FinishedBand] begin
+03900					string S;
+03950					if debug then ClearColumns;
+04000					S := CvAnadex(Band,Datum(PlotMessage)[1]);
+04100					if CharPlotTrace or Debug then
+04200					    WriteScroller("["&Me&" anadex data: '"&S&"']"&CRLF)
+04300					else
+04400					    WriteScroller(S);
+04500					ClearBand;
+04600					end
+04700			    end "cases";
+04800			if MessageTrace then Deleted(MyProc,"BandPlotter",PlotMessage);
+04900			Delete(PlotMessage);
+05000			ItemCount := ItemCount - 1;
+05100			end "mapbits";
+05200		if debug then WriteScroller("["&Me&": done]"&CRLF);
+05300	end "bandplotter";
+     	00100	process BandWriter;
+00200	begin "bandwriter"
+00300	    own band!message itemvar M;
+00400		define  X1value={Datum(P)[1]~,
+00500			BandIndex={Datum(P)[1]~,
+00600			Y1value={Datum(P)[2]~,
+00700			X2value={Datum(P)[3]~,
+00800			Y2value={Datum(P)[4]~;
+00900	
+01000		if debug then WriteScroller("["&Me&": Running"&CRLF);
+01100		while true do
+01200		    begin "plotting"
+01300			M := Interrogate(Band!Box,WAIT);
+01400			! Now, we take each element in the set, which is
+01500			   an integer array itemvar, and draw it.  When each
+01600			   is completed, it is removed from the set.  When
+01700			   the set is empty, we generate a new request to
+01800			   the BandScheduler.  If a completion is terminal,
+01900			   we delete the element, otherwise, it becomes part
+02000			   of the next request;
+02100			while BandSet(Datum(M)) } PHI do
+02200			    begin "lopset"
+02300				integer array itemvar P;
+02400				P := lop(BandSet(Datum(M)));
+02500				if debug then 
+02600					WriteScroller("["&Me&": received ["&
+02700						(if Datum(P)[0]=IsEof then "EOF" else
+02800						(OpName(Datum(P)[0])&": "&cvs(X1value)&","&
+02900						cvs(Y1value)&","&
+03000						cvs(X2value)&","&
+03100						cvs(Y2value)&"]"))&
+03200						"]"&CRLF);
+03300				begin "pdda"
+03400				integer L, i, YMax;
+03500				real x, y, dx, dy;
+03600	
+03700				YMax := BandID(Datum(M)) * BandSize + (BandSize);
+03800	
+03900				L := abs(X2value-X1value);
+04000				if abs(Y2value-Y1value) > L then L := abs(Y2value-Y1value);
+04100				dx := (X2value-X1value) / L;
+04200				dy := (Y2value-Y1value) / L;
+04300				x := X1value + 0.5;
+04400				y := Y1value + 0.5;
+04500				for i := 1 thru L do
+04600				    begin "DDArun"
+04700					Plot(x,y);
+04800					x := x + dx;
+04900					y := y + dy;
+05000					if y  > YMAX then
+05100					    begin "overflow band"
+05200						X1value := x;
+05300						Y1value := y;
+05400						Cause(Points!Box,P,TellAll+Reschedule);
+05500						continue "lopset";
+05600					    end "overflow band";
+05700				    end "DDArun";
+05800				end "pdda";
+05900			    end "lopset";
+06000			Cause(Char!Box,CharMessage(FinishedBand,BandID(Datum(M)),0),TellAll+Reschedule);
+06100			Cause(Points!Box,PlotterMessage(FinishedBand,BandID(Datum(M)),0,0,0),TellAll+Reschedule);
+06200			if MessageTrace then Deleted(MYPROC,"BandScheduler",M);
+06300			Delete(M);
+06400			ItemCount := ItemCount-1;
+06500		    end "plotting";
+06600		if debug then WriteScroller("["&Me&": done]"&CRLF);
+06700	end "bandwriter";
+     	00100	process SplineDrawer;
+00200	begin "splinedrawer"
+00300		integer array itemvar SplineMessage;
+00400		define X1Value={datum(SplineMessage)[1]~,
+00500			Y1Value={datum(SplineMessage)[2]~,
+00600			SplineIndex={datum(SplineMessage)[3]~;
+00700	
+00800		define SplineSize=20;
+00900		real array Spline!X[0:SplineSize+1];
+01000		real array Spline!Y[0:SplineSize+1];
+01100	
+01200	boolean X!AXIS!ROTATE;
+01300	real X!AXIS!ANGLE;
+     	00100	procedure DrawSpline(integer FromKnot, ToKnot);
+00200	begin "DRAW!Spline"
+00300	! Mario's Spline drawer, from KNEJI/IGRAPH;
+00400	real OldX,OldY,NewX,NewY;
+00500	safe real array Spline!B[0:SplineSize+1];
+00600	safe real array Spline!C[0:SplineSize+1];
+00700	safe real array Spline!D[0:SplineSize+1];
+00800	safe real array Spline!SPP[0:SplineSize+1];
+00900	integer I,KBase;
+01000	real StepSize;
+01100	integer SAVEX,SAVEY;
+01200	boolean SAVEMODE;
+01300	real CosPhi,SinPhi;
+01400	define Xprime(X,Y)="(X)*CosPhi-(Y)*SinPhi";
+01500	define Yprime(X,Y)="(X)*SinPhi+(Y)*CosPhi";
+01600	
+01700	
+01800	
+01900	define X(I)="Spline!X[I]";
+02000	define Y(I)="Spline!Y[I]";
+02100	define B(I)="Spline!B[I]";
+02200	define C(I)="Spline!C[I]";
+02300	define D(I)="Spline!D[I]";
+02400	define SPP(I)="Spline!SPP[I]";
+02500	define DeltaX(I) = "(X(I+1)-X(I))";
+02600	define DeltaY(I) = "(Y(I+1)-Y(I))";
+02700	
+02800	if FromKnot < 1 or FromKnot > SplineSize or ToKnot < 1 or ToKnot > SplineSize
+02900		or ToKnot  FromKnot
+03000	then return;		! Out of bounds or single point Spline;
+03100	
+03200	if ToKnot = FromKnot+1		! TWO POINT Spline;
+03300		then	
+03400		    begin "two point spline"
+03500			cause(Points!Box,
+03600			      PlotterMessage(VectorOp,X(ToKnot),Y(ToKnot),X(FromKnot),Y(FromKnot)),
+03700			      TellAll+Reschedule);
+03800			return;
+03900		    end "two point spline";
+04000	
+04100	! three or more point splines are going to be padded by adding two extra points
+04200	  to the curve. These points are going to be the New end points;
+04300	
+04400	if X(FromKnot+1)  X(FromKnot)
+04500	    then X(FromKnot-1) := X(FromKnot)-1.0
+04600	    else X(FromKnot-1) := X(FromKnot)+1.0;
+04700	
+04800	if Y(FromKnot+1)  Y(FromKnot)
+04900	    then Y(FromKnot-1) := Y(FromKnot)-1.0*abs((Y(FromKnot+1)-Y(FromKnot))/(X(FromKnot+1)-X(FromKnot)))
+05000	    else Y(FromKnot-1) := Y(FromKnot)+1.0*ABS((Y(FromKnot+1)-Y(FromKnot))/(X(FromKnot+1)-X(FromKnot)));
+05100	
+05200	if X(ToKnot)  X(ToKnot-1)
+05300	    then X(ToKnot+1) := X(ToKnot)+1.0
+05400	    else X(ToKnot+1) := X(ToKnot)-1.0;
+05500	
+05600	if Y(ToKnot)  Y(ToKnot-1)
+05700	    then Y(ToKnot+1) := Y(ToKnot)+1.0*ABS((Y(ToKnot)-Y(ToKnot-1))/(X(ToKnot)-X(ToKnot-1)))
+05800	    else Y(ToKnot+1) := Y(ToKnot)-1.0*ABS((Y(ToKnot)-Y(ToKnot-1))/(X(ToKnot)-X(ToKnot-1)));
+05900	
+06000	FromKnot := FromKnot-1; 
+06100	ToKnot := ToKnot+1;
+06200	
+06300	
+06400	for I := FromKnot+1 thru ToKnot-1 
+06500		do
+06600		 B(I) := (DeltaY(I)/DeltaX(I)-DeltaY(I-1)/DeltaX(I-1));
+06700	
+06800	! forward elimination;
+06900	
+07000	C(FromKnot+1) := 2.0*(DeltaX(FromKnot)+DeltaX(FromKnot+1));
+07100	for I := FromKnot+2 thru ToKnot-1 do
+07200		begin
+07300		C(I) := 2.0*(X(I+1)-X(I-1)) - DeltaX(I-1)^2/C(I-1);
+07400		B(I) := B(I) - DeltaX(I-1)*B(I-1)/C(I-1);
+07500		end;
+07600	
+07700	! back substitution;
+07800	
+07900	SPP(FromKnot) := SPP(ToKnot) := 0.0;
+08000	SPP(ToKnot-1) := B(ToKnot-1)/C(ToKnot-1);
+08100	for I := ToKnot-2 step -1 until FromKnot+2 
+08200		do
+08300		 SPP(I) := (B(I)-DeltaX(I)*SPP(I+1))/C(I);
+08400	
+08500	for I := FromKnot thru ToKnot-1 do
+08600		begin
+08700		B(I) := DeltaY(I)/DeltaX(I)-(SPP(I+1)+2.0*SPP(I))*DeltaX(I);
+08800		C(I) := 3.0*SPP(I);
+08900		D(I) := (SPP(I+1)-SPP(I))/DeltaX(I);
+09000		end;
+09100	
+09200	if  X!AXIS!ROTATE 
+09300	then	begin 
+09400		CosPhi := cos( (X!AXIS!ANGLE*PI)/180.0);
+09500		SinPhi := sin( (X!AXIS!ANGLE*PI)/180.0) 
+09600		end
+09700	else	begin 
+09800			CosPhi := 1; 
+09900			SinPhi := 0 
+10000		end;
+10100	
+10200	
+10300	SaveMode := X!AXIS!ROTATE;
+10400	X!AXIS!ROTATE := false;
+10500	
+10600	for KBase := FromKnot thru ToKnot-1 do
+10700		begin
+10800		OldX := Xprime(X(KBase),Y(KBase));
+10850		OldY := Yprime(X(KBase),Y(KBase));
+10900		if X(KBase+1)  X(KBase)
+11000		    then StepSize := (X(KBase+1)-X(KBase))/10.0 max 10.0
+11100		    else StepSize := (X(KBase)-X(KBase-1))/10.0 min -10.0;
+11200		for NewX := X(KBase) step StepSize until X(KBase+1), X(KBase+1) DO
+11300			begin
+11400			NewY := Y(KBase)+B(KBase)*(NewX-X(KBase))+C(KBase)*(NewX-X(KBase))^2+D(KBase)*(NewX-X(KBase))^3;
+11500			if abs(NewY - OldY) < abs(StepSize) and NewX } X(KBase+1) then continue;
+11600			Cause(Points!Box,
+11700			    PlotterMessage(VectorOp,
+11800				Xprime(NewX,NewY),Yprime(NewX,NewY),OldX,OldY),
+11900			   TellAll+Reschedule);;
+12000			end;
+12100		end;
+12200	X!AXIS!ROTATE := SAVEMODE;
+12300	end "DRAW!Spline";
+     	00100	! SplineDrawer, continued;
+00200		X!AXIS!ROTATE := false;
+00300		X!AXIS!ANGLE := 0.0;
+01200		if debug then WriteScroller("["&Me&": Running]"&CRLF);
+01300		while true do
+01400		    begin "splining"
+01500			SplineMessage := Interrogate(Spline!Box,WAIT);
+01550			if TypeIt(SplineMessage) = 0 then
+01553			    begin "bogus"
+01556				WriteScroller("%"&Me&": rejecting null message"&CRLF);
+01559				continue "splining";
+01562			    end "bogus";
+01600			if debug then WriteScroller("["&Me&": received ["&
+01700							cvs(X1Value)&","&
+01800							cvs(Y1Value)&","&
+01900							cvs(SplineIndex)&"]]"&CRLF);
+02000			case Datum(SplineMessage)[0] of
+02100			begin "decode"
+02200			[IsEof] begin "eof"
+02300				done "splining"
+02400				end "eof";
+02500	
+02600			[SetSplineOp] begin "setspline"
+02700				if 1  SplineIndex  SplineSize 
+02800				   then
+02900				      begin
+03000					Spline!X[SplineIndex] := X1Value;
+03100					Spline!Y[SplineIndex] := Y1Value;
+03200				    end
+03300				    else
+03400					begin "bad index"
+03500					end "bad index";
+03600				end "setspline";
+03700			[DrawSplineOp] begin "draw spline"
+03800					DrawSpline(1,SplineIndex);
+03900				       end "draw spline"
+04000			end "decode";
+04100	
+04200		if MessageTrace then Deleted(MYPROC,"SplineDrawer",SplineMessage);
+04300		Delete(SplineMessage);
+04400		ItemCount := ItemCount -1;
+04500		end "splining";
+04600		if debug then WriteScroller("["&Me&": done]"&CRLF);
+04700	end "splinedrawer";
+     	00100	process BandScheduler;
+00200	begin "BandScheduler"
+00300		integer Array Itemvar PointMessage;
+00400		integer OffsetX, OffsetY;
+00500		set array BandSets[0:Bands-1];
+00600		define X1value={Datum(PointMessage)[1]~,
+00700			 BandIndex={Datum(PointMessage)[1]~,
+00800			Y1value={Datum(PointMessage)[2]~,
+00900			X2value={Datum(PointMessage)[3]~,
+01000			Y2value={Datum(PointMessage)[4]~;
+01100	
+01200		OffsetX := OffsetY := 0;
+01300		if debug then WriteScroller("["&Me&": Running"&CRLF);
+01400		while true do
+01500		    begin "plotting"
+01600			PointMessage  :=  Interrogate(Points!Box,WAIT);
+01700			if debug then WriteScroller("["&Me&": received ["&
+01800						(if Datum(PointMessage)[0]=IsEof then "EOF" else
+01900						(OpName(Datum(PointMessage)[0])&": "&cvs(X1value)&","&
+02000						cvs(Y1value)&","&
+02100						cvs(X2value)&","&
+02200						cvs(Y2value)&"]"))&
+02300						"]"&CRLF);
+02400			case Datum(PointMessage)[0] of
+02500			begin "decode"
+02600			[IsEof] begin "eof"
+02700				! Now we can start scheduling the bands;
+02800				OffsetX := OffsetY := 0;
+02900				Cause(Points!Box,PlotterMessage(FinishedBand,-1,0,0,0),TellAll+Reschedule);
+03000				end "eof";
+03100			[FinishedBand] begin "finished"
+03200					! We have finished band BandIndex, do
+03300					  BandIndex+1;
+03400					if 0BandIndex<Bands-1 then Bandsets[BandIndex] := Phi;
+03500					if BandIndex+1 > Bands-1 then
+03600						begin "done"
+03700						if MessageTrace then Deleted(MYPROC,"BandScheduler",PointMessage);
+03800						Delete(PointMessage);
+03900						ItemCount := ItemCount-1;
+04000						done "plotting";
+04100						end "done";
+04200					Cause(Band!Box,BandMessage(BandIndex+1,
+04300								   BandSets[BandIndex+1]),
+04400							TellAll+Reschedule);
+04500					end "finished";
+04600			[SetOrigin] begin "setorigin"
+04700					OffsetX := X1value;
+04800					OffsetY := Y1value;
+04900				    end "setorigin";
+05000			[SetSplineOp] begin "setspline"
+05100					cause(Spline!Box,PointMessage,TellAll+Reschedule);
+05200					continue "plotting";
+05300				      end "setspline";
+05400			[DrawSplineOp] begin "drawspline"
+05500					cause(Spline!Box,PointMessage,TellAll+Reschedule);
+05600					continue "plotting";
+05700				      end "drawspline";
+05800			[VectorOp]  begin "vector"
+05900					integer I;
+06000			    X1value := X1value+OffsetX;
+06100			    Y1value := Y1value+OffsetY;
+06200			    X2value := X2value+OffsetX;
+06300			    Y2value := Y2value+OffsetY;
+06400			    ! Place in canonical order, lowest Y-value first;
+06500			    if Y1value > Y2value then
+06600				    begin "swapem"
+06700				    X1value swap X2value;
+06800				    Y1value swap Y2value;
+06900				    end "swapem";
+07000			    if 0  (I := Y1value % BandSize) < Bands then
+07100				begin "ok origin"
+07200				BandSets[I] := BandSets[I] union {PointMessage~;
+07300				continue "plotting"; 	! bypass deletion code;
+07400				end "ok origin";
+07500				end "vector"
+07600			end "decode";
+07700			if MessageTrace then Deleted(MYPROC,"BandScheduler",PointMessage);
+07800			Delete(PointMessage);
+07900			ItemCount := ItemCount-1;
+08000		    end "plotting";
+08100		CAUSE(Char!Box,CharMessage(IsEof,0,0),TellAll+Reschedule);
+08200		if debug then WriteScroller("["&Me&": done]"&CRLF);
+08300	end "BandScheduler";
+     	00100	integer array itemvar procedure PlotterMessage(MessageType K; integer X1,Y1,X2,Y2);
+00200	begin "plottermsg"
+00300		own integer array Message[0:4];
+00400		integer array itemvar M;
+00500	
+00600		Message[0] _ K;
+00700		Message[1]_X1;
+00800		Message[2]_Y1;
+00900		Message[3]_X2;
+01000		Message[4]_Y2;
+01100	
+01200		ItemCount_ItemCount+1;
+01300		M _ New(Message);
+01400		if MessageTrace then Created(MYPROC,"PlotterMessage",M);
+01500		return(M);
+01600	end "plottermsg";
+     	00100	process Reader;
+00200	begin "reader"
+00300	
+00400	! This procedure reads the input file.  lines are of the
+00500	  form:
+00600		[x1,y1,x2,y2] ...
+00700	   where the 4-tuples can be repeated as often as necessary.
+00800	   It parses the tuple, rejecting any bogus tuples, and
+00900	   either places a message in the
+01000		MESSAGE!BOX
+01100	   mailbox, or a binary 4-tuple in the
+01200		POINTS!BOX
+01300	   mailbox.  It then suspends, allowing one of the two others to run.
+01400	;
+01500		breaktable LeftBkt, CommaBrk, RightBkt;
+01600		integer X1,Y1,X2,Y2;
+01700		integer OpCode;
+01800	
+01900		SetBreak(LeftBkt:=GetBreak,"["," "&TAB&CRLF,"ISN");
+02000		SetBreak(CommaBrk:=GetBreak,",]"," "&TAB&CRLF,"ISN");
+02100		SetBreak(RightBkt:=GetBreak,"]"," "&TAB&CRLF,"ISN");
+02200	
+02300		if debug then WriteScroller("["&Me&": running]"&CRLF);
+02400		while not EOF[InputChannel] do
+02500		    begin "reading"
+02600			SZILCH:=input(InputChannel,LeftBkt);
+02700			OpCode := VectorOp;
+02800			if BreakChar[InputChannel] } "[" then continue "reading";
+02900			SDUM := input(InputChannel,CommaBrk);
+03000			if BreakChar[InputChannel] } "," then continue "reading";
+03100			if upequ(SDUM,"SPLINE") then
+03300			begin "do splining"
+03325			    integer SplineIndex;
+03337			    SplineIndex := 1;
+03350			while true do
+03400			    begin "splines"
+03600				OpCode := SetSplineOp;
+03800				SDUM := input(InputChannel,CommaBrk);
+03900				X1 := cvd(SDUM);
+04000				if BreakChar[InputChannel] } ","
+04100				   then
+04200					continue "reading";
+04300				SDUM := input(InputChannel,CommaBrk);
+04400				Y1 := cvd(SDUM);
+04500				cause(Points!Box,PlotterMessage(OpCode,X1,Y1,SplineIndex,0),TellAll+Reschedule);
+04600				SplineIndex := SplineIndex + 1;
+04700				if BreakChar[InputChannel] } "," then
+04800				    begin "endsplines"
+04900					cause(Points!Box,PlotterMessage(DrawSplineOp,0,0,SplineIndex-1,0),TellAll+Reschedule);
+05000					done "splines";
+05100				    end "endsplines";
+05200			    end "splines";
+05300			continue "reading";
+05400			end "do splining";
+05500			X1 := CVD(SDUM);
+05600			SDUM := input(InputChannel,CommaBrk);
+05700			if BreakChar[InputChannel] = "]" then 
+05800			    begin "origin"
+05900				OpCode := SetOrigin;
+06000				X2:=Y2:=-1;
+06100				Y1 := cvd(SDUM);
+06200				
+06300			    end "origin"
+06400			else
+06500			   begin "not origin"
+06600			if BreakChar[InputChannel] } "," then continue "reading";
+06700			Y1 := CVD(SDUM);
+06800			SDUM := input(InputChannel,CommaBrk);
+06900			if BreakChar[InputChannel] } "," then continue "reading";
+07000			X2 := CVD(SDUM);
+07100			SDUM := input(InputChannel,RightBkt);
+07200			if BreakChar[InputChannel] } "]" then continue "reading";
+07300			Y2 := CVD(SDUM);
+07400			if debug then WriteScroller("["&Me&": "&cvs(X1)&","&cvs(Y1)&","&
+07500						 cvs(X2)&","&cvs(Y2)&"]"&CRLF);
+07600			    end "not origin";
+07700			Cause(Points!Box,PlotterMessage(OpCode,X1,Y1,X2,Y2),TELLALL+RESCHEDULE);
+07800			end "reading";
+07900		Cause(Points!Box,PlotterMessage(IsEOF,0,0,0,0),TELLALL+RESCHEDULE);
+08000	
+08100		relbreak(LeftBkt);
+08200		relbreak(CommaBrk);
+08300		relbreak(RightBkt);
+08400		if debug then WriteScroller("["&Me&": Done]"&CRLF);
+08500	end "reader";
+     	00100	simple procedure ProcessFiles;
+00200	!-------------------------------------------------
+00300	!
+00400	! ABSTRACT:
+00500	!	Main file processing
+00600	!
+00700	! PARAMETERS:
+00800	!
+00900	! The global variable InputChannel is an implicit
+01000	! parameter to this routine.
+01100	!
+01200	! RESULTS:
+01300	!
+01400	! SIDE EFFECTS:
+01500	!
+01600	! ERRORS:
+01700	!
+01800	! DESIGN:
+01900	!
+02000	!-------------------------------------------------;
+02100	    begin "Process"
+02200	
+02300	    if Concept then
+02400	      begin "concept"
+02500		integer I;
+02600	
+02700	
+02800		outstr("[Main: Processing]"&CRLF);
+02900		LastChar := FontBase;
+03000		FontID := 1;
+03100		ReaderHandle := New;
+03200		Sprout(ReaderHandle,Reader,PSTACK(20)+STRINGSTACK(20)+SUSPHIM+RUNME);
+03300		Del!Pname(ReaderHandle);
+03400		New!Pname(ReaderHandle,"Reader");
+03500		if debug then outstr("[Main: Reader sprouted]"&CRLF);
+03600		PointPlotterHandle := New;
+03700		Sprout(PointPlotterHandle,PointPlotter,PSTACK(20)+STRINGSTACK(20)+SUSPHIM+RUNME);
+03800		Del!Pname(PointPlotterHandle);
+03900		New!Pname(PointPlotterHandle,"PointPlotter");
+04000		if debug then outstr("[Main: PointPlotter sprouted]"&CRLF);
+04100		CharPlotterHandle := New;
+04200		Sprout(CharPlotterHandle,CharPlotter,PSTACK(20)+STRINGSTACK(20)+SUSPHIM+RUNME);
+04300		Del!PName(CharPlotterHandle);
+04400		New!Pname(CharPlotterHandle,"CharPlotter");
+04500		if debug then outstr("[Main: CharPlotter sprouted]"&CRLF);
+04600		Char!mgrHandle := New;
+04700		Sprout(Char!mgrHandle,Char!Manager,PSTACK(20)+STRINGSTACK(20)+SUSPHIM+RUNME);
+04800		Del!Pname(Char!mgrHandle);
+04900		New!Pname(Char!mgrHandle,"Char!Manager");
+05000		if debug then outstr("[Main: Char!Manager sprouted]"&CRLF);
+05100		WriterHandle := New;
+05200		Sprout(WriterHandle,Writer,PSTACK(20)+STRINGSTACK(20)+SUSPHIM+RUNME);
+05300		Del!Pname(WriterHandle);
+05400		New!Pname(WriterHandle,"Writer");
+05500	
+05600		if debug then outstr("[Main: Writer sprouted]"&CRLF);
+05700		Resume(ReaderHandle,ANY,NOTNOW+IRUN);
+05800		Resume(PointPlotterHandle,ANY,NOTNOW+IRUN);
+05900		Resume(CharPlotterHandle,ANY,NOTNOW+IRUN);
+06000		Resume(Char!mgrHandle,ANY,NOTNOW+IRUN);
+06100		Resume(WriterHandle,ANY,NOTNOW+IRUN);
+06200		if debug then outstr("[Main: Suspending]"&CRLF);
+06300		PRISET(ReaderHandle,Lowest-1);
+06400		PRISET(MYPROC,Lowest);
+06500		PRISET(WriterHandle,6);
+06600	!	DDFINT;
+06700		UrSchd;
+06800		if debug then outstr("[Main: Waiting for Join]"&CRLF);
+06900		JOIN({ReaderHandle,PointPlotterHandle,CharPlotterHandle~);
+07000		Terminate(ReaderHandle);
+07100		Delete(ReaderHandle);
+07200		Terminate(PointPlotterHandle);
+07300		Delete(PointPlotterHandle);
+07400		Terminate(CharPlotterHandle);
+07500		Delete(CharPlotterHandle);
+07600		Terminate(Char!mgrHandle);
+07700		Delete(Char!mgrHandle);
+07800		Terminate(WriterHandle);
+07900		Delete(WriterHandle);
+08000		Close(InputChannel); 
+08100	     end "concept"
+08200	else
+08300	    if Anadex then
+08400		begin "anadex"
+08500		ReaderHandle := New;
+08600		Sprout(ReaderHandle,Reader,PSTACK(20)+STRINGSTACK(20)+SUSPHIM+RUNME);
+08700		Del!Pname(ReaderHandle);
+08800		New!Pname(ReaderHandle,"Reader");
+08900		if debug then outstr("[Main: Reader sprouted]"&CRLF);
+09000		BandSchedulerHandle := New;
+09100		Sprout(BandSchedulerHandle,BandScheduler,PSTACK(20)+STRINGSTACK(20)+SUSPHIM+RUNME);
+09200		Del!Pname(BandSchedulerHandle);
+09300		New!Pname(BandSchedulerHandle,"BandScheduler");
+09400		if debug then outstr("[Main: BandScheduler sprouted]"&CRLF);
+09500		BandPlotterHandle := New;
+09600		Sprout(BandPlotterHandle,BandPlotter,PSTACK(20)+STRINGSTACK(20)+SUSPHIM+RUNME);
+09700		Del!Pname(BandPlotterHandle);
+09800		New!Pname(BandPlotterHandle,"BandPlotter");
+09900		if debug then outstr("[Main: BandPlotter sprouted]"&CRLF);
+10000		WriterHandle := New;
+10100		Sprout(WriterHandle,Writer,PSTACK(20)+STRINGSTACK(20)+SUSPHIM+RUNME);
+10200		Del!Pname(WriterHandle);
+10300		New!Pname(WriterHandle,"Writer");
+10400		BandWriterHandle := New;
+10403		SplineHandle := New;
+10500		Sprout(BandWriterHandle,BandWriter,PSTACK(20)+STRINGSTACK(20)+SUSPHIM+RUNME);
+10600		Del!Pname(BandWriterHandle);
+10700		New!Pname(BandWriterHandle,"BandWriter");
+10703		Sprout(SplineHandle,SplineDrawer,PSTACK(20)+STRINGSTACK(20)+SUSPHIM+RUNME);
+10706		Del!Pname(SplineHandle);
+10709		New!Pname(SplineHandle,"SplineDrawer");
+10800		Resume(ReaderHandle,ANY,NOTNOW+IRUN);
+10900		Resume(BandSchedulerHandle,ANY,NOTNOW+IRUN);
+11000		Resume(BandPlotterHandle,ANY,NOTNOW+IRUN);
+11003		Resume(SplineHandle,ANY,NOTNOW+IRUN);
+11100		Resume(BandWriterHandle,ANY,NOTNOW+IRUN);
+11200		Resume(WriterHandle,ANY,NOTNOW+IRUN);
+11300		PRISET(ReaderHandle,Lowest-1);
+11400		PRISET(MYPROC,Lowest);
+11500		PRISET(WriterHandle,6);
+11600		UrSchd;
+11700		if debug then outstr("[Main: Waiting for Join]"&CRLF);
+11800		JOIN( {ReaderHandle,BandSchedulerHandle,BandPlotterHandle~ );
+11900		Terminate(ReaderHandle);
+12000		Delete(ReaderHandle);
+12100		Terminate(BandSchedulerHandle);
+12200		Delete(BandSchedulerHandle);
+12203		Terminate(SplineHandle);
+12206		Delete(SplineHandle);
+12300		Terminate(BandPlotterHandle);
+12400		Delete(BandPlotterHandle);
+12500		Terminate(BandWriterHandle);
+12550		Delete(BandWriterHandle);
+12575		Terminate(WriterHandle);
+12587		Delete(WriterHandle);
+12593		outstr(CRLF);
+12600		end "anadex";
+12700	    end "Process";
+     	00100	! FINDSTR procedure courtesy of Craig Everhart ;
+00200	
+00300	bail!simple string procedure FINDSTR(string filename; string EXTLIST(null));
+00400	    begin "FINDSTR"
+00500	! Does an extended LOOKUP on CHAN for FILE.EXT[PPN], picking up
+00600	  "Logical Device Name", e.g. DSKC1 or MUS0, then does a DSKCHR
+00700	  UUO to determine the structure it came from, e.g. DSKC or MUS;
+00800	    own safe integer array XLOOKBLK[0:'16];
+00900	    boolean FLAG!;
+01000	    channel CHAN;
+01100	    integer FILE, EXT,PPN;
+01200	    CHAN_getchan;
+01300		OPEN(CHAN,"DSK",'17,0,0,00,00,EOF[CHAN]);
+01400		if EOF[CHAN] then begin release(CHAN); return(null); end;
+01500	    FILE_cvfil(filename,ext,ppn);
+01600	    while true do
+01700	        begin "try all extensions"
+01800		XLOOKBLK[0]_'16;	! number of arguments;
+01900		XLOOKBLK[1]_PPN;
+02000		XLOOKBLK[2]_FILE;
+02100		XLOOKBLK[3]_EXT;
+02200		start!code "Extended LOOKUP"
+02300		    HRLZ	1,CHAN;
+02400		    LSH	1,5;	! Shift channel number into AC field;
+02500		    TLO	1,'076000;	! LOOKUP;
+02600		    HRRI	1,access(XLOOKBLK[0]);
+02700		    SETZM	FLAG!;
+02800		    XCT	1;		! Do it;
+02900		      SETOM	FLAG!;		! Error return;
+03000		end "Extended LOOKUP";
+03100	    if FLAG! then 
+03200		   begin
+03300			if length(EXTLIST) = 0 then
+03400			begin "none"
+03500			release(CHAN);
+03600			return(null);
+03700			end "none";
+03800			ext_cvsix(scan(EXTLIST,COMMABRK,zilch));
+03900		    end
+04000		else
+04100		    done "try all extensions";
+04200	      end "try all extensions";
+04300	    XLOOKBLK[0]_XLOOKBLK['16];	! Copy logical unit name to 1st word;
+04400	    start!code "STR name"
+04500		MOVEI	1,access(XLOOKBLK[0]);	! Address of block;
+04600		HRLI	1,5;			! We want up to STR name;
+04700		CALLI	1,'45;	! DSKCHR - get it;
+04800		  SETOM	FLAG!;	! error return;
+04900	    end "STR name";
+05000	    
+05100	    release(CHAN);
+05200	    return(if FLAG! then "DSK" else cv6str(XLOOKBLK[4]))
+05300	    end "FINDSTR";
+     	00100	! Exported procedure GRAPH;
+00200	
+00300	!-------------------------------------------------
+00400	!
+00500	! ABSTRACT:
+00600	!	This is the main body of GRAPH.
+00700	!
+00800	! PARAMETERS:
+00900	!
+01000	! RESULTS:
+01100	!
+01200	! SIDE EFFECTS:
+01300	!
+01400	! ERRORS:
+01500	!
+01600	! DESIGN:
+01700	!
+01800	!-------------------------------------------------;
+01900	
+02000	boolean NoOutput;
+02100	
+02200	INIT;
+02300	ParseSwitches(GetSwitchIni("GRAPH"));
+02400	repeat
+02500	    begin "Command loop"
+02600	    string LocalDefaultDevice;
+02700	
+02800	    LocalDefaultDevice_DefaultDevice;
+02900	    GETCOMMANDLINE;
+03000	
+03100	    comment	Set per-command defaults;
+03200	
+03300	    STOP!COMMAND _ false;
+03400	
+03500	    comment	Parse command line;
+03600	
+03700	    OUTFILE _ scan(CMDLINE, ARROWBRK, DUM);
+03800	    if DUM } "_"  and  DUM } "="
+03900		then begin CMDLINE _ OUTFILE; OUTFILE _ null end;
+04000	    INFILE _ scan(CMDLINE, SLASHBRK, DUM);
+04100	    NoOutput_false;
+04200	    if nulstr(OUTFILE) then 
+04300		begin "no output given"
+04400		OUTFILE _ scan(SDum_INFILE, DOTBRK, DUM);
+04500		NoOutput_true;
+04600		end "no output given";
+04700	
+04800	    ParseSwitches(CMDLINE);
+04900	    if STOP!COMMAND or nulstr(INFILE) then continue "Command loop";
+05000	    if WANTREAD(InputChannel_getchan, InputCount, BreakChar[InputChannel], EOF[InputChannel],
+05100			INFILE, Ascii, "Input file:", "PLT")
+05200		then continue "Command loop";
+05300	
+05400	    DefaultOutExt_"GRA";
+05500	
+05600	    begin "open output"
+05700	    begin "try it"
+05800		string D,F;
+05900	
+06000		D_GetDev(OutFile,LocalDefaultDevice);
+06100		if (calli(cvsix(D),4) land '200000000000) and (F_FindStr(OutFile,DefaultOutExt)) then
+06200			! ^^ true if device is a disk-like device;
+06300		     D_F;
+06400		OutFile _ D & ":" & OutFile;
+06500	    end "try it";
+06600	    if WantWrite(OutputChannel_getchan, EOF[OutputChannel], OUTFILE, WarnSwitch,Ascii,"Output file: ", DefaultOutExt)
+06700		then begin release(InputChannel); continue "Command loop" end;
+06800	    end "open output";
+06900		if MessageTrace then
+07000			if WantWrite(MessageCHannel_Getchan,EOF[MessageChannel], SDUM_"MESSAG.TRC",WarnSwitch,Ascii,"Message trace file: ",null)
+07100		    then begin
+07200			release(MessageChannel);
+07300			continue "Command loop";
+07400			end;
+07500		  ProcessFiles;
+07600	    release(InputChannel);  release(OutputChannel);
+07700	    release(MessageChannel);
+07800	
+07900	    end   "Command loop"
+08000	end "GRAPH"
+   

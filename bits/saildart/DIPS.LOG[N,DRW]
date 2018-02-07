@@ -1,0 +1,5 @@
+8T14: Definitions are different
+ pin 3 old function TOC, new function TIP
+ pin 5(5/1): old use ''; new use 'A1'
+ pin 6/1: load  .03/-1.52; new  .04/-1.60
+New definition retained as file 8T14.NEW

@@ -1,0 +1,1345 @@
+00100	@part(WL,root "SUDS.MSS[A210JN11]")
+00200	@pagefooting(center "W", right "@title(Chapter)")
+00300	@chap(Introduction)
+00400	
+00500	Note: unless the graphics support code for D is present in
+00600	the graphics,  the
+00700	keyboard will @i[not] generate the correct codes for , ,
+00800	and  by using the <control>, <meta>, and <meta>-<control>
+00900	combinations.  However, the GDP keytop symbols for ,  and
+01000	 @i[will] work.  In addition,  the wirelister may be run
+01100	from an ordinary terminal (or a GDP) by using the apostrophe convention described
+01200	on page @pageref(apostrophes).
+01300	
+01400	
+01500	The wirelister checks out the placement of dips on the board (you
+01600	didn't overlap two of them, did you?), checks the loading
+01700	of signals, and checks for consistency (e.g., two totem-pole
+01800	outputs tied together are detected).  It can produce a number
+01900	of listings depending upon what sort of data you wish
+02000	to reference.  The most important listings are:
+02100	@enter(itemize)
+02200	The wrap list (WLZ) file; this is used by a technician to
+02300	wrap the board.
+02400	
+02500	The routing list (WLR) file; this is used by designers to
+02600	debug the board.
+02700	
+02800	The signal summary (WSS) file; this is a sorted list of the
+02900	signal names, cross-referenced to the drawings.
+03000	
+03100	The stuffing list (STF) file; this is the set of instructions 
+03200	about where to stuff chips in the board.
+03300	
+03400	The wirelist summary (WLU) file; this is used by the MAPLSD
+03500	program (page @pageref(MAPLSD)) to print a picture of the
+03600	dip layout.
+03700	@leave(itemize)
+03800	
+03900	There are numerous other summaries possible, many of which are
+04000	used as input to programs that are unavailable at CMU.
+04100	
+     	00100	@chap(Wirelister commands)
+00200	The extended commands are availble by typing "X" followed
+00300	by the name of the command.
+00400	
+00500	@enter(description)
+00600	
+00700	@label(XBFILES)
+00800	@index(BFILES)@index(XBFILES)
+00900	
+01000	BFILES   Print a file list for the back panel.
+01100	
+01200	
+01300	@label(XBLIST)
+01400	@index(XBLIST)@index(BLIST)
+01500	
+01600	BLIST   Writes a back panel wirelist, default extension
+01700	@index(Extension BL)@index(BL extension)
+01800	.BL.
+01900	
+02000	@label(XBMAKALL)
+02100	@index(XBMAKALL)@index(BMAKALL)
+02200	
+02300	BMAKALL   Like XMAKALL (page @pageref(XMAKALL)) except that it
+02400	also does an XBLIST (page @pageref(XBLIST) and BSUM (page @pageref(XBSUM)).
+02500	
+02600	@label(XBOARDWL)
+02700	@index(XBOARD)@index(BOARD)
+02800	
+02900	BOARD   Selects the board type.  See section @ref(Boards), page
+03000	@pageref(boards).
+03100	
+03200	
+03300	@label(XBPRINT)
+03400	@index(XBPRINT)
+03500	@index(BPRINT)
+03600	
+03700	BPRINT   Asks for a signal name, and prints the run information
+03800	on the terminal.  DI or ? work as in the "P" commands,
+03900	page @pageref(Pcmds).
+04000	
+04100	@label(XBSIMPLE)
+04200	@index(XBSIMPLE)@index(BSIMPLE)
+04300	
+04400	BSIMPLE   Writes a
+04500	@index(Extension SMP)@index(SMP extension)
+04600	.SMP file, including all power and NC pins.
+04700	
+04800	
+04900	@label(XBSSEL)
+05000	@index(BSSEL)@index(XBSSEL)
+05100	
+05200	BSSEL   Like BSUM, except that it is selective; you are asked about
+05300	each category before it is written to the file.
+05400	
+05500	@label(XBSUM)
+05600	@index(BSUM)@index(XBSUM)
+05700	
+05800	BSUM   Writes a back panel wirelist summary, similar to the
+05900	WLS file for a normal wirelist.  Default extension is
+06000	@index(Extension BS)@index(BS, extension)
+06100	.BS.
+06200	
+06300	@label(XCITYBL)
+06400	@index(XCITYBL)@index(CITYBL)
+06500	@index(City block routing)
+06600	
+06700	CITYBL   Tells the wirelister that all the wires will be wrapped in a 
+06800	cityblock fashion.  It then calculates the wirelengths
+06900	appropriately.
+07000	
+07100	
+07200	@label(XCLEARWL)
+07300	@index(XCLEAR)@index(CLEAR)
+07400	
+07500	CLEAR   This command is equivalent to "^C@ START<crlf>" except that
+07600	it does not flush an XDSKIN (page @pageref(XDSKINWL)) in progress.
+07700	
+07800	
+07900	@label(XCONSUM)
+08000	@index(CONSUM)@index(XCONSUM)
+08100	
+08200	CONSUM   Writes a connector-pins-needed summary, default extension
+08300	@index(Extension WCS)@index(WCS extension)
+08400	.WCS.  This lists signals
+08500	in the same format as XSIGSUM (page @pageref(XSIGSUM)) but includes
+08600	only those signals which need to get from one card to another, but
+08700	don't as yet.
+08800	
+08900	@label(XCSTRAP)
+09000	@index(CSTRAP)@index(XCSTRAP)
+09100	
+09200	CSTRAP   Asks for a card location, if necessary (it should be necessary).
+09300	The writes a file (default extension
+09400	@index(Extension DAT)@index(DAT extension)
+09500	.DAT) which contains the back connector locations which are gotten
+09600	by taking a wild back connector fom this card and finding the
+09700	matching connector on the other card.  This allows pre-placement
+09800	of pins which have been previously assigned to one of a pair
+09900	of cards.  The file is suitable for reading into
+10000	D with the XIPINS (page @pageref(XIPINS)) command.
+10100	
+10200	@label(XDDTWL)
+10300	@index(DDT)@index(XDDT)
+10400	
+10500	DDT   Enter DDT if it is loaded.
+10600	
+10700	@label(XDEFPPN)
+10800	@index(DEFPPN)@index(XDEFPPN)
+10900	DEFPPN   Accepts a ppn to use as the default ppn when none is
+11000	specified for an input file.
+11100	
+11200	@index(X-DEFPPN)@index(-DEFPPN)
+11300	@indexentry(key "XDEFPPN-",entry "X-DEFPPN",number)
+11400	@indexentry(key "DEFPPN-",entry "-DEFPPN",number)
+11500	
+11600	-DEFPPN   Sets the default ppn to [0,0].  The default ppn will
+11700	be 0 unless the filename comes from an indirect file.  In this
+11800	case, the ppn which is the default is the ppn of the indirect
+11900	file.
+12000	
+12100	
+12200	@label(XDSKCONWL)
+12300	@index(DSKCON)@index(XDSKCON)
+12400	
+12500	DSKCON   If the last XDSKIN (page @pageref(XDSKINWL)) was suspended
+12600	by a XDSKHLD (page @pageref(XDSKHLD)) or an error, this command
+12700	causes the file to be reopened and an appropriate number of characters
+12800	to be skipped to reposition it to where it was.  Obviously if you
+12900	have edited the file somehow in between the XDSKHLD and the 
+13000	XDSKCON, you will be in trouble.  XDSKHLD and XDSKCON are used
+13100	by XSAVE to get around the fact that saving the core image causes
+13200	a RESET UUO to be done.
+13300	
+13400	
+13500	@label(XDSKHLD)
+13600	
+13700	@index(DSKHLD)@index(XDSKHLD)
+13800	
+13900	DSKHLD   Releases the disk input file used for command input (XDSKIN), but remembers where it was;
+14000	you may use XDSKCON (page @pageref(XDSKCONWL))  to continue.
+14100	
+14200	@label(XDSKINWL)
+14300	@index(DSKIN)@index(XDSKIN)
+14400	
+14500	DSKIN   Asks for a filename, default extension 
+14600	@index(Extension TXT)@index(TXT extension)
+14700	.TXT.  Takes command input from this file instead of
+14800	the terminal; if any error occurs, input reverts to the
+14900	terminal.
+15000	See also XDSKHLD, XDSKCON, XDSKSKP.
+15100	
+15200	@label(XDSKSKPWL)
+15300	@index(DSKSKP)@index(XDSKSKP)
+15400	
+15500	DSKSKP   If no file is open, asks for a filename and opens that file.
+15600	Reads to the next line feed, echoing characters as it goes, and
+15700	then asks "STOP?".  If you respond with "Y", followed by a <crlf>,
+15800	skipping stops and control reverts to whomever had it last.  If
+15900	you respond with <escape>, then skipping stops and control reverts
+16000	to the terminal.  Anything else causes the next line to be
+16100	skipped (and echoed) and the sequence then repeats.
+16200	
+16300	
+16400	
+16500	
+16600	@label(XECL)
+16700	@index(ECL)@index(XECL)
+16800	
+16900	ECL   Sets the default for ECL dips during DIP definition.
+17000	See page @pageref(levels).
+17100	
+17200	@index(-ECL)@index(X-ECL)
+17300	@indexentry(key "XECL-",entry "X-ECL",number)
+17400	@indexentry(key "ECL-",entry "-ECL",number)
+17500	
+17600	-ECL   Clears the ECL default.
+17700	
+17800	@label(XERRSUM)
+17900	@index(ERRSUM)@index(XERRSUM)
+18000	
+18100	ERRSUM   Writes an error summary file, default extension
+18200	@index(Extension LES)@index(LES extension)
+18300	.LES, which has each run of some of the categories from the wirelist
+18400	summary output.  This is a binary file which goes back into the
+18500	D program (see page @pageref(LESD)) and allows you to flash the
+18600	runs from each error category.
+18700	
+18800	@label(XEXTENT)
+18900	@index(EXTENT)@index(XEXTENT)
+19000	
+19100	EXTENT   This sets  the number of paddles to assume to make it to the
+19200	back panel for cards with no location.  It is initialized to 4.
+19300	@index(-EXTENT)@index(X-EXTENT)
+19400	@indexentry(key "XEXTENT-",entry "X-EXTENT",number)
+19500	@indexentry(key "EXTENT-",entry "-EXTENT",number)
+19600	
+19700	-EXTENT   Resets the default extent (4).
+19800	
+19900	
+20000	@label(XFILES)
+20100	@index(XFILES)@index(FILES)
+20200	
+20300	FILES   Prints a file list for the card.
+20350	
+20353	@label(XFRACTION)
+20356	@index(XFRACTION)@index(FRACTION)
+20359	
+20362	FRACTION   Prints out the current resolution of wire lengths in
+20365	fractions of an inch.  Smallest resolution is 1/2 inch.  If the
+20368	resolution is set to any power of 10, e.g., 10, 100, 1000, the
+20371	wire length will print out in decimal inches; if any other value,
+20374	in fractions of an inch.  Fraction reduction will be done when
+20377	possible, but only works well when the denominator is a power of 2.
+20380	Note that the FRACTION value is set to a default board value
+20383	whenever an XBOARD command (page @pageref(XBOARDWL)) is given.
+20386	
+20400	
+20500	
+20600	@label(XHELPWL)
+20700	
+20800	@emphasize[HELP]   Prints a command summary.
+20900	
+21000	@label(XIERRORWL)
+21100	@index(IERROR)@index(XIERROR)
+21200	
+21300	IERROR   Enable output of errors on wirelist file input to go to
+21400	a file.  When you do an I, I, I or B (pages @pageref(EpsilonBWL) and @pageref(AlphaIWL)) command you will be asked for a filename
+21500	(default extension
+21600	@index(Extension WIE)@index(WIE extension)
+21700	WIE).  This file contains the filename of the file being processed
+21800	and any errors which cannot be indicated later.  If you respond
+21900	with a <crlf> to the WIE filename error prompt, the error messages
+22000	will go to the terminal (as if no XIERROR command had been done).
+22100	
+22200	@indexentry(key "XIERROR-",entry "X-IERROR",number)
+22300	@indexentry(key "IERROR-",entry "-IERROR",number)
+22400	
+22500	@label(XMAKALL)
+22600	@index(XMAKALL)@index(MAKALL)
+22700	
+22800	MAKALL   Asks for one name and a possible card name, then does
+22900	an L, L, and L (see page @pageref(AlphaLWL)), writing
+23000	three files.
+23100	
+23200	
+23300	
+23400	
+23500	
+23600	@label(XMPART)
+23700	@index(MPART)@index(XMPART)
+23800	
+23900	MPART   Make master parts list (from .BAC files).
+24000	
+24100	@label(XOLD)
+24200	@index(XOLD)@index(OLD)
+24300	@index(DIPS.DIP)
+24400	
+24500	OLD   Sets the mode for reading old DIPS.DIP files.
+24600	
+24700	@index(-OLD)@index(X-OLD)
+24800	@indexentry(key "XOLD-",entry "X-OLD",number)
+24900	@indexentry(key "OLD-",entry "-OLD",number)
+25000	
+25100	-OLD   Clears the OLD mode.
+25200	
+25300	
+25400	@label(XOUTSUM)
+25500	@index(XOUTSUM)@index(OUTSUM)
+25600	
+25700	OUTSUM   Writes output pin termination summary.
+25800	
+25900	@label(XPAGEWL)
+26000	@index(XPAGE)@index(PAGE)
+26100	
+26200	PAGE   Allows you to set the number of lines per page for listings;
+26300	default is 52.  
+26400	
+26500	@index(X-PAGE)@index(-PAGE)
+26600	@indexentry(key "XPAGE-",entry "X-PAGE",number)
+26700	@index(X-PAGE)@index(-PAGE)
+26800	
+26900	-PAGE   Resets to the default page height.
+27000	
+27100	
+27200	@label(XPART)
+27300	@index(XPART)@index(PART)
+27400	@index(PRT extension)@index(Extension PRT)
+27500	@index(Parts list)
+27600	
+27700	PART   Writes a PRT file which tells for each dip type on a board
+27800	what its part number is and how many are used.
+27900	Used for ordering parts.
+28000	
+28100	@label(XREFERENCE)
+28200	@index(XREFERENCE)@index(REFERENCE)
+28300	
+28400	@emphasize[REFERENCE]   This enables the feature in the WL files which causes all
+28500	signal names for a wire to appear in each alphabetical
+28600	sorting of each name, but only one of them will have the pin
+28700	information printed.  All the others will print 
+28800	@index(____ REFERENCE)
+28900	@indexentry(key "REFERENCE",entry "____REFERENCE",number)
+29000	'____ REFERENCE' next to the signal with which the pins
+29100	appear.
+29200	
+29300	@index(X-REFERENCE)@index(-REFERENCE)
+29400	@indexentry(key "XREFERENCE-",entry "X-REFERENCE",number)
+29500	@indexentry(key "REFERENCE-",entry "-REFERENCE",number)
+29600	
+29700	-REFERENCE   Disabless the above mentioned feature.
+29800	
+29900	
+30000	@label(XRESIDENT)
+30100	
+30200	@index(XRESIDENT)@index(RESIDENT)
+30300	
+30400	@emphasize[RESIDENT]   Reads in a dip definition file and makes the dip definitions
+30500	resident in the core image.  Dip definitions will be retained
+30600	across ^C/START and SAVE operations.  This is the normal mode
+30700	in which the core image is saved; see section @ref(Saving), page
+30800	@pageref(saving).
+30900	
+31000	@index(X-RESIDENT)@index(-RESIDENT)
+31100	@indexentry(key "XRESIDENT-", entry "X-RESIDENT",number)
+31200	@indexentry(key "RESIDENT-", entry "-RESIDENT",number)
+31300	
+31400	@emphasize[-RESIDENT]   Releases dip definitions so they may be edited.
+31500	A ^C/START or XSAVE sequence will delete the dip definitions.
+31600	You must make dips resident after editing, and after writing
+31700	the new definitions out.  See section @ref(saving), page 
+31800	@pageref(saving).
+31900	
+32000	@label(XROUTE)
+32100	@index(ROUTE)@index(XROUTE)
+32200	
+32300	@emphasize[ROUTE]   This routes all runs on the specified card and then produces
+32400	@index(WLR extension)@index(Extension WLR)
+32500	a listing (default extension WLR).  The listing is like a WL
+32600	listing except that the pins are ordered and a pseudo Z-level
+32700	is indicated in an extra column.
+32800	This is the commonly used file for debugging the hardware.
+32900	
+33000	@label(XSAVE)
+33100	@index(SAVE)@index(XSAVE)
+33200	
+33300	@emphasize[SAVE]   Exits to the monitor.  You must then do a
+33400	monitor SAVE command to save the core image (presumably
+33500	with dip definitions resident; see XRESIDENT, page @pageref(XRESIDENT)
+33600	and section @ref(saving), page @pageref(saving)).
+33700	If an XDSKIN operation (page @pageref(XDSKINWL)) is in progress,
+33800	it is suspended during the save and restarted (using XDSKCON,
+33900	page @pageref(XDSKCONWL)) after a START command.  However,
+34000	if the core image is re-run, an explicit DSKCON must be given
+34100	to resume DSKIN execution.
+34200	
+34300	
+34400	
+34500	@label(XSIGSUM)
+34600	@index(XSIGSUM)@index(SIGSUM)
+34700	
+34800	SIGSUM   Write a signal summary list for the entire wirelist.
+34900	Default extension is
+35000	@index(WSS extension)@index(Extension WSS)
+35100	WSS.  
+35200	
+35300	@label(XSPACESWL)
+35400	@index(XSPACES)@index(SPACES)
+35500	
+35600	SPACES   Makes spaces in signal names significant.  Affects only the
+35700	I (page @pageref(AlphaIWL)) and I (page @pageref(BetaIWL))
+35800	commands.
+35900	
+36000	@index(X-SPACES)@index(-SPACES)
+36100	@indexentry(key "XSPACES-", entry "X-SPACES",number)
+36200	@indexentry(key "SPACES-", entry "-SPACES",number)
+36300	
+36400	-SPACES   Spaces in signal names are not signficant except when
+36500	they separate two digits.  This is the default.
+36600	
+36700	
+36800	@label(XSTATUS)
+36900	@index(XSTATUS)@index(STATUS)
+37000	
+37100	STATUS   Prints out the current program state, including the
+37200	flags set by XSPACES (page @pageref(XSPACESWL)), REFERENCE
+37300	(page @pageref(XREFERENCE)), etc.
+37400	
+37500	
+37600	
+37700	@label(XSTRAPS)
+37800	@index(XSTRAPS)@index(STRAPS)
+37900	
+38000	STRAPS   Reads a
+38100	@index(Extension C2C)@index(C2C extension)
+38200	.C2C file which has two card locations on each line separated
+38300	by a tab.  This specifies which cards have their back strap
+38400	connectors strapped together.  A special format allows each
+38500	paddle to be mentioned expltl so you can strap different
+38600	paddles in different directions.  An attempt is made to look
+38700	at each wire which has a back connector on it.
+38800	If it has no name, you lose.  Otherwise, the program finds
+38900	the same named wire on the other card.  If it is found,
+39000	then it tries to match edge pins on this wire with edge
+39100	pins on that wiere.  A match occurs if they are the
+39200	sme pin, or one or both are "wild" specified pins.  This
+39300	allows errors to be avoided when only one card is placed.
+39400	
+39500	@label(XSTUFF)
+39600	@index(XSTUFF)@index(STUFF)
+39700	@index(Extension STF)@index(STF extension)
+39800	
+39900	@emphasize[STUFF]   Writes a STF file which tells for each dip type on a board
+40000	where it is used (what location).
+40100	This file is used while stuffing chips into the board.
+40200	
+40300	
+40400	@label(XTERMLIST)
+40500	@index(XTERMLIST)@index(TERMLIST)
+40600	
+40700	TERMLIST   Write terminator test point list.
+40800	
+40900	@label(XTEST)
+41000	@index(XTEST)@index(TEST)
+41100	
+41200	TEST   Writes a card tester file for P. Petit's simulator.  The
+41300	default extension is
+41400	@index(Extension TST)@index(TST extension)
+41500	.TST.
+41600	
+41700	
+41800	@label(XTTL)
+41900	@index(TTL)@index(XTTL)
+42000	@indexentry(key "XTTL-",entry "X-TTL",number)
+42100	@indexentry(key "TTL-",entry "-TTL",number)
+42200	
+42300	-TTL   Clears the TTL default.
+42400	This sets the default level for defining dips; see page @pageref(levels).
+42500	
+42600	@label(XUMAKE)
+42700	@index(XUMAKE)@index(UMAKE)
+42800	
+42900	UMAKE   Writes a file, default extension
+43000	@index(Extension UML)@index(UML extension)
+43100	.UML, which is input to the D program.  It replaces all
+43200	edge pins with generated "U" pins.
+43300	
+43400	@label(XUML)
+43500	@index(UML)@index(XUML)
+43600	
+43700	UML   Prints a module map for the card you select.  Also prints
+43800	edge signals in boxes for each paddle.  Default extension
+43900	is
+44000	@index(UML extension)@index(Extension UML)
+44100	.UML.
+44200	
+44300	
+44400	
+44500	@label(XWIDTH)
+44600	@index(XWIDTH)@index(WIDTH)
+44700	
+44800	WIDTH   Allows you to set the page width for output listings.
+44900	
+45000	@index(X-WIDTH)@index(-WIDTH)
+45100	@indexentry(key "XWIDTH-", entry "X-WIDTH",number)
+45200	@indexentry(key "WIDTH-", entry "-WIDTH",number)
+45300	
+45400	-WIDTH   Resets the width to its default value.
+45500	
+45600	
+45700	@label(XWIREGND)
+45800	@index(WIREGND)@index(XWIREGND)
+45900	
+46000	WIREGND   Enable wiring of ground pins on dips.
+46100	
+46200	@label(XWLSSEL)
+46300	@index(WLSSEL)@index(XWLSSEL)
+46400	
+46500	WLSSEL   Like L (page @pageref(BetaLWL)) except that it is selective;
+46600	you are asked about each category before it is written on the file.
+46700	
+46800	
+46900	@label(XZLEVEL)
+47000	@index(XZLEVEL)@index(ZLEVEL)
+47100	
+47200	@emphasize[ZLEVEL]   This produces a technician command file, default
+47300	@index(Extension WLZ)@index(WLZ extension)
+47400	extension WLZ.  It is effectively
+47500	a from to listing for each wire on the board with the Z-level
+47600	information.  First is PWR and GND Z-level 1 and Z-level 2.
+47700	Then signals, Z-level 1 and Z-level 2.
+47800	This is the file which is used as an input to SMECO  
+47900	@index(SMECO input file)
+48000	(Smart Engineering Change Order) page @pageref(smeco).
+48100	
+48200	@leave(description)
+     	00100	@enter(description)
+00200	@label(AlphaBWL)
+00300	@index(B, read backpanel wirelist)
+00400	@index(Wirelist, backpanel)@index(Backpanel wirelist)
+00500	@indexentry(key "B, read backpanel wirelist",entry "B, read backpanel wirelist",number)
+00600	@indexentry(key "read backpanel wirelist, B",entry "Read backpanel wirelist, B",number)
+00700	
+00800	B   Reads a back panel wirelist written with W (page @pageref(BetaWWL)), default extension is
+00900	@index(Extension BAC)@index(BAC extension)
+01000	.BAC.  You may now make a backpanel wirelist using the
+01100	X-commands.
+01200	
+01300	
+01400	@label(BetaBWL)
+01500	@index(B, read backpanel wirelist)
+01600	@index(Wirelist, backpanel)@index(Backpanel wirelist)
+01700	@indexentry(key "B, read backpanel wirelist",entry "B, read backpanel wirelist",number)
+01800	@indexentry(key "read backpanel wirelist, B",entry "Read backpanel wirelist, B",number)
+01900	
+02000	B   Reads a .BAC file, but only inputs filename and title
+02100	information, and dip counts for making an
+02200	@index(Extension MPL)@index(MPL extension)
+02300	MPL file.
+02400	
+02500	@label(EpsilonBWL)
+02600	@index(B, read BEQ file)
+02700	
+02800	@indexentry(key "B, read BEQ file",entry "B, read BEQ file",number)
+02900	@indexentry(key "read BEQ file, B",entry "read BEQ file, B",number)
+03000	
+03100	B   Reads a file with the same form as a
+03200	@index(Extension WEQ)@index(WEQ extension)
+03300	.WEQ file, except the default extension is
+03400	@index(Extension BEQ)@index(BEQ extension)
+03500	.BEQ.  It has the same effect on the back panel as a .WEQ
+03600	file has on the card wire list, except that there is
+03700	no problem about card locations since it applies to
+03800	the whole back panel.
+03900	
+04000	@label(AlphaCWL)
+04100	@index(C, verify PC wirelist)
+04200	@indexentry(key "C, verify PC wirelist",entry "C, verify PC wirelist",number)
+04300	@indexentry(key "verify PC wirelist, C",entry "Verify PC wirelist, C",number)
+04400	
+04500	C   Asks for a card location if necessary, then asks for a
+04600	filename.  The default extension is
+04700	@index(Extension WLC)@index(WLC extension).
+04800	The card specified is found in the D wirelist and PC wirelist.
+04900	The two wirelists are compared and an error listing is
+05000	produced.  Make one to find out the format.   The 
+05100	information from C is included in C.
+05200	
+05300	@index(C, verify PC wirelist)
+05400	@indexentry(key "C, verify PC wirelist",entry "C, verify PC wirelist",number)
+05500	@indexentry(key "verify PC wirelist, C",entry "Verify PC wirelist, C",number)
+05600	
+05700	C   Asks for a card location if necessary.  Compares D and PC
+05800	wirelists as in C, but it checks only if you have placed
+05900	the right dip sockets on the PC card for the dips you are
+06000	using in the logic drawing.  Also checks  that you have
+06100	not pre-assinged an illegal connector pin number.
+06200	This command can be done only after a L (see page
+06300	@pageref(BetaLWL) has been done with no errors detected.
+06400	The sorts of errors L detects will cause confusion and
+06500	mayhem in C.
+06600	
+06700	@label(EpsilonDWL)
+06800	@index(D, enter dips submode)
+06900	@index(Dips submode)
+07000	@indexentry(key "D, enter dips submode",entry "D, enter dips submode",number)
+07100	
+07200	@emphasize[D]   Enter dips submode.  Used to define or modify the parameters
+07300	of dip bodies.  See page @pageref(dipsmode).
+07400	
+07500	@label(EWL)
+07600	@index(E, exit wirelister)
+07700	
+07800	@emphasize[E]   Exit the wirelister.
+07900	
+08000	
+08100	@label(AlphaIWL)
+08200	@index(I, input wirelist)
+08300	@indexentry(key "I, input wirelist",entry "I, input wirelist",number)
+08400	@index(Wirelist, input)
+08500	@enter(multiple)
+08600	@emphasize[I]   This command is used to input a wirelist into the wirelister.
+08700	You are asked for a filename and the default extension for the
+08800	@index(Extension WD)@index(WD, extension)
+08900	typed in filename is WD. The file is read, signal names are
+09000	compared with the existing wirelist and a wirelist is built.
+09100	
+09200	@index(@@, wirelist command file flag)
+09300	@index(DIR extension)@index(Extension DIR)
+09400	You can also type in @@filename (default extension is DIR)
+09500	which contains a list of files to be read. The DIR file
+09600	should have the filenames on consecutive lines.
+09700	@leave(multiple)
+09800	
+09900	@label(BetaIWL)
+10000	@index(I, input wirelist)
+10100	@indexentry(key "I, input wirelist",entry "I, input wirelist",number)
+10200	@index(Wirelist, input)
+10300	
+10400	I   Input a wirelist, default extension
+10500	@index(WPC extension)@index(Extension WPC)
+10600	.WPC, generated by the PC program.
+10700	Same options available as for I.
+10800	
+10900	@label(EpsilonIWL)
+11000	@index(I, input wirelist)
+11100	@indexentry(key "I, input wirelist",entry "I, input wirelist",number)
+11200	@index(Wirelist, input)
+11300	
+11400	I   Input a wirelist, default extension
+11500	@index(Extension WEQ)@index(WEQ extension)
+11600	.WEQ.  This file contains a number of signal names on each
+11700	line, separated by tabs.  The effect is that each line is
+11800	treated as a wire; thus, you may ground wires, tie them to
+11900	HI, or even to other wires.  Please note that the
+12000	card location of the wirelist you wish to affect must appear
+12100	with the filename just as in I.
+12200	
+12300	
+12400	@label(AlphaLWL)
+12500	@index(L, wirelist output)
+12600	@indexentry(key "L, wirelist output",entry "L, wirelist output",number)
+12700	@index(Extension WL)@index(WL extension)
+12800	
+12900	L   This produces the wirelist on to a file. The default 
+13000	extension for the file is WL.  The XROUTE command (page @pageref(XROUTE)) should 
+13100	be used instead if Dip Locations are set.
+13200	All unnamed signals are given unique numbers in this file
+13300	which are printed preceded by a #.
+13400	For selective listing by signal name to the terminal, see
+13500	the P and P commands, page @pageref(PWL).
+13600	
+13700	
+13800	
+13900	@label(BetaLWL)
+14000	@index(L, wirelist output)
+14100	@indexentry(key "L, wirelist output",entry "L, wirelist output",number)
+14200	
+14300	L   This makes several summaries.
+14400	 The default extension for this file
+14500	@index(WLS extension)@index(Extension WLS)
+14600	is WLS.
+14700	@enter(itemize)
+14800	All dip types used in this wire list totalling
+14900	the different body names and total number of sections used.
+15000	
+15100	@index(Ungenerated signals)@index(Signals, ungenerated)
+15200	'Ungenerated Signals'
+15300	
+15400	@index(Unused signals)@index(Signals, unused)
+15500	'Unused Signals'
+15600	
+15700	@leave(itemize)
+15800	
+15900	@label(EpsilonLWL)
+16000	@indexentry(key "L, wirelist output",entry "L, wirelist output",number)
+16100	@index(L, wirelist output)
+16200	
+16300	@emphasize[L]   This is a listing file
+16400	which is sorted by dip number.  Under each dip number is listed
+16500	the signals connected to each pin.  At the end of the listing,
+16600	the edge connector fingers are listed in alphabetical order
+16700	along with signal connected to each.
+16800	This is a good file to look at for errors.
+16900	In addition, this file is used as input to the MAPLSD program,
+17000	page @pageref(MAPLSD), which plots a layout of the dip bodies.
+17100	@index(Extension WLU)@index(WLU extension)
+17200	The default extension for this file WLU. 
+17300	To get selective output to the terminal, see the P command,
+17400	page @pageref(BetaPWL).
+17500	
+17600	
+17700	@label(AlphaNWL)
+17800	@index(N, wirelist title)
+17900	@index(Wirelist title, N)
+18000	@emphasize[N]   This asks for a WIRE LIST TITLE? The string you type will be 
+18100	used on listings involving this wire list.
+18200	
+18300	@label(PWL)
+18400	@label(PCMDS)
+18500	
+18600	@index(P, wirelist)@index(Wirelist, P)
+18700	
+18800	P   Prints the signal name; prints the information that would be
+18900	generated using L (page @pageref(AlphaLWL)) except that
+19000	the output is to the terminal.
+19100	
+19200	@label(AlphaPWL)
+19300	@index(P, wirelist)
+19400	@indexentry(key "P, wirelist",entry "P, wirelist",number)
+19500	@indexentry(key "Wirelist, P",entry "Wirelist, P",number)
+19600	
+19700	P   Same as P, except that it prompts for the signal name.
+19800	
+19900	@label(BetaPWL)
+20000	@index(P, wirelist)
+20100	@indexentry(key "P, wirelist",entry "P, wirelist",number)
+20200	@indexentry(key "Wirelist, P",entry "Wirelist, P",number)
+20300	
+20400	P   Asks for a card location if necessary.  Then asks for
+20500	a dip or connector location.  The prints the information
+20600	for that listing as it would have been created by an
+20700	L command, see page @pageref(EpsilonLWL).
+20800	
+20900	@index(P, wirelist)
+21000	
+21100	@indexentry(key "P, wirelist",entry "P, wirelist",number)
+21200	@indexentry(key "Wirelist, P",entry "Wirelist, P",number)
+21300	P   Asks for a signal name, the does an P for this signal
+21400	for every card currently read in.  In addition, if
+21500	 or ? appears in front of the signal name, high and low
+21600	versions of the signal will be printed.  This also works for
+21700	P and P.
+21800	
+21900	@label(BetaWWL)
+22000	@index(B, read backpanel wirelist)
+22100	@index(Wirelist, backpanel)@index(Wackpanel wirelist)
+22200	@indexentry(key "W, write backpanel wirelist",entry "W, write backpanel wirelist",number)
+22300	@indexentry(key "write backpanel wirelist, W",entry "Write backpanel wirelist, W",number)
+22400	@index(Extension BAC)@index(BAC extension)
+22500	
+22600	
+22700	W   Writes a back panel wirelist file from all the cards
+22800	in the default wirelist.  The default extension is
+22900	.BAC.
+23000	
+23100	@index(@@, wirelist command file)
+23200	
+23300	@index(TXT extension)@index(Extension TXT)
+23400	
+23500	@@   Used for inputing a command file, default extension .TXT.
+23600	Same as XDSKIN<crlf> (page @pageref(XDSKINWL)).
+23700	
+23800	
+23900	
+24000	@leave(description)
+     	00100	@sec(Wirelist generation)
+00200	
+00300	Generating a wirelist can involve many operations.  The typical
+00400	set of operations used a CMU is very small.
+00500	
+00600	
+00700	The typical commands that are used are:
+00800	@enter(description)
+00900	
+01000	@index(I, input wirelist)
+01100	@indexentry(key "I, input wirelist",entry "I, input wirelist",number)
+01200	@index(Wirelist, input)
+01300	
+01400	I   Input files to the wirelister.  See page @pageref(AlphaIWL).
+01500	You may use a command file by specifying @@<filename>.  The file
+01600	so named contains the filenames of the DRW files to be used, and
+01700	may be created with the DIRECT command using the /I option:
+01800	@enter(example)
+01900	DI FOOWL.DIR=FOO???.DRW/I
+02000	@leave(example)
+02100	which creates a file containing all those filenames which matched
+02200	the search string FOO???.DRW.  Thus, consistent naming conventions
+02300	for files make life much easier.
+02400	
+02500	@index(WL extension)@index(Extension WL)
+02600	@index(L, wirelist output)
+02700	@indexentry(key "L, wirelist output",entry "L, wirelist output",number)
+02800	
+02900	L   Produce a .WL file, see page @pageref(AlphaLWL); mostly at CMU we use XROUTE (page @pageref(XROUTE)).
+03000	
+03100	@index(L, wirelist output)
+03200	@indexentry(key "L, wirelist output",entry "L, wirelist output",number)
+03300	
+03400	@index(Extension WLS)@index(WLS extension)
+03500	L   Produce a .WLS file (page @pageref(BetaLWL)).
+03600	
+03700	
+03800	@indexentry(key "L, wirelist output",entry "L, wirelist output",number)
+03900	@index(L, wirelist output)
+04000	@index(Extension WLU)@index(WLU extension)
+04100	
+04200	L   Produce a WLU file, a listing sorted by dip number.  A good file to look at
+04300	for errors.  See page @pageref(EpsilonLWL).
+04400	
+04500	@index(N, wirelist title)
+04600	@index(Wirelist title, N)
+04700	
+04800	N   Asks for a wirelist title.  See page @pageref(AlphaNWL).
+04900	
+05000	
+05100	@index(XPART)@index(PART)
+05200	
+05300	XPART   Generates a parts list, extension
+05400	@index(Extension PRT)@index(PRT extension)
+05500	.PRT.  See page @pageref(XPART).
+05600	
+05700	@index(XREFERENCE)@index(REFERENCE)
+05800	
+05900	XREFERENCE   Allows a cross reference of  multiply-named signals.
+06000	See page @pageref(XREFERENCE).
+06100	
+06200	@index(X-REFERENCE)@index(-REFERENCE)
+06300	@indexentry(key "XREFERENCE-",entry "X-REFERENCE",number)
+06400	@indexentry(key "REFERENCE-",entry "-REFERENCE",number)
+06500	
+06600	X-REFERENCE   Disables XREFERENCE mode.
+06700	
+06800	@index(XROUTE)@index(ROUTE)
+06900	
+07000	XROUTE   Produces the most common form of the wirelist output,
+07100	the
+07200	@index(WLR extension)@index(Extension WLR)
+07300	.WLR file.  See page @pageref(XROUTE).
+07400	
+07500	@index(SIGSUM)@index(XSIGSUM)
+07600	
+07700	XSIGSUM   Writes a signal summary file, default extension
+07800	@index(Extension WSS)@index(WSS extension)
+07900	.WSS.  See page @pageref(XSIGSUM).
+08000	
+08100	@index(XSTUFF)@index(STUFF)
+08200	
+08300	XSTUFF   Writes a
+08400	@index(STF extension)@index(Extension STF)
+08500	.STF file, which contains information on stuffing dips
+08600	into the board.
+08700	
+08800	@index(XZLEVEL)@index(ZLEVEL)
+08900	
+09000	XZLEVEL   Writes the technician command file
+09100	@index(WLZ extension)@index(Extension WLZ).
+09200	.WLZ.  This is used to wrap the board.  See page @pageref(XZLEVEL).
+09300	This file is also used as input to
+09400	@index(SMECO)
+09500	SMECO, page @pageref(SMECO).
+09600	
+09700	@leave(description)
+09800	
+09900	Here is a typical command file.  The FOO.DIR file contains the
+10000	names of all the WD files.  The file below is called FOO.TXT, and
+10100	all occurrences of FOO should be replaced with a filename appropriate
+10200	to your wirelist:
+10300	@enter(example)
+10400	XREFERENCE
+10500	'I@@FOO
+10600	'NFOO-type wirelist title
+10700	'LFOO
+10800	''LFOO
+10900	'''LFOO
+11000	XROUTE
+11100	FOO
+11200	XZLEVEL
+11300	FOO
+11400	XSTUFF
+11500	FOO
+11600	@leave(example)
+     	     	00100	@sec(The wirelist database)
+00200	@subsec(Protocol for updating)
+00300	@label(saving)
+00400	@index(DIPS.DIP)
+00500	
+00600	The W program maintains the wirelist database.  This database contains
+00700	the information required to map physical pin numbers to default
+00800	pin numbers (i.e., when you have several bodies in a single dip),
+00900	check loading rules, etc.
+01000	
+01100	The wirelist database @i[must] be maintained carefully.  It is
+01200	easy to screw up and lose lots of your editing.  The
+01300	following sequence of commands must be followed exactly or
+01400	you will probably lose your edit.
+01500	
+01600	@enter(example)
+01700	@u[.]RU W
+01800	@u[*]@r[]D
+01900	@u[*]X-RESIDENT
+02000	@u[*]			<do your editing>
+02100	@u[*]WDIPS.DIP		<must do this!>
+02200	@u[*]XRESIDENT
+02300	@u[*]XSAVE
+02400	@leave(example)
+02500	
+02600	If you fail to do the W command to some file, e.g., DIPS.DIP,
+02700	you will lose your edits when the XRESIDENT command reads
+02800	DIPS.DIP back in!
+02900	
+03000	@subsec(Dips submode commands)@label(dipsmode)
+03100	
+     	00100	@enter(description)
+00200	@index(@@, dips submode)@index(Dips submode, @@)
+00300	@@   Same as "XDSKIN<crlf>", see page @pageref(XDSKINWL).
+00400	
+00500	
+00600	
+00700	@label(DipsC)
+00800	@index(C, dips submode)@index(Dips submode, C)
+00900	@index(Copying Dip definition)
+01000	
+01100	@emphasize[C]<dipname>   Copy definition of <dipname>.   Asks for a
+01200	new <dipname>; if it already exists you are asked if you wish to
+01300	replace it.  It will then ask for a loading conversion factor. 
+01400	This wants something of the form <integer> or <integer>/<integer>.
+01500	@i[It cannot understand floating point!  If you want the loading
+01600	factor to be 0.8, you must specify it as 4/5!].  The table
+01700	below gives the conversion factors for converting one type of
+01800	dip to another.  The user is cautioned about LSTTL conversions,
+01900	since the sink current of most LSTTL is actually twice what is 
+02000	expected (8ma as opposed to 4ma if a straight loading conversion
+02100	is done).  Note that this means that converting @i[to] LSTTL
+02200	will result in under-rated sink current, and converting @i[from]
+02300	LSTTL will give an over-rated sink current.
+02400	
+02500	@enter(example,leftmargin -8)
+02600			Desired TTL family
+02700	@index(LSTTL to TTL conversion)
+02800	@index(TTL to STTL conversion)
+02900	@index(TTL to HTTL conversion)
+03000	@index(TTL to LTTL conversion)
+03100	@index(TTL to LSTTL conversion)
+03200	@index(STTL to TTL conversion)
+03300	@index(STTL to HTTL conversion)
+03400	@index(STTL to LTTL conversion)
+03500	@index(STTL to LSTTL conversion)
+03600	@index(HTTL to TTL conversion)
+03700	@index(HTTL to STTL conversion)
+03800	@index(HTTL to LTTL conversion)
+03900	@index(HTTL to LSTTL conversion)
+04000	@index(LTTL to TTL conversion)
+04100	@index(LTTL to STTL conversion)
+04200	@index(LTTL to HTTL conversion)
+04300	@index(LTTL to LSTTL conversion)
+04400	@index(LSTTL to STTL conversion)
+04500	@index(LSTTL to HTTL conversion)
+04600	@index(LSTTL to LTTL conversion)
+04700	Current TTL
+04800	family
+04900	        TTL      STTL      HTTL      LTTL      LSTTL
+05000	
+05100	TTL     1         5/4       5/4       1/2       1/4
+05200	
+05300	STTL    4/5       1         1         2/5       1/5
+05400	
+05500	HTTL    4/5       1         1         2/5       2/5
+05600	
+05700	LTTL    2         5/2       5/2       1         1
+05800	
+05900	LSTTL   4         5         5/2       1         1  
+06000	
+06100	@leave(example)
+06200	
+06300	@label(DipsD)
+06400	@index(D, dips submode)@index(Dips submode, D)
+06500	@index(DIPS.DIP, deleting entry)@index(Deleting Dip definition)
+06600	
+06700	@emphasize[D]<dipname>   Deletes the definition of <dipname>.
+06800	If <dipname> is empty, you get DDT if it is loaded.
+06900	
+07000	@label(DipsE)
+07100	@index(E, dips submode)@index(Dips submode, E)
+07200	
+07300	@emphasize[E]   Exit to top mode.
+07400	
+07500	@label(DipsI)
+07600	@index(DIPS.DIP, reading)@index(I, dips submode)@index(Dips submode, I)
+07700	@index(Reading DIPS.DIP)
+07800	
+07900	@emphasize[I]<filename>   Input a dip file into the internal data structure.
+08000	If the filename is omitted, the last one used for an I, W or
+08100	N command is used.  The name starts out as 
+08200	@index(DIPS.DIP)
+08300	DIPS.DIP[<library>], but a particular saved version of W may
+08400	have a different one set.  The default extension is
+08500	@index(Extension DIP)@index(DIP extension)
+08600	.DIP.
+08700	
+08800	@label(DipsL)
+08900	@index(L, dips submode)@index(Dips submode, L)
+09000	@emphasize[L]   Asks for a filename, and writes a file
+09100	of all dip definitions (default extension 
+09200	@index(Extension LSD)@index(LSD extension)
+09300	@index(DIPS.LSD, writing)
+09400	.LSD).  This lists all the dip definitions in sorted order,
+09500	and is also used by the MAPLSD program (page @pageref(maplsd)).
+09600	
+09700	
+09800	
+09900	@label(DipsM)
+10000	@index(Editing Dip definition)@index(Modifying Dip definition)
+10100	@index(Dip definition, creating)
+10200	@index(Dip definition, modifying)
+10300	@index(M, dips submode)@index(Dips submode, M)
+10400	
+10500	@enter(multiple)
+10600	@emphasize[M]<dipname>   Modify the definition of <dipname>.
+10700	If no definition exists, a new one is created; you are
+10800	asked for the number of pins.  Give a number followed by
+10900	a <crlf>.
+11000	A heading line is typed, and @i[echoing is turned off].  This seems
+11100	silly, but that is how the program works.  The cursor is
+11200	positioned at the PIN# column and now awaits commands.  The
+11300	following commands are available:
+11400	@enter(description)
+11500	@label(DipsEA)
+11600	@index(Automatic mode, dip editing)
+11700	@index(A, dip editing)@index(Dip editing, A)
+11800	A<cr>   Specifies that you wish to enter automatic numbering mode.
+11900	After you terminate work on pin <n> with a <crlf>, you are
+12000	automatically positioned at pin <n+1>.  To get out of automatic
+12100	mode, either type <escape> or finish the last pin in the dip.
+12200	
+12300	
+12400	@label(DipsEL)
+12500	@index(L, dip editing)@index(Dip editing, L)
+12600	L<cr>   Automatically copies all columns to the left of the LOAD
+12700	column when you type <n><tab>.
+12800	
+12900	<n><crlf>   Types the information for pin <n>
+13000	
+13100	<n>@emphasize[<tab>]   Types the information for pin <n> and then tabs
+13200	to the "TYPE" column.  You can now change any or all of the data
+13300	items for this pin.  Type <cr> to fill in the rest of the line
+13400	with what was already there.  Type <tab> to get to the next
+13500	column.  Bad format is filtered out, and only good data is
+13600	echoed when <tab> is typed.  To leave a column unchanged, just
+13700	type <tab>.  Note that <backspace> works in case you think you
+13800	made a mistake and want to back up over what you just typed.
+13900	However,  since echoing is turned off this is sometimes hard
+14000	to guess about.  Apparently this crockitude is left over from
+14100	the days of the model 33 TTY!
+14200	
+14300	@label(DipsEP)
+14400	@index(P, dip editing)@index(Dip editing, P)
+14500	
+14600	P<cr>   Automatically copies all columns to the left of the PS
+14700	column when you type <n><tab>.
+14800	
+14900	@index(S, dip editing)@index(Dip editing, S)
+15000	S<cr>   Automatically copies all columns to the left of the SECTION
+15100	column when you type <n><tab>
+15200	
+15300	@index(T, dip editing)@index(Dip editing, T)
+15400	
+15500	T<cr>   Automatically copies all columns to the left of the TYPE
+15600	column when you type <n><tab>.
+15700	@leave(description)
+15800	
+15900	@index(TYPE, field of dip definition)
+16000	The TYPE field specifies the nature of the pin function.  The
+16100	type may be optionally prefixed with the character
+16200	"E" for ECL or "T" for TTL.
+16300	@index(ECL levels)@index(TTL levels)
+16400	@enter(description)
+16500	@index(TYPE I, input)
+16600	@index(I, pin type)
+16700	
+16800	I   Input pin.  Requires drive; must be connected if section is used.
+16900	
+17000	@index(TYPE IP, input pullup)
+17100	@index(IP, pin type)
+17200	
+17300	IP   Input pin with internal pullup (TTL) or pulldown (ECL).  Does not require drive and need not be connected..
+17400	
+17500	@index(IS, pin type)
+17600	@index(TYPE IS, input load sharing)
+17700	
+17800	IS   Input pin with load sharing.  Requires drive; must be connected if
+17900	section is used.
+18000	
+18100	@index(ISP, pin type)
+18200	@index(TYPE ISP, input load sharing)
+18300	
+18400	ISP   Input pin with load sharing and internall pullup (TTL) or pulldown (ECL).
+18500	Does not require drive and need not be connected.
+18600	
+18700	@index(O, pin type)
+18800	@index(TYPE O, output)
+18900	
+19000	O    Output pin; standard output configuration assumed (e.g., totem-pole
+19100	for TTL).  Two TTL output pins may not be connected.
+19200	
+19300	@index(OT, pin type)
+19400	@index(TYPE OT, output three-state)
+19500	@index(Tri-state output)
+19600	@index(Three-state output)
+19700	
+19800	OT   Output pin, three-state.  More than one three-state output pin
+19900	may appear in a run.
+20000	
+20100	@index(OC, pin type)
+20200	@index(TYPE OC, open-collector)
+20300	@index(Open-collector output)
+20400	
+20500	OC   Output pin, open-collector.  More than one open-collector output
+20600	pin may appear on a run.
+20700	
+20800	
+20900	@index(OP, pin type)
+21000	@index(TYPE OP, pullup output)
+21100	@index(Pullup output)
+21200	
+21300	OP   Output pin with internal pullup resistor.  More than one of these
+21400	may appear on a run, intermixed with OC types.  Proper loading will
+21500	be computed.
+21600	
+21700	@index(TYPE P, power)
+21800	@index(P, power run)
+21900	@index(Power pin)
+22000	
+22100	P   Power connection pin (Vcc for TTL).
+22200	
+22300	PWR   Power connection pin; same as P.
+22400	
+22500	@index(G, pin type)
+22600	@index(TYPE G, ground)
+22700	@index(Ground pin)
+22800	
+22900	G   Ground connection pin.
+23000	
+23100	@index(N, pin type)
+23200	@index(TYPE N, unconnected pin)
+23300	@index(Unconnected pin)
+23400	
+23500	N   Unconnected pin.  Wires run to unconnected pins will be flagged.
+23600	Note that in some cases this is ok, but some dips will blow up
+23700	if their "NC" pins have signals on them.
+23800	
+23900	NC   Same as N; unconnected pin.
+24000	
+24100	
+24200	@index(TYPE Z, terminator)
+24300	@index(Terminator)
+24400	@index(Z, pin type)
+24500	
+24600	Z   Terminator.
+24700	@leave(description)
+24800	
+24900	In addition, an "F" suffix may be added to an output to mark it as
+25000	a flipflop output.  This has special effects in handling of signal names.
+25100	
+25200	@label(levels)
+25300	If the XECL (page @pageref(XECL)) or XTTL (page @pageref(XTTL)) commands
+25400	have been given, the "E" or "T" prefix is automatically assumed.
+25500	Otherwise, the signal is considered "neutral" with respect to
+25600	ECL or TTL levels@foot<This information, it is reputed, lives
+25700	in TYPTAB in WLDIP.FAI and the table following TYPTAB, in case
+25800	desperation with the dip editor forces you to the ultimate
+25900	documentation.>.
+26000	
+26100	@index(USE column)
+26200	The USE column is for comments useful to the person debugging the
+26300	hardware.  The USE information appears in the wirelist files 
+26400	so that the purpose of the pin may be determined without having
+26500	to go back to the TTL data book and look at the pictures.
+26600	If the USE field begins with the prefix "CLK", the wirelister
+26700	will take note of the fact, but no one@foot<Certainly not TAG, on
+26800	21-Jan-75.> knows what it does about this.
+26900	
+27000	@index(PS column)
+27100	The PS column is an aribtrary integer which you assign to indicate
+27200	which pins share loads.  This is used to compute the high-level
+27300	loading of signal lines in TTL.  Give the same number to all pins
+27400	which share with each other.
+27500	
+27600	@index(SECTION column)
+27700	The SECTION column is used to assign body pins ("default pin numbers")
+27800	to physical pins of a DIP.  The section information is of the form:
+27900	@enter(example)
+28000	<default pin> / <section> {,<subsection>~@+[*]
+28100	@leave(example)
+28200	
+28300	The equivalent pins in different sections are specified by having
+28400	equal logical pin numbers.  The subsection number is used with the
+28500	section number to describe a dip with more than one level
+28600	of structure, e.g., a 10100 ECL dip with four identical sections, and
+28700	where one pin in each section is tied to a common enable line.  In
+28800	this case, the four gates sharing the common enable line are considered
+28900	to be in section 0, and a separate subsection number for each
+29000	gate.  Section and subsection numbers must be sequentially assigned,
+29100	and must be distinct, i.e., a number used as a section designator
+29200	must not also be used to number a subsection.  If you are confused,
+29300	check out the definitions of gates like the dm8837, shown
+29400	on page @pageref(dm8837).  If you 
+29500	are still confused, the previous manual invites you to
+29600	ask Tom Gafford, and if still confused, or don't know who or
+29700	where he is, it offers the very good advice to contact Dick
+29800	Helliwell around 3a.m. and harass him because it is all his fault.
+29900	
+30000	@leave(multiple)
+30100	@label(DipsN)
+30200	@index(N, dips submode)@index(Dips submode, N)@index(DIPS.DIP, respecifying)
+30300	
+30400	@emphasize[N]<filename>   Prints the current filename for
+30500	I (page @pageref(DipsI)) and W (page @pageref(DipsW))  commands, or if the optional filename is given,
+30600	changes the filename used for future commands.
+30700	
+30800	
+30900	
+31000	@label(DipsP)
+31100	@index(P, dips submode)@index(Dips submode, P)
+31200	
+31300	@emphasize[P]<dipname>   Print the definition of <dipname> on
+31400	the terminal.  This is usually useful before you are about to
+31500	edit the dip.
+31600	
+31700	@label(DipsR)
+31800	@index(R, dips submode)@index(Dips submode, R)
+31900	
+32000	R<dipname>   Renames <dipname> to a new name.  You will be asked
+32100	for the new name.
+32200	
+32300	@label(DipsS)
+32400	@index(S, dips submode)@index(Dips submode, S)
+32500	
+32600	S<dipname>   Sets the part number string for <dipname>
+32700	
+32800	@label(DipsW)
+32900	@index(W, dips submode)@index(Dips submode, W)
+33000	@index(DIPS.DIP, writing)
+33100	
+33200	@emphasize[W]<filename>   Writes the internal data structure onto
+33300	a file.  If the filename is omitted, the last one used for an
+33400	I, W or N command is used.  
+33500	
+33600	@leave(descriptioN)
+     	00100	@subsec(Examples of DIP definitions)
+00200	@label(Dipexamples)
+00300	@enter(example)
+00400	74 00	14 PINS
+00500	PIN #	TYPE	LOW	HI	USE	PS	SECTION(S)
+00600	1	TISP	-1.60	0.04		1	1/0
+00700	2	TISP	-1.60	0.04		1	2/0
+00800	3	TO	16.00	-0.80			3/0
+00900	4	TISP	-1.60	0.04		2	1/1
+01000	5	TISP	-1.60	0.04		2	2/1
+01100	6	TO	16.00	-0.80			3/1
+01200	7	G
+01300	8	TO	16.00	-0.80			3/2
+01400	9	TISP	-1.60	0.04		3	2/2
+01500	10	TISP	-1.60	0.04		3	1/2
+01600	11	TO	16.00	-0.80			3/3
+01700	12	TISP	-1.60	0.04		4	2/3
+01800	13	TISP	-1.60	0.04		4	1/3
+01900	14	TV	5.00V	22.00MA	
+02000	@hinge()
+02100	DM8837	16 PINS
+02200	@label(dm8837)
+02300	PIN #	TYPE	LOW	HI	USE	PS	SECTION(S)
+02400	1	IP	-0.05	0.05	BUS 1		1/0
+02500	2	TO	16.00	-0.40	OUT 1		2/0
+02600	3	IP	-0.05	0.05	BUS 2		1/1
+02700	4	TO	16.00	-0.40	OUT 2		2/1
+02800	5	IP	-0.05	0.05	BUS 3		1/2
+02900	6	TO	16.00	-0.40	OUT 3		2/2
+03000	7	TIP	-3.20	0.08	DSAB A		3/0,1,2
+03100	8	G
+03200	9	TIP	-3.20	0.08	DSAB B		3/3,4,5
+03300	10	TO	16.00	-0.40	OUT 4		2/3
+03400	11	IP	-0.05	0.05	BUS 4		1/3
+03500	12	TO	16.00	-0.40	OUT 5		2/4
+03600	13	IP	-0.05	0.05	BUS 5		1/4
+03700	14	TO	16.00	-0.40	OUT 6		2/5
+03800	15	IP	-0.05	0.05	BUS 6		1/5
+03900	16	V	5.00V	60.00MA	VCC
+04000	@leave(example)
+     	00100	@sec(MAPLSD and MAP)@label(MAPLSD)
+00200	MAPLSD is the prototype of the MAP program.  The MAP program
+00300	is a core image which contains a set of DIP definitions, and
+00400	reads a drawing file containing the names
+00500	of the dips sorted in order (WLU files).  This file  
+00600	is produced by the L command in W, page @pageref(EpsilonLWL).
+00700	The output of MAP  is
+00800	a map of all the dip locations.
+00900	
+01000	
+01100	To create a MAP program, you must first produce an LSD file
+01200	@index(LSD extension)@index(Extension LSD)
+01300	by using the L command in dips submode of W (page @pageref(DipsL)).
+01400	Then run MAPLSD[X335DP00] according to the following protocol:
+01500	@enter(example)
+01600	@u[.]RU MAPLSD[X335DP00]
+01700	@u[LSD file?] DIPS.LSD
+01800	@u[#### ... ####]
+01900	@u[Save this core image when it exits]
+02000	@u[EXIT]
+02100	@u[.]SAV MAP
+02200	@leave(example)
+02300	
+02400	The version of MAP, when run, will produce the map from the list
+02500	of files.
+02600	@enter(example)
+02700	@u[.]RU MAP
+02800	@u[WLU file: ]FOO
+02900	@u<Output file: [FOO.MAP]> <crlf>
+03000	@u[EXIT]
+03100	@leave(example)
+03200	To print the map on the XGP, use the XGP command file
+03300	@index(MAP.CMD)
+03400	MAP.CMD[X335DP00].
+03500	
+03600	@enter(example)
+03700	@u[.]R LOOK
+03800	@u[*]@@MAP[X335DP00]
+03900	@u[**]...
+04000	@u[*]FOO.MAP
+04100	@leave(example)
+     	00100	@sec(SMECO)@label(SMECO)
+00200	
+00300	<Richard Swan volunteered to write something here>
+00400	
+   

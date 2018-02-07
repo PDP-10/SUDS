@@ -1,0 +1,2067 @@
+				T.WLR[WL,DRW]		19-AUG-76  0850
+FILNAM	P,PN		DATE	   TIME	MODULE(DWG NUM)	REV	AUTHOR
+	TITLE 1				PROJECT		BOARD TYPE
+	TITLE 2				SHEET n OF m
+	CARD LOC(VARIABLE SETTINGS)
+
+TT1	MAY,TAG		19-AUG-76  0830				TAG
+	UNIBUS ADDRESS DECODER				MDB
+TT10	MAY,TAG		24-JUL-76  0644				
+	TTY CONNECTOR					MDB
+TT11	MAY,TAG		26-JUL-76  0622				TAG
+	UNIBUS CONNECTOR		ARM INTERFACE	MDB
+					SHEET 1 OF 1
+TT2	MAY,TAG		19-AUG-76  0724				TAG
+	UNIBUS DATA I/O					MDB
+TT3	MAY,TAG		19-AUG-76  0729				TAG
+	INTERRUPTER					MDB
+TT4	MAY,TAG		19-AUG-76  0730				
+	FLAG STORAGE, LINE CTR,				MDB
+	START/STOP SYNC & CONTROL
+TT5	MAY,TAG		19-AUG-76  0730				
+	UART CONTROL					MDB
+TT6	MAY,TAG		19-AUG-76  0745				
+	UART CLOCK					MDB
+TT7	MAY,TAG		19-AUG-76  0733				
+	UARTS						MDB
+	LINES 0 TO 3
+TT8	MAY,TAG		19-AUG-76  0816				
+	CURRENT LOOP AND				MDB
+	EIA INTERFACE, LINES 0 & 1
+TT9	MAY,TAG		19-AUG-76  0818				
+	CURRENT LOOP AND				MDB
+	EIA INTERFACE, LINE 2 & 3
+				T.WLR[WL,DRW]		19-AUG-76  0850
+LOC	DIPTYPE	BODY	FILE	POS
+
+A1	74 38	38	TT7	A7
+			TT3	A4
+			TT3	A6
+			TT3	A6
+A2	74 38	38	TT3	D7
+			TT3	A2
+			TT3	A4
+			TT3	A2
+A3	74 38	38	TT1	B7
+			TT2	A7
+			TT3	C7
+		38O	TT3	B7
+A5	74LS27	LS27	TT2	A5
+		LS27O	TT2	A3
+		LS27	TT1	B6
+A7	74LS00	LS00	TT4	A7
+			TT1	B4
+B1	8838	8838	TT2	D3
+B2	74LS08	LS08	TT3	D6
+			TT3	C6
+			TT1	B3
+			TT3	C6
+B3	74LS139	LS139	TT1	A3
+			TT1	A5
+B4	UART	TR1602	TT7	B7
+B5	8131	8131	TT1	C7
+B6	8131	8131	TT1	C5
+B7	8131	8131	TT1	C3
+B8	UART	TR1602	TT7	B3
+B9	BLANK2	R	TT8	B7
+			TT9	B7
+			TT8	A1
+			TT9	A1
+			TT8	D7
+			TT9	D7
+			TT8	C1
+			TT9	C1
+C1	8838	8838	TT2	B3
+C2	74LS02	LS02	TT4	B4
+			TT4	A4
+		LS02O	TT3	C4
+		LS02	TT3	D3
+				T.WLR[WL,DRW]		19-AUG-76  0850
+LOC	DIPTYPE	BODY	FILE	POS
+
+C3	74LS02	LS02	TT3	B3
+		LS02O	TT1	B4
+		LS02	TT1	B4
+			TT1	A6
+C5	DM8837I	8837IO	TT8	A3
+			TT9	A4
+		8837I0O	TT8	C3
+		8837IO	TT9	C4
+		8837I0	TT3	B2
+		8837I	TT3	C2
+C6	74LS04	LS04	TT1	A4
+			TT1	B7
+		LS04R	TT3	B3
+		LS04	TT3	D5
+			TT3	B3
+		LS04R	TT1	B6
+C7	DM8837I	8837I0O	TT1	A2
+		8837I	TT1	A2
+			TT1	A2
+		8837I0	TT1	B2
+		8837IO	TT3	B6
+			TT3	B2
+C9	6IN16	OPTO	TT8	A6
+			TT8	C6
+C10	BLANK2	R	TT8	A3
+			TT9	A3
+			TT8	A5
+			TT9	A5
+			TT8	C3
+			TT9	C3
+			TT8	C5
+			TT9	C5
+D1	74LS153	LS153	TT2	C5
+D2	74LS74	LS74	TT3	C5
+			TT3	B5
+D3	74 25	25	TT3	C3
+			TT3	D6
+D5	BLANK2	R	TT3	B1
+			TT3	A6
+		C	TT3	B5
+		R	TT3	A7
+D6	BLANK2	R	TT4	C7
+		C	TT4	D6
+		R	TT4	D6
+		C	TT4	D7
+		R	TT4	D7
+			TT4	A5
+				T.WLR[WL,DRW]		19-AUG-76  0850
+LOC	DIPTYPE	BODY	FILE	POS
+
+D7	74LS221	LS221	TT4	D6
+			TT4	D7
+D9	6IN16	OPTO	TT8	A3
+			TT8	D3
+D10	6IN16	OPTO	TT9	A3
+			TT9	D3
+E1	74LS153	LS153	TT2	C5
+E2	74LS74	LS74	TT4	B7
+			TT3	D2
+E3	74LS139	LS139	TT5	A2
+			TT5	C2
+E4	UART	TR1602	TT7	B5
+E5	74LS04	LS04R	TT5	C7
+			TT5	D8
+			TT5	C7
+		LS04	TT5	B6
+		LS04R	TT4	B2
+			TT4	B2
+E6	74LS221	LS221	TT4	C6
+			TT4	A5
+E7	74LS193	LS193	TT4	C2
+E8	UART	TR1602	TT7	B1
+E9	8IN16	CLD	TT9	C7
+			TT9	A7
+E10	6IN16	OPTO	TT9	A6
+			TT9	C6
+F1	74LS153	LS153	TT2	B5
+F2	9334	9334	TT6	A5
+F3	34702	34702	TT6	A2
+F5	74 06	06	TT8	B2
+			TT9	B2
+			TT8	D2
+			TT9	D2
+		06R	TT3	B4
+		06	TT3	B6
+F6	DM8599	8599	TT4	B1
+F7	74LS139	LS139	TT5	A7
+			TT5	C6
+F9	8IN16	CLD	TT8	C7
+			TT8	A7
+F10	BLANK2	D	TT8	A2
+			TT9	A2
+		R	TT8	A2
+			TT9	A2
+		D	TT8	D2
+			TT9	D2
+		R	TT8	C2
+			TT9	C2
+				T.WLR[WL,DRW]		19-AUG-76  0850
+LOC	DIPTYPE	BODY	FILE	POS
+
+H1	74LS153	LS153	TT2	A5
+H2	74LS04	LS04R	TT5	D7
+			TT8	B2
+			TT9	B2
+			TT8	D2
+			TT9	D2
+H3	74LS00	LS00	TT4	B3
+			TT4	B3
+			TT4	A2
+			TT4	A2
+H4	2IN24	X24P	TT6	A2
+		R24P	TT6	A1
+		C24P	TT6	A1
+			TT6	A1
+H5	74LS27	LS27	TT5	B5
+			TT7	A6
+			TT4	A6
+H6	74LS74	LS74I	TT4	B4
+			TT4	B4
+H7	74LS74	LS74	TT4	A4
+			TT4	A3
+H9	75154	75154	TT8	A4
+			TT9	A4
+			TT8	C4
+			TT9	C4
+H10	1488	1488O	TT8	B2
+			TT9	B2
+		1488/1O	TT8	D2
+		1488O	TT9	D2
+P2	50PIN	50PIN	TT6	A8
+P3	50PIN	50PIN	TT10	A6
+C	CON			
+D	CON			
+E	CON			
+F	CON			
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+GND	A1(7)       .	 
+	A1(7)       |	 
+			GND/0.00
+	A2(7)       .	 
+	A2(7)       |	 
+			GND/0.00
+	A3(7)       .	 
+	A3(7)       |	 
+			GND/0.00
+	A5(7)       .	 
+	A5(7)       |	 
+			GND/0.00
+	A7(7)       .	 
+	A7(7)       |	 
+			GND/0.00
+	B1(8)       .	 
+	B1(8)       |	 
+			GND/0.00
+	B2(8)       .	 
+	B2(8)       |	 
+			GND/0.00
+	B3(8)       .	 
+	B3(8)       |	 
+			GND/0.00
+	B4(3)       .	 
+	B4(20)      |	 			4.5
+			GND/0.00
+	B5(10)      \	 TI	1.60	0.04		T4	8131	8131	TT1	C7
+	B5(14)      |	 TI	1.60	0.04	3.0	T6	8131	8131	TT1	C7
+	B5(12)      |	 TI	1.60	0.04	3.0	T5	8131	8131	TT1	C7
+	B5(8)       |	 			3.5
+	B5(8)       |	 
+	B5(7)       |	 TI	2.40	0.08	2.1	STB	8131	8131	TT1	C7
+	B5(6)       |	 TI	1.60	0.04	2.1	T3	8131	8131	TT1	C7
+			8.80/0.00		13.7
+	B6(7)       \	 TI	2.40	0.08		STB	8131	8131	TT1	C5
+	B6(8)       |	 			2.1
+	B6(8)       |	 
+			2.40/0.00		2.1
+	B7(10)      \	 TI	1.60	0.04		T4	8131	8131	TT1	C3
+	B7(12)      |	 TI	1.60	0.04	3.0	T5	8131	8131	TT1	C3
+	B7(14)      |	 TI	1.60	0.04	3.0	T6	8131	8131	TT1	C3
+	B7(15)      |	 TI	0.05	0.05	2.1	B6	8131	8131	TT1	C3
+	B7(1)       |	 TI	0.05	0.05	3.5	B1	8131	8131	TT1	C3
+	B7(2)       |	 TI	1.60	0.04	2.1	T1	8131	8131	TT1	C3
+	B7(7)       |	 TI	2.40	0.08	3.0	STB	8131	8131	TT1	C3
+	B7(8)       |	 			2.1
+	B7(8)       |	 
+			8.90/0.00		18.8
+	B8(3)       .	 
+	B8(20)      |	 			4.5
+			GND/0.00
+	C1(8)       .	 
+	C1(8)       |	 
+			GND/0.00
+	C2(8)       .	 
+	C2(8)       |	 
+			GND/0.00
+	C3(8)       .	 
+	C3(8)       |	 
+			GND/0.00
+	C5(9)       .	 TI	-3.20	0.08		DIS A	DM8837I	8837I0O	TT8	C3
+	C5(7)       |	 TI	-3.20	0.08	3.5	DIS B	DM8837I	8837I0	TT3	B2
+	C5(8)       |	 			2.1
+	C5(8)       |	 
+			-6.40/0.00		5.6
+	C6(8)       .	 
+	C6(8)       |	 
+			GND/0.00
+	C7(9)       .	 TI	-3.20	0.08		DIS A	DM8837I	8837I0O	TT1	A2
+	C7(7)       |	 TI	-3.20	0.08	3.5	DIS B	DM8837I	8837I0	TT1	B2
+	C7(8)       |	 			2.1
+	C7(8)       |	 
+			-6.40/0.00		5.6
+	D1(12)      .	 TI	-0.36	0.02		2C2	74LS153	LS153	TT2	C5
+	D1(15)      |	 TI	-0.36	0.02	3.0	2G	74LS153	LS153	TT2	C5
+	D1(1)       |	 TI	-0.36	0.02	3.5	1G	74LS153	LS153	TT2	C5
+	D1(4)       |	 TI	-0.36	0.02	3.0	1C2	74LS153	LS153	TT2	C5
+	D1(8)       |	 			3.0
+	D1(8)       |	 
+			-1.44/0.00		12.5
+	D2(8)       .	 
+	D2(8)       |	 
+			GND/0.00
+	D3(9+)      \	 TI	-1.60	0.04			74 25	25	TT3	D6
+	D3(8)       |	 			3.5
+	D3(8)       |	 
+			-1.60/0.00		3.5
+	D7(8)       .	 
+	D7(8)       |	 
+			GND/0.00
+	E1(10)      \	 TI	-0.36	0.02		2C0	74LS153	LS153	TT2	C5
+	E1(12)      |	 TI	-0.36	0.02	3.0	2C2	74LS153	LS153	TT2	C5
+	E1(15)      |	 TI	-0.36	0.02	3.0	2G	74LS153	LS153	TT2	C5
+	E1(1)       |	 TI	-0.36	0.02	3.5	1G	74LS153	LS153	TT2	C5
+	E1(4)       |	 TI	-0.36	0.02	3.0	1C2	74LS153	LS153	TT2	C5
+	E1(8)       |	 			3.0
+	E1(8)       |	 
+			-1.80/0.00		15.5
+	E2(8)       .	 
+	E2(8)       |	 
+			GND/0.00
+	E3(1)       \	 TIP	-0.36	0.02		-1G	74LS139	LS139	TT5	A2
+	E3(8)       |	 			3.5
+	E3(8)       |	 
+			-0.36/0.00		3.5
+	E4(3)       .	 
+	E4(20)      |	 			4.5
+			GND/0.00
+	E5(8)       .	 
+	E5(8)       |	 
+			GND/0.00
+	E6(9)       .	 TIP	-0.36	0.02		-A2	74LS221	LS221	TT4	C6
+	E6(8)       |	 			3.5
+	E6(8)       |	 
+	E6(1)       |	 TIP	-0.36	0.02	3.5	-A1	74LS221	LS221	TT4	A5
+			-0.72/0.00		7.0
+	E7(9)       .	 TI	-0.36	0.02		D0	74LS193	LS193	TT4	C2
+	E7(10)      |	 TI	-0.36	0.02	2.1	D1	74LS193	LS193	TT4	C2
+	E7(8)       |	 			3.5
+	E7(8)       |	 
+			-0.72/0.00		5.6
+	E8(3)       .	 
+	E8(20)      |	 			4.5
+			GND/0.00
+	F1(10)      .	 TI	-0.36	0.02		2C0	74LS153	LS153	TT2	B5
+	F1(13)      |	 TI	-0.36	0.02	3.0	2C3	74LS153	LS153	TT2	B5
+	F1(15)      |	 TI	-0.36	0.02	3.0	2G	74LS153	LS153	TT2	B5
+	F1(1)       |	 TI	-0.36	0.02	3.5	1G	74LS153	LS153	TT2	B5
+	F1(3)       |	 TI	-0.36	0.02	3.0	1C3	74LS153	LS153	TT2	B5
+	F1(6)       |	 TI	-0.36	0.02	3.0	1C0	74LS153	LS153	TT2	B5
+	F1(8)       |	 			3.0
+	F1(8)       |	 
+			-2.16/0.00		18.5
+	F2(8)       .	 
+	F2(8)       |	 
+			GND/0.00
+	F3(5)       \	 TI	0.00	0.00		CP	34702	34702	TT6	A2
+	F3(8)       |	 			3.0
+	F3(8)       |	 
+			GND/0.00		3.0
+	F5(8)       .	 
+	F5(8)       |	 
+			GND/0.00
+	F6(14)      \	 TI	-1.60	0.04		C	DM8599	8599	TT4	B1
+	F6(13)      |	 TI	-1.60	0.04	2.1	D	DM8599	8599	TT4	B1
+	F6(8)       |	 			3.5
+	F6(8)       |	 
+	F6(2)       |	 TI	-1.60	0.04	3.5	ME	DM8599	8599	TT4	B1
+			-4.80/0.00		9.1
+	F7(8)       .	 
+	F7(8)       |	 
+			GND/0.00
+	H1(10)      \	 TI	-0.36	0.02		2C0	74LS153	LS153	TT2	A5
+	H1(15)      |	 TI	-0.36	0.02	3.0	2G	74LS153	LS153	TT2	A5
+	H1(1)       |	 TI	-0.36	0.02	3.5	1G	74LS153	LS153	TT2	A5
+	H1(3)       |	 TI	-0.36	0.02	3.0	1C3	74LS153	LS153	TT2	A5
+	H1(6)       |	 TI	-0.36	0.02	3.0	1C0	74LS153	LS153	TT2	A5
+	H1(8)       |	 			3.0
+	H1(8)       |	 
+			-1.80/0.00		15.5
+	H2(8)       .	 
+	H2(8)       |	 
+			GND/0.00
+	H3(7)       .	 
+	H3(7)       |	 
+			GND/0.00
+	H5(9)       \	 TIP	-0.36	0.02			74LS27	LS27	TT7	A6
+	H5(7)       |	 			3.5
+	H5(7)       |	 
+			-0.36/0.00		3.5
+	H6(7)       .	 
+	H6(7)       |	 
+			GND/0.00
+	H7(2)       \	 TI	-0.40	0.02		D1	74LS74	LS74	TT4	A3
+	H7(7)       |	 			3.0
+	H7(7)       |	 
+			-0.40/0.00		3.0
+	H9(8)       .	 
+	H9(8)       |	 
+			GND/0.00
+	H10(8)      .	 
+	H10(8)      |	 
+			GND/0.00
+	D5(2)       \	 I	0.00	0.00			BLANK2	C	TT3	B5
+	D5(4)       |	 I	0.00	0.00	3.0		BLANK2	R	TT3	B1
+	D5(8)       |	 			3.0
+			GND/0.00		6.0
+	D9(14)      \	 I	0.00	0.00			6IN16	OPTO	TT8	A3
+	D9(9)       |	 I	0.00	0.00	3.0		6IN16	OPTO	TT8	D3
+	D9(8)       |	 			3.5
+			GND/0.00		6.5
+	D10(14)     \	 I	0.00	0.00			6IN16	OPTO	TT9	A3
+	D10(9)      |	 I	0.00	0.00	3.0		6IN16	OPTO	TT9	D3
+	D10(8)      |	 			3.5
+			GND/0.00		6.5
+	H4(13)      \	 I	0.00	0.00			2IN24	C24P	TT6	A1
+	H4(14)      |	 I	0.00	0.00	2.1		2IN24	C24P	TT6	A1
+	H4(12)      |	 			3.5
+			GND/0.00		5.6
+	P2(50)      .	 I	0.00	0.00			50PIN	50PIN	TT6	A8
+	P2(48)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(46)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(44)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(42)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(40)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(38)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(36)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(34)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(32)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(30)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(28)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(26)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(24)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(22)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(20)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(18)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(16)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(14)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(12)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(10)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(8)       |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(6)       |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(4)       |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(2)       |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(25)      |	 			2.1
+			GND/0.00		52.5
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+PWR	A1(14)      .	 
+	A1(14)      |	 
+			PWR/0.00
+	A2(14)      .	 
+	A2(14)      |	 
+			PWR/0.00
+	A3(14)      .	 
+	A3(14)      |	 
+			PWR/0.00
+	A5(14)      .	 
+	A5(14)      |	 
+			PWR/0.00
+	A7(14)      .	 
+	A7(14)      |	 
+			PWR/0.00
+	B1(16)      .	 
+	B1(16)      |	 
+			PWR/0.00
+	B2(15)      .	 
+	B2(16)      |	 			2.1
+			PWR/0.00
+	B3(16)      .	 
+	B3(16)      |	 
+			PWR/0.00
+	B5(16)      .	 
+	B5(16)      |	 
+			PWR/0.00
+	B6(16)      .	 
+	B6(16)      |	 
+			PWR/0.00
+	B7(16)      .	 
+	B7(16)      |	 
+			PWR/0.00
+	C1(16)      .	 
+	C1(16)      |	 
+			PWR/0.00
+	C2(15)      .	 
+	C2(16)      |	 			2.1
+			PWR/0.00
+	C3(15)      .	 
+	C3(16)      |	 			2.1
+			PWR/0.00
+	C6(15)      .	 
+	C6(16)      |	 			2.1
+			PWR/0.00
+	D1(16)      .	 
+	D1(16)      |	 
+			PWR/0.00
+	D2(15)      .	 
+	D2(16)      |	 			2.1
+			PWR/0.00
+	D3(15)      .	 
+	D3(16)      |	 			2.1
+			PWR/0.00
+	D7(16)      .	 
+	D7(16)      |	 
+			PWR/0.00
+	E1(16)      .	 
+	E1(16)      |	 
+			PWR/0.00
+	E2(15)      .	 
+	E2(16)      |	 			2.1
+			PWR/0.00
+	E3(16)      .	 
+	E3(16)      |	 
+			PWR/0.00
+	E5(15)      .	 
+	E5(16)      |	 			2.1
+			PWR/0.00
+	E6(16)      .	 
+	E6(16)      |	 
+			PWR/0.00
+	E7(16)      .	 
+	E7(16)      |	 
+			PWR/0.00
+	F1(16)      .	 
+	F1(16)      |	 
+			PWR/0.00
+	F2(16)      .	 
+	F2(16)      |	 
+			PWR/0.00
+	F5(15)      .	 
+	F5(16)      |	 			2.1
+			PWR/0.00
+	F7(16)      .	 
+	F7(16)      |	 
+			PWR/0.00
+	H1(16)      .	 
+	H1(16)      |	 
+			PWR/0.00
+	H2(15)      .	 
+	H2(16)      |	 			2.1
+			PWR/0.00
+	H3(14)      .	 
+	H3(14)      |	 
+			PWR/0.00
+	H5(14)      .	 
+	H5(14)      |	 
+			PWR/0.00
+	H6(14)      .	 
+	H6(14)      |	 
+			PWR/0.00
+	H7(14)      .	 
+	H7(14)      |	 
+			PWR/0.00
+	B9(1)       \	 I	0.00	0.00			BLANK2	R	TT8	A1
+	B9(2)       |	 I	0.00	0.00	2.1		BLANK2	R	TT8	C1
+	B9(5)       |	 I	0.00	0.00	3.0		BLANK2	R	TT9	A1
+	B9(6)       |	 I	0.00	0.00	2.1		BLANK2	R	TT9	C1
+	B9(9)       |	 I	0.00	0.00	3.5		BLANK2	R	TT9	D7
+	B9(10)      |	 I	0.00	0.00	2.1		BLANK2	R	TT9	B7
+	B9(13)      |	 I	0.00	0.00	3.0		BLANK2	R	TT8	D7
+	B9(14)      |	 I	0.00	0.00	2.1		BLANK2	R	TT8	B7
+	B9(16)      |	 			3.0
+			PWR/0.00		20.9			     INPUT CONNECTED TO POWER!	____ 3
+	P2(35)      \	 I	0.00	0.00			50PIN	50PIN	TT6	A8
+	P2(37)      |	 I	0.00	0.00	2.1		50PIN	50PIN	TT6	A8
+	P2(50)      |	 			4.5
+			PWR/0.00		6.6			     INPUT CONNECTED TO POWER!	____ 3
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+%A1(6)											   ONE PIN RUN	____ 0
+	A1(6)     	 TOC	48.00				74 38	38	TT3	A6
+											 UNUSED SIGNAL	____ 1
+%A1(8)											   ONE PIN RUN	____ 0
+	A1(8)     	 TOC	48.00				74 38	38	TT3	A6
+											 UNUSED SIGNAL	____ 1
+%A5(8)	A5(8)       .	 TO	8.00	-0.40			74LS27	LS27O	TT2	A3
+	A5(4)       |	 TIP	-0.36	0.02	4.0		74LS27	LS27	TT2	A5
+			-0.36(0.02)/8.00(-0.40)
+%A7(3)	B3(15)      .	 TIP	-0.36	0.02		-2G	74LS139	LS139	TT1	A5
+	A7(3)       |	 TO	8.00	-0.40	9.0		74LS00	LS00	TT1	B4
+			-0.36(0.02)/8.00(-0.40)
+%B2(11)	A2(4)       .	 TIS	-1.60	0.04			74 38	38	TT3	A2
+	A2(5)       |	 TIS	(-1.60)	0.04	2.1		74 38	38	TT3	A2
+	A2(10)      |	 TIS	(-1.60)	0.04	3.5		74 38	38	TT3	A2
+	A2(9)       |	 TIS	-1.60	0.04	2.1		74 38	38	TT3	A2
+	A1(4)       |	 TIS	-1.60	0.04	3.0		74 38	38	TT3	A6
+	A1(5)       |	 TIS	(-1.60)	0.04	2.1		74 38	38	TT3	A6
+	A1(1)       |	 TIS	-1.60	0.04	3.0		74 38	38	TT3	A4
+	A1(2)       |	 TIS	(-1.60)	0.04	2.1		74 38	38	TT3	A4
+	A2(13)      |	 TIS	(-1.60)	0.04	3.0		74 38	38	TT3	A4
+	A2(12)      |	 TIS	-1.60	0.04	2.1		74 38	38	TT3	A4
+	B2(8+)      |	 TO	8.00	-0.40	3.0		74LS08	LS08	TT3	C6
+	B2(11+)     |	 TO	8.00	-0.40	3.0		74LS08	LS08	TT3	D6
+	A1(10)      |	 TIS	(-1.60)	0.04	4.5		74 38	38	TT3	A6
+	A1(9)       |	 TIS	-1.60	0.04	2.1		74 38	38	TT3	A6
+			-9.60(0.48)/16.00(-0.80)	35.6			     "WIRE-OR" WARNING	____ 2
+%B2(3)	C3(9+)      .	 TISP	-0.36	0.02			74LS02	LS02O	TT1	B4
+	B2(3+)      |	 TO	8.00	-0.40	3.5		74LS08	LS08	TT1	B3
+			-0.36(0.02)/8.00(-0.40)
+%B2(6)	F5(3+)      .	 TI	-1.60	0.04			74 06	06	TT3	B6
+	B2(6+)      |	 TO	8.00	-0.40	10.0		74LS08	LS08	TT3	C6
+	A3(13)      |	 TIS	(-1.60)	0.04	3.5		74 38	38	TT3	C7
+	A3(12)      |	 TIS	-1.60	0.04	2.1		74 38	38	TT3	C7
+			-3.20(0.12)/8.00(-0.40)	15.6
+%B5(9)	B5(9)       .	 TO	16.00	0.80		OUT	8131	8131	TT1	C7
+	A5(13)      |	 TIP	-0.36	0.02	3.0		74LS27	LS27	TT1	B6
+			-0.36(0.02)/16.00(0.80)
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+%B6(9)	B6(9)       .	 TO	16.00	0.80		OUT	8131	8131	TT1	C5
+	A5(2)       |	 TIP	-0.36	0.02	3.5		74LS27	LS27	TT1	B6
+			-0.36(0.02)/16.00(0.80)
+%B7(4)											   ONE PIN RUN	____ 0
+	B7(4)     	 TI	1.60	0.04		T2	8131	8131	TT1	C3    NO DRIVE	____ 1
+%B7(6)											   ONE PIN RUN	____ 0
+	B7(6)     	 TI	1.60	0.04		T3	8131	8131	TT1	C3    NO DRIVE	____ 1
+%B7(9)	B7(9)       .	 TO	16.00	0.80		OUT	8131	8131	TT1	C3
+	A5(1)       |	 TIP	-0.36	0.02	4.0		74LS27	LS27	TT1	B6
+			-0.36(0.02)/16.00(0.80)
+%C10(5)	C10(5)      .	 I	0.00	0.00			BLANK2	R	TT8	A5
+	C9(1)       |	 I	0.00	0.00	4.0		6IN16	OPTO	TT8	A6
+			0.00/0.00							      NO DRIVE	____ 1
+%C10(7)	E10(1)      .	 I	0.00	0.00			6IN16	OPTO	TT9	A6
+	C10(7)      |	 I	0.00	0.00	5.5		BLANK2	R	TT9	A5
+			0.00/0.00							      NO DRIVE	____ 1
+%C10(8)	E10(6)      .	 I	0.00	0.00			6IN16	OPTO	TT9	C6
+	C10(8)      |	 I	0.00	0.00	5.0		BLANK2	R	TT9	C5
+			0.00/0.00							      NO DRIVE	____ 1
+%C2(1)	D2(1+)      .	 TI	-1.20	0.06		-CLR1	74LS74	LS74	TT3	B5
+	C2(1+)      |	 TO	8.00	-0.40	3.5		74LS02	LS02O	TT3	C4
+			-1.20(0.06)/8.00(-0.40)
+%C2(10)	H7(12)      .	 TI	-0.40	0.02		D2	74LS74	LS74	TT4	A4
+	C2(10+)     |	 TO	8.00	-0.40	12.0		74LS02	LS02	TT4	A4
+			-0.40(0.02)/8.00(-0.40)
+%C2(13)	H6(3)       \	 TI	-0.80	0.04		CLK1	74LS74	LS74I	TT4	B4
+	H6(11)      |	 TI	-0.80	0.04	4.0	CLK2	74LS74	LS74I	TT4	B4
+	C2(13+)     |	 TO	8.00	-0.40	11.0		74LS02	LS02	TT4	B4
+			-1.60(0.08)/8.00(-0.40)	15.0
+%C3(1)	C3(1+)      .	 TO	8.00	-0.40			74LS02	LS02	TT1	B4
+	A7(2)       |	 TISP	-0.36	0.02	9.0		74LS00	LS00	TT1	B4
+			-0.36(0.02)/8.00(-0.40)
+%C3(13)	C3(13+)     .	 TO	8.00	-0.40			74LS02	LS02	TT3	B3
+	C2(3+)      |	 TISP	-0.36	0.02	3.0		74LS02	LS02O	TT3	C4
+			-0.36(0.02)/8.00(-0.40)
+%C5(11)	C10(2)      \	 I	0.00	0.00			BLANK2	R	TT8	C3
+	D9(10)      |	 I	0.00	0.00	4.5		6IN16	OPTO	TT8	D3
+	C5(11)      |	 TI	-0.05	0.05	7.5	IN3	DM8837I	8837I0O	TT8	C3
+			-0.05/0.00		12.0					      NO DRIVE	____ 1
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+%C5(13)	C10(3)      \	 I	0.00	0.00			BLANK2	R	TT9	A3
+	D10(15)     |	 I	0.00	0.00	4.5		6IN16	OPTO	TT9	A3
+	C5(13)      |	 TI	-0.05	0.05	9.0	IN2	DM8837I	8837IO	TT9	A4
+			-0.05/0.00		13.5					      NO DRIVE	____ 1
+%C5(15)	C10(4)      \	 I	0.00	0.00			BLANK2	R	TT9	C3
+	D10(10)     |	 I	0.00	0.00	4.0		6IN16	OPTO	TT9	D3
+	C5(15)      |	 TI	-0.05	0.05	8.0	IN1	DM8837I	8837IO	TT9	C4
+			-0.05/0.00		12.0					      NO DRIVE	____ 1
+%C5(5)	C10(1)      \	 I	0.00	0.00			BLANK2	R	TT8	A3
+	D9(15)      |	 I	0.00	0.00	5.0		6IN16	OPTO	TT8	A3
+	C5(5)       |	 TI	-0.05	0.05	7.5	IN6	DM8837I	8837IO	TT8	A3
+			-0.05/0.00		12.5					      NO DRIVE	____ 1
+%C6(10)	C6(10+)     .	 TO	8.00	-0.40			74LS04	LS04	TT3	B3
+	C3(12+)     |	 TISP	-0.36	0.02	6.5		74LS02	LS02	TT3	B3
+			-0.36(0.02)/8.00(-0.40)
+%C6(12)	C6(12+)     \	 TO	8.00	-0.40			74LS04	LS04	TT3	D5
+	D3(10+)     |	 TI	-1.60	0.04	6.5		74 25	25	TT3	D6
+	C2(2+)      |	 TISP	-0.36	0.02	3.5		74LS02	LS02O	TT3	C4
+			-1.96(0.06)/8.00(-0.40)	10.0
+%C6(8)	D2(3+)      \	 TI	-0.80	0.04		CLK1	74LS74	LS74	TT3	B5
+	D3(4+)      |	 TI	-1.60	0.04	4.5		74 25	25	TT3	C3
+	C6(8+)      |	 TO	8.00	-0.40	6.5		74LS04	LS04R	TT3	B3
+			-2.40(0.08)/8.00(-0.40)	11.0
+%C7(12)	F5(1+)      \	 TI	-1.60	0.04			74 06	06R	TT3	B4
+	C6(9+)      |	 TIP	-0.36	0.02	6.5		74LS04	LS04R	TT3	B3
+	C7(12)      |	 TO	16.00	-0.40	4.0	OUT2	DM8837I	8837IO	TT3	B2
+			-1.96(0.06)/16.00(-0.40)	10.5
+%C7(14)	C7(14)      \	 TO	16.00	-0.40		OUT1	DM8837I	8837IO	TT3	B6
+	A3(10)      |	 TIS	(-1.60)	0.04	9.0		74 38	38O	TT3	B7
+	A3(9)       |	 TIS	-1.60	0.04	2.1		74 38	38O	TT3	B7
+			-1.60(0.08)/16.00(-0.40)	11.1
+%C7(2)	C7(2)       .	 TO	16.00	-0.40		OUT4	DM8837I	8837I0	TT1	B2
+	C3(8+)      |	 TISP	-0.36	0.02	8.0		74LS02	LS02O	TT1	B4
+			-0.36(0.02)/16.00(-0.40)
+%C9(6)	C10(6)      .	 I	0.00	0.00			BLANK2	R	TT8	C5
+	C9(6)       |	 I	0.00	0.00	4.0		6IN16	OPTO	TT8	C6
+			0.00/0.00							      NO DRIVE	____ 1
+%D1(7)	D1(7)       .	 TO	8.00	-0.40		1Y	74LS153	LS153	TT2	C5
+	B1(2)       |	 TI	-1.60	0.04	4.0	IN3	8838	8838	TT2	D3
+			-1.60(0.04)/8.00(-0.40)
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+%D1(9)	D1(9)       .	 TO	8.00	-0.40		2Y	74LS153	LS153	TT2	C5
+	B1(5)       |	 TI	-1.60	0.04	5.0	IN4	8838	8838	TT2	D3
+			-1.60(0.04)/8.00(-0.40)
+%D10(11)										   ONE PIN RUN	____ 0
+	D10(11)   	 I	0.00	0.00			6IN16	OPTO	TT9	D3    NO DRIVE	____ 1
+%D10(16)										   ONE PIN RUN	____ 0
+	D10(16)   	 I	0.00	0.00			6IN16	OPTO	TT9	A3    NO DRIVE	____ 1
+%D2(5)	D2(12+)     .	 TI	-0.40	0.02		D2	74LS74	LS74	TT3	C5
+	D3(13+)     |	 TI	-1.60	0.16	4.5		74 25	25	TT3	D6
+	D2(5+)      |	 TO	8.00	-0.40	3.5	Q1	74LS74	LS74	TT3	B5
+	B2(4+)      |	 TISP	-0.36	0.02	4.5		74LS08	LS08	TT3	C6
+	B2(12+)     |	 TISP	-0.36	0.02	4.0		74LS08	LS08	TT3	D6
+	B2(10+)     |	 TISP	-0.36	0.02	3.0		74LS08	LS08	TT3	C6
+			-3.08(0.24)/8.00(-0.40)	19.5
+%D2(6)	D3(1+)      .	 TI	-1.60	0.04			74 25	25	TT3	C3
+	D2(6+)      |	 TO	8.00	-0.40	4.5	-Q1	74LS74	LS74	TT3	B5
+			-1.60(0.04)/8.00(-0.40)
+%D2(8)	D2(8+)      \	 TO	8.00	-0.40		-Q2	74LS74	LS74	TT3	C5
+	C3(11+)     |	 TISP	-0.36	0.02	4.5		74LS02	LS02	TT3	B3
+	B2(5+)      |	 TISP	-0.36	0.02	4.0		74LS08	LS08	TT3	C6
+			-0.72(0.04)/8.00(-0.40)	8.5
+%D2(9)	D3(12+)     .	 TI	-1.60	0.16			74 25	25	TT3	D6
+	D2(9+)      |	 TO	8.00	-0.40	4.5	Q2	74LS74	LS74	TT3	C5
+	B2(13+)     |	 TISP	-0.36	0.02	4.5		74LS08	LS08	TT3	D6
+	B2(9+)      |	 TISP	-0.36	0.02	3.0		74LS08	LS08	TT3	C6
+			-2.32(0.20)/8.00(-0.40)	12.0
+%D3(6)	D3(6+)      .	 TO	16.00	-0.80			74 25	25	TT3	C3
+	D2(11+)     |	 TI	-0.80	0.04	4.5	CLK2	74LS74	LS74	TT3	C5
+			-0.80(0.04)/16.00(-0.80)
+%D3(8)	D2(2+)      .	 TI	-0.40	0.02		D1	74LS74	LS74	TT3	B5
+	D3(8+)      |	 TO	16.00	-0.80	3.5		74 25	25	TT3	D6
+	A2(2)       |	 TIS	(-1.60)	0.04	5.5		74 38	38	TT3	D7
+	A2(1)       |	 TIS	-1.60	0.04	2.1		74 38	38	TT3	D7
+			-2.00(0.10)/16.00(-0.80)	11.1
+%D7(13)	E6(10)      \	 TIP	-0.44	0.02		B2	74LS221	LS221	TT4	C6
+	D7(13)      |	 TO	8.00	-0.40	4.5	Q1	74LS221	LS221	TT4	D6
+	D7(9)       |	 TIP	-0.36	0.02	3.0	-A2	74LS221	LS221	TT4	D7
+			-0.80(0.04)/8.00(-0.40)	7.5
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+%D7(14)	D7(14)      .	 O	0.00	0.00		CEXT1	74LS221	LS221	TT4	D6
+	D6(3)       |	 I	0.00	0.00	3.0		BLANK2	C	TT4	D6
+			0.00/0.00
+%D7(15)	D6(14)      \	 I	0.00	0.00			BLANK2	C	TT4	D6
+	D7(15)      |	 O	0.00	0.00	4.0	RCEXT1	74LS221	LS221	TT4	D6
+	D6(2)       |	 I	0.00	0.00	3.0		BLANK2	R	TT4	D6
+			0.00/0.00		7.0
+%D7(4)											   ONE PIN RUN	____ 0
+	D7(4)     	 TO	8.00	-0.40		-Q1	74LS221	LS221	TT4	D6
+										   UNUSED EXTRA OUTPUT	____ 0
+%D7(6)	D7(6)       .	 O	0.00	0.00		CEXT2	74LS221	LS221	TT4	D7
+	D6(5)       |	 I	0.00	0.00	4.0		BLANK2	C	TT4	D7
+			0.00/0.00
+%D7(7)	D6(12)      \	 I	0.00	0.00			BLANK2	C	TT4	D7
+	D6(4)       |	 I	0.00	0.00	4.0		BLANK2	R	TT4	D7
+	D7(7)       |	 O	0.00	0.00	4.0	RCEXT2	74LS221	LS221	TT4	D7
+			0.00/0.00		8.0
+%D9(11)											   ONE PIN RUN	____ 0
+	D9(11)    	 I	0.00	0.00			6IN16	OPTO	TT8	D3    NO DRIVE	____ 1
+%D9(16)											   ONE PIN RUN	____ 0
+	D9(16)    	 I	0.00	0.00			6IN16	OPTO	TT8	A3    NO DRIVE	____ 1
+%E1(7)	E1(7)       .	 TO	8.00	-0.40		1Y	74LS153	LS153	TT2	C5
+	B1(11)      |	 TI	-1.60	0.04	6.0	IN2	8838	8838	TT2	D3
+			-1.60(0.04)/8.00(-0.40)
+%E1(9)	E1(9)       .	 TO	8.00	-0.40		2Y	74LS153	LS153	TT2	C5
+	B1(14)      |	 TI	-1.60	0.04	5.0	IN1	8838	8838	TT2	D3
+			-1.60(0.04)/8.00(-0.40)
+%E2(6)	E2(6+)      .	 TO	8.00	-0.40		-Q1	74LS74	LS74	TT3	D2
+	C2(5+)      |	 TISP	-0.36	0.02	4.5		74LS02	LS02	TT3	D3
+			-0.36(0.02)/8.00(-0.40)
+%E5(6)	F7(15)      .	 TIP	-0.36	0.02		-2G	74LS139	LS139	TT5	A7
+	E5(6+)      |	 TO	8.00	-0.40	5.5		74LS04	LS04	TT5	B6
+			-0.36(0.02)/8.00(-0.40)
+%E6(12)											   ONE PIN RUN	____ 0
+	E6(12)    	 TO	8.00	-0.40		-Q2	74LS221	LS221	TT4	C6
+										   UNUSED EXTRA OUTPUT	____ 0
+%E6(13)											   ONE PIN RUN	____ 0
+	E6(13)    	 TO	8.00	-0.40		Q1	74LS221	LS221	TT4	A5
+										   UNUSED EXTRA OUTPUT	____ 0
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+%E6(14)											   ONE PIN RUN	____ 0
+	E6(14)    	 O	0.00	0.00		CEXT1	74LS221	LS221	TT4	A5
+											 UNUSED SIGNAL	____ 1
+%E6(15)	E6(15)      .	 O	0.00	0.00		RCEXT1	74LS221	LS221	TT4	A5
+	D6(6)       |	 I	0.00	0.00	4.5		BLANK2	R	TT4	A5
+			0.00/0.00
+%E6(4)	H6(10)      \	 TI	-0.80	0.04		-SET2	74LS74	LS74I	TT4	B4
+	H6(4)       |	 TI	-0.80	0.04	4.0	-SET1	74LS74	LS74I	TT4	B4
+	E6(4)       |	 TO	8.00	-0.40	4.5	-Q1	74LS221	LS221	TT4	A5
+			-1.60(0.08)/8.00(-0.40)	8.5
+%E6(6)											   ONE PIN RUN	____ 0
+	E6(6)     	 O	0.00	0.00		CEXT2	74LS221	LS221	TT4	C6
+											 UNUSED SIGNAL	____ 1
+%E6(7)	E6(7)       .	 O	0.00	0.00		RCEXT2	74LS221	LS221	TT4	C6
+	D6(1)       |	 I	0.00	0.00	3.0		BLANK2	R	TT4	C7
+			0.00/0.00
+%E7(12)											   ONE PIN RUN	____ 0
+	E7(12)    	 TO	8.00	-0.40		-C	74LS193	LS193	TT4	C2
+										   UNUSED EXTRA OUTPUT	____ 0
+%E7(13)											   ONE PIN RUN	____ 0
+	E7(13)    	 TO	8.00	-0.40		-B	74LS193	LS193	TT4	C2
+										   UNUSED EXTRA OUTPUT	____ 0
+%E7(6)											   ONE PIN RUN	____ 0
+	E7(6)     	 TO	8.00	-0.40		Q1	74LS193	LS193	TT4	C2
+										   UNUSED EXTRA OUTPUT	____ 0
+%E7(7)											   ONE PIN RUN	____ 0
+	E7(7)     	 TO	8.00	-0.40		Q0	74LS193	LS193	TT4	C2
+										   UNUSED EXTRA OUTPUT	____ 0
+%E9(13)	E10(16)     .	 I	0.00	0.00			6IN16	OPTO	TT9	A6
+	E9(13)      |	 I	0.00	0.00	4.0		8IN16	CLD	TT9	A7
+			0.00/0.00							      NO DRIVE	____ 1
+%E9(4)	E10(14)     .	 I	0.00	0.00			6IN16	OPTO	TT9	A6
+	E9(4)       |	 I	0.00	0.00	3.0		8IN16	CLD	TT9	A7
+			0.00/0.00							      NO DRIVE	____ 1
+%E9(8)	E10(9)      .	 I	0.00	0.00			6IN16	OPTO	TT9	C6
+	E9(8)       |	 I	0.00	0.00	3.0		8IN16	CLD	TT9	C7
+			0.00/0.00							      NO DRIVE	____ 1
+%E9(9)	E10(11)     .	 I	0.00	0.00			6IN16	OPTO	TT9	C6
+	E9(9)       |	 I	0.00	0.00	4.0		8IN16	CLD	TT9	C7
+			0.00/0.00							      NO DRIVE	____ 1
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+%F1(7)	F1(7)       .	 TO	8.00	-0.40		1Y	74LS153	LS153	TT2	B5
+	C1(2)       |	 TI	-1.60	0.04	5.0	IN3	8838	8838	TT2	B3
+			-1.60(0.04)/8.00(-0.40)
+%F1(9)	F1(9)       .	 TO	8.00	-0.40		2Y	74LS153	LS153	TT2	B5
+	C1(5)       |	 TI	-1.60	0.04	6.0	IN4	8838	8838	TT2	B3
+			-1.60(0.04)/8.00(-0.40)
+%F3(1)	F3(1)       \	 TO	1.60	-0.30		O0	34702	34702	TT6	A2
+	F3(14)      |	 TI	0.00	0.00	3.5	S0	34702	34702	TT6	A2
+	F2(1)       |	 TI	-1.60	0.04	3.0	A1	9334	9334	TT6	A5
+			-1.60(0.04)/1.60(-0.30)	6.5
+%F3(10)	F3(10)      .	 TO	1.60	-0.30		Z	34702	34702	TT6	A2
+	F2(13)      |	 TI	-1.60	0.04	4.5	D	9334	9334	TT6	A5
+			-1.60(0.04)/1.60(-0.30)
+%F3(11)											   ONE PIN RUN	____ 0
+	F3(11)    	 TI	0.00	0.00		S3	34702	34702	TT6	A2    NO DRIVE	____ 1
+%F3(15)											   ONE PIN RUN	____ 0
+	F3(15)    	 TI	0.00	0.00		IM	34702	34702	TT6	A2    NO DRIVE	____ 1
+%F3(2)	F3(2)       \	 TO	1.60	-0.30		O1	34702	34702	TT6	A2
+	F3(13)      |	 TI	0.00	0.00	4.0	S1	34702	34702	TT6	A2
+	F2(2)       |	 TI	-1.60	0.04	3.0	A2	9334	9334	TT6	A5
+			-1.60(0.04)/1.60(-0.30)	7.0
+%F3(3)	F3(3)       \	 TO	1.60	-0.30		O2	34702	34702	TT6	A2
+	F3(12)      |	 TI	0.00	0.00	4.0	S2	34702	34702	TT6	A2
+	F2(3)       |	 TI	-1.60	0.04	3.0	A4	9334	9334	TT6	A5
+			-1.60(0.04)/1.60(-0.30)	7.0
+%F3(4)											   ONE PIN RUN	____ 0
+	F3(4)     	 TI	0.00	0.00		ECP L	34702	34702	TT6	A2    NO DRIVE	____ 1
+%F3(6)	F3(6)       .	 TO	0.10	-0.10		OX	34702	34702	TT6	A2
+	H4(11)      |	 I	0.00	0.00	4.5		2IN24	C24P	TT6	A1
+	H4(10)      |	 I	0.00	0.00	2.1		2IN24	R24P	TT6	A1
+	H4(9)       |	 I	0.00	0.00	2.1		2IN24	X24P	TT6	A2
+			0.00/0.10		8.7
+%F3(7)	H4(12)      .	 I	0.00	0.00			2IN24	C24P	TT6	A1
+	H4(15)      |	 I	0.00	0.00	4.0		2IN24	R24P	TT6	A1
+	H4(16)      |	 I	0.00	0.00	2.1		2IN24	X24P	TT6	A2
+	F3(7)       |	 TI	0.00	0.00	3.5	IX	34702	34702	TT6	A2
+			0.00/0.00		9.6					      NO DRIVE	____ 1
+%F3(9)	F3(9)       .	 TO	1.60	-0.30		CO	34702	34702	TT6	A2
+	F2(14)      |	 TI	-2.40	0.06	4.5	-E	9334	9334	TT6	A5
+			-2.40(0.06)/1.60(-0.30)					   OUTPUT LOW OVERLOAD	____ 2
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+%F5(10)	F5(10+)     .	 TOC	40.00				74 06	06	TT9	B2
+	E10(2)      |	 I	0.00	0.00	9.0		6IN16	OPTO	TT9	A6
+			0.00/40.00
+%F5(12)	F5(12+)     .	 TOC	40.00				74 06	06	TT9	D2
+	E10(7)      |	 I	0.00	0.00	10.0		6IN16	OPTO	TT9	C6
+			0.00/40.00
+%F5(2)	F5(2+)      \	 TOC	40.00				74 06	06R	TT3	B4
+	F5(4+)      |	 TOC	40.00		3.0		74 06	06	TT3	B6
+	D5(15)      |	 I	0.00	0.00	5.0		BLANK2	C	TT3	B5
+	D5(1)       |	 I	0.00	0.00	3.5		BLANK2	R	TT3	A6
+	C7(15)      |	 TI	-0.05	0.05	5.0	IN1	DM8837I	8837IO	TT3	B6
+			-0.05/40.00		16.5					   NO HI DRIVE	____ 3
+%F5(6)	F5(6+)      .	 TOC	40.00				74 06	06	TT8	B2
+	C9(2)       |	 I	0.00	0.00	9.0		6IN16	OPTO	TT8	A6
+			0.00/40.00
+%F5(8)	F5(8+)      .	 TOC	40.00				74 06	06	TT8	D2
+	C9(7)       |	 I	0.00	0.00	10.0		6IN16	OPTO	TT8	C6
+			0.00/40.00
+%F6(10)											   ONE PIN RUN	____ 0
+	F6(10)    	 TI	-1.60	0.04		D3	DM8599	8599	TT4	B1    NO DRIVE	____ 1
+%F6(11)											   ONE PIN RUN	____ 0
+	F6(11)    	 TOT	12.00	-5.20		S4	DM8599	8599	TT4	B1
+											 UNUSED SIGNAL	____ 1
+%F6(12)											   ONE PIN RUN	____ 0
+	F6(12)    	 TI	-1.60	0.04		D4	DM8599	8599	TT4	B1    NO DRIVE	____ 1
+%F6(5)	F6(5)       .	 TOT	12.00	-5.20		S1	DM8599	8599	TT4	B1
+	E5(1+)      |	 TIP	-0.36	0.02	4.5		74LS04	LS04R	TT4	B2
+			-0.36(0.02)/12.00(-5.20)
+%F6(7)	F6(7)       .	 TOT	12.00	-5.20		S2	DM8599	8599	TT4	B1
+	E5(3+)      |	 TIP	-0.36	0.02	4.5		74LS04	LS04R	TT4	B2
+			-0.36(0.02)/12.00(-5.20)
+%F6(9)											   ONE PIN RUN	____ 0
+	F6(9)     	 TOT	12.00	-5.20		S3	DM8599	8599	TT4	B1
+											 UNUSED SIGNAL	____ 1
+%F7(4)	F7(4)       .	 TO	8.00	-0.40		-1Y0	74LS139	LS139	TT5	C6
+	E5(9+)      |	 TIP	-0.36	0.02	6.5		74LS04	LS04R	TT5	C7
+			-0.36(0.02)/8.00(-0.40)
+%F7(5)	F7(5)       .	 TO	8.00	-0.40		-1Y1	74LS139	LS139	TT5	C6
+	E5(11+)     |	 TIP	-0.36	0.02	6.0		74LS04	LS04R	TT5	C7
+			-0.36(0.02)/8.00(-0.40)
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+%F7(6)	F7(6)       .	 TO	8.00	-0.40		-1Y2	74LS139	LS139	TT5	C6
+	E5(13+)     |	 TIP	-0.36	0.02	6.0		74LS04	LS04R	TT5	D8
+			-0.36(0.02)/8.00(-0.40)
+%F7(7)	H2(1+)      .	 TIP	-0.36	0.02			74LS04	LS04R	TT5	D7
+	F7(7)       |	 TO	8.00	-0.40	9.0	-1Y3	74LS139	LS139	TT5	C6
+			-0.36(0.02)/8.00(-0.40)
+%F9(13)	F9(13)      .	 I	0.00	0.00			8IN16	CLD	TT8	A7
+	C9(16)      |	 I	0.00	0.00	5.5		6IN16	OPTO	TT8	A6
+			0.00/0.00							      NO DRIVE	____ 1
+%F9(4)	F9(4)       .	 I	0.00	0.00			8IN16	CLD	TT8	A7
+	C9(14)      |	 I	0.00	0.00	6.0		6IN16	OPTO	TT8	A6
+			0.00/0.00							      NO DRIVE	____ 1
+%F9(8)	F9(8)       .	 I	0.00	0.00			8IN16	CLD	TT8	C7
+	C9(9)       |	 I	0.00	0.00	6.5		6IN16	OPTO	TT8	C6
+			0.00/0.00							      NO DRIVE	____ 1
+%F9(9)	F9(9)       .	 I	0.00	0.00			8IN16	CLD	TT8	C7
+	C9(11)      |	 I	0.00	0.00	5.5		6IN16	OPTO	TT8	C6
+			0.00/0.00							      NO DRIVE	____ 1
+%H1(7)	H1(7)       .	 TO	8.00	-0.40		1Y	74LS153	LS153	TT2	A5
+	C1(11)      |	 TI	-1.60	0.04	7.0	IN2	8838	8838	TT2	B3
+			-1.60(0.04)/8.00(-0.40)
+%H1(9)	H1(9)       .	 TO	8.00	-0.40		2Y	74LS153	LS153	TT2	A5
+	C1(14)      |	 TI	-1.60	0.04	6.0	IN1	8838	8838	TT2	B3
+			-1.60(0.04)/8.00(-0.40)
+%H2(10)	H2(10+)     .	 TO	8.00	-0.40			74LS04	LS04R	TT9	D2
+	F5(13+)     |	 TI	-1.60	0.04	6.5		74 06	06	TT9	D2
+			-1.60(0.04)/8.00(-0.40)
+%H2(4)	H2(4+)      .	 TO	8.00	-0.40			74LS04	LS04R	TT8	B2
+	F5(5+)      |	 TI	-1.60	0.04	7.0		74 06	06	TT8	B2
+			-1.60(0.04)/8.00(-0.40)
+%H2(6)	H2(6+)      .	 TO	8.00	-0.40			74LS04	LS04R	TT8	D2
+	F5(9+)      |	 TI	-1.60	0.04	6.0		74 06	06	TT8	D2
+			-1.60(0.04)/8.00(-0.40)
+%H2(8)	H2(8+)      .	 TO	8.00	-0.40			74LS04	LS04R	TT9	B2
+	F5(11+)     |	 TI	-1.60	0.04	6.5		74 06	06	TT9	B2
+			-1.60(0.04)/8.00(-0.40)
+%H3(3)	H7(4)       .	 TI	-0.80	0.04		-SET1	74LS74	LS74	TT4	A3
+	H3(3)       |	 TO	8.00	-0.40	7.5		74LS00	LS00	TT4	A2
+			-0.80(0.04)/8.00(-0.40)
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+%H3(6)	H7(1)       .	 TI	-1.20	0.06		-CLR1	74LS74	LS74	TT4	A3
+	H3(6)       |	 TO	8.00	-0.40	7.5		74LS00	LS00	TT4	A2
+			-1.20(0.06)/8.00(-0.40)
+%H5(6)	H5(6)       .	 TO	8.00	-0.40			74LS27	LS27	TT5	B5
+	E5(5+)      |	 TIP	-0.36	0.02	4.5		74LS04	LS04	TT5	B6
+			-0.36(0.02)/8.00(-0.40)
+%H5(8)	H5(8)       .	 TO	8.00	-0.40			74LS27	LS27	TT7	A6
+	A1(13)      |	 TIS	-1.60	0.04	13.0		74 38	38	TT7	A7
+			-1.60(0.04)/8.00(-0.40)
+%H6(5)											   ONE PIN RUN	____ 0
+	H6(5)     	 TO	8.00	-0.40		Q1	74LS74	LS74I	TT4	B4
+										   UNUSED EXTRA OUTPUT	____ 0
+%H6(9)											   ONE PIN RUN	____ 0
+	H6(9)     	 TO	8.00	-0.40		Q2	74LS74	LS74I	TT4	B4
+										   UNUSED EXTRA OUTPUT	____ 0
+%H7(5)											   ONE PIN RUN	____ 0
+	H7(5)     	 TO	8.00	-0.40		Q1	74LS74	LS74	TT4	A3
+										   UNUSED EXTRA OUTPUT	____ 0
+%H7(6)	H7(6)       .	 TO	8.00	-0.40		-Q1	74LS74	LS74	TT4	A3
+	C2(8+)      |	 TISP	-0.36	0.02	13.0		74LS02	LS02	TT4	A4
+			-0.36(0.02)/8.00(-0.40)
+%H9(1)											   ONE PIN RUN	____ 0
+	H9(1)     	 O	0.00	0.00		THLD 3	75154	75154	TT9	A4
+											 UNUSED SIGNAL	____ 1
+%H9(14)											   ONE PIN RUN	____ 0
+	H9(14)    	 O	0.00	0.00		THLD 4	75154	75154	TT9	C4
+											 UNUSED SIGNAL	____ 1
+%H9(2)											   ONE PIN RUN	____ 0
+	H9(2)     	 O	0.00	0.00		THLD 2	75154	75154	TT8	C4
+											 UNUSED SIGNAL	____ 1
+%H9(3)											   ONE PIN RUN	____ 0
+	H9(3)     	 O	0.00	0.00		THLD 1	75154	75154	TT8	A4
+											 UNUSED SIGNAL	____ 1
+%P2(33)											   ONE PIN RUN	____ 0
+	P2(33)    	 I	0.00	0.00			50PIN	50PIN	TT6	A8    NO DRIVE	____ 1
+%P2(39)											   ONE PIN RUN	____ 0
+	P2(39)    	 I	0.00	0.00			50PIN	50PIN	TT6	A8    NO DRIVE	____ 1
+%P2(41)											   ONE PIN RUN	____ 0
+	P2(41)    	 I	0.00	0.00			50PIN	50PIN	TT6	A8    NO DRIVE	____ 1
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+%P2(43)											   ONE PIN RUN	____ 0
+	P2(43)    	 I	0.00	0.00			50PIN	50PIN	TT6	A8    NO DRIVE	____ 1
+%P2(45)											   ONE PIN RUN	____ 0
+	P2(45)    	 I	0.00	0.00			50PIN	50PIN	TT6	A8    NO DRIVE	____ 1
+%P2(47)											   ONE PIN RUN	____ 0
+	P2(47)    	 I	0.00	0.00			50PIN	50PIN	TT6	A8    NO DRIVE	____ 1
+%P2(49)											   ONE PIN RUN	____ 0
+	P2(49)    	 I	0.00	0.00			50PIN	50PIN	TT6	A8    NO DRIVE	____ 1
+%P3(49)											   ONE PIN RUN	____ 0
+	P3(49)    	 I	0.00	0.00			50PIN	50PIN	TT10	A6    NO DRIVE	____ 1
+%P3(50)											   ONE PIN RUN	____ 0
+	P3(50)    	 I	0.00	0.00			50PIN	50PIN	TT10	A6    NO DRIVE	____ 1
+-12 VDC	B4(2)       .	 V	-12.00V	-12.00MA			UART	TR1602	TT7	B7
+	E4(2)       |	 V	-12.00V	-12.00MA	5.5		UART	TR1602	TT7	B5
+	E8(2)       |	 V	-12.00V	-12.00MA	7.0		UART	TR1602	TT7	B1
+	B8(2)       |	 V	-12.00V	-12.00MA	5.5		UART	TR1602	TT7	B3
+			PWR/0.00		18.0
+110 BAUD UART CLOCK
+	P2(17)      .	 I	0.00	0.00			50PIN	50PIN	TT6	A8
+	F2(4)       |	 TO	9.60	-0.72	6.0	Q0	9334	9334	TT6	A5
+			0.00/9.60
+1200 BAUD UART CLOCK
+	P2(25)      .	 I	0.00	0.00			50PIN	50PIN	TT6	A8
+	F2(9)       |	 TO	9.60	-0.72	6.5	Q4	9334	9334	TT6	A5
+			0.00/9.60
+150 BAUD UART CLOCK
+	P2(31)      .	 I	0.00	0.00			50PIN	50PIN	TT6	A8
+	F2(12)      |	 TO	9.60	-0.72	6.0	Q7	9334	9334	TT6	A5
+			0.00/9.60
+1800 BAUD UART CLOCK
+	P2(23)      .	 I	0.00	0.00			50PIN	50PIN	TT6	A8
+	F2(7)       |	 TO	9.60	-0.72	6.0	Q3	9334	9334	TT6	A5
+			0.00/9.60
+2400 BAUD UART CLOCK
+	P2(27)      .	 I	0.00	0.00			50PIN	50PIN	TT6	A8
+	F2(10)      |	 TO	9.60	-0.72	6.5	Q5	9334	9334	TT6	A5
+			0.00/9.60
+300 BAUD UART CLOCK
+	P2(29)      .	 I	0.00	0.00			50PIN	50PIN	TT6	A8
+	F2(11)      |	 TO	9.60	-0.72	6.5	Q6	9334	9334	TT6	A5
+			0.00/9.60
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+4800 BAUD UART CLOCK
+	P2(21)      .	 I	0.00	0.00			50PIN	50PIN	TT6	A8
+	F2(6)       |	 TO	9.60	-0.72	6.0	Q2	9334	9334	TT6	A5
+			0.00/9.60
+9600 BAUD UART CLOCK
+	P2(19)      .	 I	0.00	0.00			50PIN	50PIN	TT6	A8
+	F2(5)       |	 TO	9.60	-0.72	6.0	Q1	9334	9334	TT6	A5
+			0.00/9.60
+A01H	H1(14)      \	 TI	-0.36	0.02		A	74LS153	LS153	TT2	A5
+	F1(14)      |	 TI	-0.36	0.02	3.5	A	74LS153	LS153	TT2	B5
+	E1(14)      |	 TI	-0.36	0.02	3.5	A	74LS153	LS153	TT2	C5
+	D1(14)      |	 TI	-0.36	0.02	3.5	A	74LS153	LS153	TT2	C5
+	B3(14)      |	 TIP	-0.36	0.02	6.5	2 SEL1	74LS139	LS139	TT1	A5
+	B3(2)       |	 TIP	-0.36	0.02	4.0	1 SEL1	74LS139	LS139	TT1	A3
+	C7(6)       |	 TO	16.00	-0.40	7.0	OUT6	DM8837I	8837I	TT1	A2
+			-2.16(0.12)/16.00(-0.40)	28.0
+A02H	H1(2)       \	 TI	-0.36	0.02		B	74LS153	LS153	TT2	A5
+	F1(2)       |	 TI	-0.36	0.02	3.5	B	74LS153	LS153	TT2	B5
+	E1(2)       |	 TI	-0.36	0.02	3.5	B	74LS153	LS153	TT2	C5
+	D1(2)       |	 TI	-0.36	0.02	3.5	B	74LS153	LS153	TT2	C5
+	B3(13)      |	 TIP	-0.36	0.02	6.0	2 SEL2	74LS139	LS139	TT1	A5
+	B3(3)       |	 TIP	-0.36	0.02	4.0	1 SEL2	74LS139	LS139	TT1	A3
+	C7(4)       |	 TO	16.00	-0.40	7.5	OUT5	DM8837I	8837I	TT1	A2
+			-2.16(0.12)/16.00(-0.40)	28.0
+ADDRS  MSYN H
+	C6(5+)      \	 TIP	-0.36	0.02			74LS04	LS04	TT1	B7
+	A7(1)       |	 TISP	-0.36	0.02	5.0		74LS00	LS00	TT1	B4
+	A5(12)      |	 TO	8.00	-0.40	5.5		74LS27	LS27	TT1	B6
+	A3(2)       |	 TIS	(-1.60)	0.04	4.5		74 38	38	TT1	B7
+	A3(1)       |	 TIS	-1.60	0.04	2.1		74 38	38	TT1	B7
+			-2.32(0.12)/8.00(-0.40)	17.1
+ADDRS  MSYN L
+	C6(6+)      .	 TO	8.00	-0.40			74LS04	LS04	TT1	B7
+	B3(1)       |	 TIP	-0.36	0.02	6.0	-1G	74LS139	LS139	TT1	A3
+	C1(7)       |	 TI	-1.60	0.04	5.0	DIS B	8838	8838	TT2	B3
+	B1(7)       |	 TI	-1.60	0.04	3.5	DIS B	8838	8838	TT2	D3
+			-3.56(0.10)/8.00(-0.40)	14.5
+BBSY H	D3(2+)      .	 TI	-1.60	0.04			74 25	25	TT3	C3
+	C5(4)       |	 TO	16.00	-0.40	6.0	OUT5	DM8837I	8837I	TT3	C2
+			-1.60(0.04)/16.00(-0.40)
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+CLEAR H	E4(21)      .	 TIP	-1.60	0.01		MR	UART	TR1602	TT7	B5
+	B4(21)      |	 TIP	-1.60	0.01	5.5	MR	UART	TR1602	TT7	B7
+	B8(21)      |	 TIP	-1.60	0.01	7.0	MR	UART	TR1602	TT7	B3
+	E8(21)      |	 TIP	-1.60	0.01	5.5	MR	UART	TR1602	TT7	B1
+	C6(4+)      |	 TO	8.00	-0.40	4.5		74LS04	LS04R	TT1	B6
+	E7(14)      |	 TI	-0.36	0.02	5.0	MR	74LS193	LS193	TT4	C2
+			-6.76(0.06)/8.00(-0.40)	27.5
+CONTINUE H
+	E2(12+)     \	 TI	-0.40	0.02		D2	74LS74	LS74	TT4	B7
+	H5(12)      |	 TO	8.00	-0.40	7.5		74LS27	LS27	TT4	A6
+	A7(4)       |	 TISP	-0.36	0.02	12.0		74LS00	LS00	TT4	A7
+			-0.76(0.04)/8.00(-0.40)	19.5
+D00 OUT H
+	B8(26)      \	 TIP	-1.60	0.01		TR1	UART	TR1602	TT7	B3
+	B8(35)      |	 TIP	-1.60	0.01	3.5	PI	UART	TR1602	TT7	B3
+	E8(26)      |	 TIP	-1.60	0.01	5.0	TR1	UART	TR1602	TT7	B1
+	E8(35)      |	 TIP	-1.60	0.01	3.5	PI	UART	TR1602	TT7	B1
+	E7(15)      |	 TI	-0.36	0.02	4.5	D3	74LS193	LS193	TT4	C2
+	H3(2)       |	 TISP	-0.36	0.02	8.0		74LS00	LS00	TT4	A2
+	E4(35)      |	 TIP	-1.60	0.01	5.5	PI	UART	TR1602	TT7	B5
+	E4(26)      |	 TIP	-1.60	0.01	3.5	TR1	UART	TR1602	TT7	B5
+	B4(26)      |	 TIP	-1.60	0.01	5.5	TR1	UART	TR1602	TT7	B7
+	B4(35)      |	 TIP	-1.60	0.01	3.5	PI	UART	TR1602	TT7	B7
+	B1(3)       |	 TO	16.00	-0.40	5.5	OUT3	8838	8838	TT2	D3
+			-13.52(0.12)/16.00(-0.40)	48.0
+D01 OUT H
+	B8(27)      \	 TIP	-1.60	0.01		TR2	UART	TR1602	TT7	B3
+	B8(39)      |	 TIP	-1.60	0.01	4.0	EPE	UART	TR1602	TT7	B3
+	E8(27)      |	 TIP	-1.60	0.01	4.5	TR2	UART	TR1602	TT7	B1
+	E8(39)      |	 TIP	-1.60	0.01	4.0	EPE	UART	TR1602	TT7	B1
+	E7(1)       |	 TI	-0.36	0.02	3.0	D2	74LS193	LS193	TT4	C2
+	H3(5)       |	 TISP	-0.36	0.02	8.0		74LS00	LS00	TT4	A2
+	E4(39)      |	 TIP	-1.60	0.01	4.5	EPE	UART	TR1602	TT7	B5
+	E4(27)      |	 TIP	-1.60	0.01	4.0	TR2	UART	TR1602	TT7	B5
+	B4(39)      |	 TIP	-1.60	0.01	4.5	EPE	UART	TR1602	TT7	B7
+	B4(27)      |	 TIP	-1.60	0.01	4.0	TR2	UART	TR1602	TT7	B7
+	B1(6)       |	 TO	16.00	-0.40	6.0	OUT4	8838	8838	TT2	D3
+			-13.52(0.12)/16.00(-0.40)	46.5
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+D02 OUT H
+	B8(28)      .	 TIP	-1.60	0.01		TR3	UART	TR1602	TT7	B3
+	B8(36)      |	 TIP	-1.60	0.01	3.5	SBS	UART	TR1602	TT7	B3
+	E8(28)      |	 TIP	-1.60	0.01	5.0	TR3	UART	TR1602	TT7	B1
+	E8(36)      |	 TIP	-1.60	0.01	3.5	SBS	UART	TR1602	TT7	B1
+	E4(36)      |	 TIP	-1.60	0.01	7.5	SBS	UART	TR1602	TT7	B5
+	E4(28)      |	 TIP	-1.60	0.01	3.5	TR3	UART	TR1602	TT7	B5
+	B4(28)      |	 TIP	-1.60	0.01	5.5	TR3	UART	TR1602	TT7	B7
+	B4(36)      |	 TIP	-1.60	0.01	3.5	SBS	UART	TR1602	TT7	B7
+	B2(1+)      |	 TISP	-0.36	0.02	4.5		74LS08	LS08	TT1	B3
+	B1(10)      |	 TO	16.00	-0.40	5.0	OUT2	8838	8838	TT2	D3
+			-13.16(0.10)/16.00(-0.40)	41.5
+D03 OUT H
+	B8(29)      \	 TIP	-1.60	0.01		TR4	UART	TR1602	TT7	B3
+	B8(38)      |	 TIP	-1.60	0.01	3.5	WLS1	UART	TR1602	TT7	B3
+	E8(29)      |	 TIP	-1.60	0.01	5.0	TR4	UART	TR1602	TT7	B1
+	E8(38)      |	 TIP	-1.60	0.01	3.5	WLS1	UART	TR1602	TT7	B1
+	E4(38)      |	 TIP	-1.60	0.01	7.0	WLS1	UART	TR1602	TT7	B5
+	E4(29)      |	 TIP	-1.60	0.01	3.5	TR4	UART	TR1602	TT7	B5
+	B4(29)      |	 TIP	-1.60	0.01	5.5	TR4	UART	TR1602	TT7	B7
+	B4(38)      |	 TIP	-1.60	0.01	3.5	WLS1	UART	TR1602	TT7	B7
+	B1(13)      |	 TO	16.00	-0.40	6.0	OUT1	8838	8838	TT2	D3
+			-12.80(0.08)/16.00(-0.40)	37.5
+D04 OUT H
+	C1(3)       \	 TO	16.00	-0.40		OUT3	8838	8838	TT2	B3
+	B4(30)      |	 TIP	-1.60	0.01	6.5	TR5	UART	TR1602	TT7	B7
+	B4(37)      |	 TIP	-1.60	0.01	3.5	WLS2	UART	TR1602	TT7	B7
+	E4(30)      |	 TIP	-1.60	0.01	5.0	TR5	UART	TR1602	TT7	B5
+	E4(37)      |	 TIP	-1.60	0.01	3.5	WLS2	UART	TR1602	TT7	B5
+	E8(37)      |	 TIP	-1.60	0.01	7.5	WLS2	UART	TR1602	TT7	B1
+	E8(30)      |	 TIP	-1.60	0.01	3.5	TR5	UART	TR1602	TT7	B1
+	B8(37)      |	 TIP	-1.60	0.01	5.0	WLS2	UART	TR1602	TT7	B3
+	B8(30)      |	 TIP	-1.60	0.01	3.5	TR5	UART	TR1602	TT7	B3
+			-12.80(0.08)/16.00(-0.40)	38.0
+D05 OUT H
+	C1(6)       .	 TO	16.00	-0.40		OUT4	8838	8838	TT2	B3
+	B4(31)      |	 TIP	-1.60	0.01	6.0	TR6	UART	TR1602	TT7	B7
+	E4(31)      |	 TIP	-1.60	0.01	5.5	TR6	UART	TR1602	TT7	B5
+	F6(6)       |	 TI	-1.60	0.04	7.0	D2	DM8599	8599	TT4	B1
+	E8(31)      |	 TIP	-1.60	0.01	5.5	TR6	UART	TR1602	TT7	B1
+	B8(31)      |	 TIP	-1.60	0.01	5.5	TR6	UART	TR1602	TT7	B3
+			-8.00(0.08)/16.00(-0.40)	29.5
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+D06 OUT H
+	C1(10)      \	 TO	16.00	-0.40		OUT2	8838	8838	TT2	B3
+	B4(32)      |	 TIP	-1.60	0.01	6.5	TR7	UART	TR1602	TT7	B7
+	E4(32)      |	 TIP	-1.60	0.01	5.5	TR7	UART	TR1602	TT7	B5
+	E2(2+)      |	 TI	-0.40	0.02	5.0	D1	74LS74	LS74	TT3	D2
+	F6(4)       |	 TI	-1.60	0.04	7.5	D1	DM8599	8599	TT4	B1
+	E8(32)      |	 TIP	-1.60	0.01	5.5	TR7	UART	TR1602	TT7	B1
+	B8(32)      |	 TIP	-1.60	0.01	5.5	TR7	UART	TR1602	TT7	B3
+			-8.40(0.10)/16.00(-0.40)	35.5
+D07 OUT H
+	E8(33)      \	 TIP	-1.60	0.01		TR8	UART	TR1602	TT7	B1
+	B8(33)      |	 TIP	-1.60	0.01	5.5	TR8	UART	TR1602	TT7	B3
+	B4(33)      |	 TIP	-1.60	0.01	8.0	TR8	UART	TR1602	TT7	B7
+	E4(33)      |	 TIP	-1.60	0.01	5.5	TR8	UART	TR1602	TT7	B5
+	C1(13)      |	 TO	16.00	-0.40	7.0	OUT1	8838	8838	TT2	B3
+			-6.40(0.04)/16.00(-0.40)	26.0
+DR	H3(12)      \	 TISP	-0.36	0.02			74LS00	LS00	TT4	B3
+	H1(13)      |	 TI	-0.36	0.02	5.0	2C3	74LS153	LS153	TT2	A5
+	E1(13)      |	 TI	-0.36	0.02	4.5	2C3	74LS153	LS153	TT2	C5
+	E4(19)      |	 TOT	1.60	-0.20	8.0	DR	UART	TR1602	TT7	B5
+	B4(19)      |	 TOT	1.60	-0.20	5.5	DR	UART	TR1602	TT7	B7
+	B8(19)      |	 TOT	1.60	-0.20	7.0	DR	UART	TR1602	TT7	B3
+	E8(19)      |	 TOT	1.60	-0.20	5.5	DR	UART	TR1602	TT7	B1
+			-1.08(0.06)/1.60(-0.20)	35.5
+FE	D1(13)      .	 TI	-0.36	0.02		2C3	74LS153	LS153	TT2	C5
+	E4(14)      |	 TOT	1.60	-0.20	6.5	FE	UART	TR1602	TT7	B5
+	B4(14)      |	 TOT	1.60	-0.20	5.5	FE	UART	TR1602	TT7	B7
+	A5(10)      |	 TIP	-0.36	0.02	3.0		74LS27	LS27O	TT2	A3
+	B8(14)      |	 TOT	1.60	-0.20	6.5	FE	UART	TR1602	TT7	B3
+	E8(14)      |	 TOT	1.60	-0.20	5.5	FE	UART	TR1602	TT7	B1
+			-0.72(0.04)/1.60(-0.20)	27.0
+HI	H10(5+)     .	 TIS	-1.00	0.01		IN2 B	1488	1488O	TT8	B2
+	H10(12+)    |	 TIS	-1.00	0.01	4.0	IN2 D	1488	1488O	TT9	D2
+	H10(9+)     |	 TIS	-1.00	0.01	3.0	IN2 C	1488	1488O	TT9	B2
+	H7(10)      |	 TI	-0.80	0.04	6.0	-SET2	74LS74	LS74	TT4	A4
+	E6(3)       |	 TIP	-0.54	0.04	4.5	-CLR1	74LS221	LS221	TT4	A5
+	E6(11)      |	 TIP	-0.54	0.02	4.0	-CLR2	74LS221	LS221	TT4	C6
+	E7(4)       |	 TI	-0.36	0.02	5.0	-CU	74LS193	LS193	TT4	C2
+	D7(10)      |	 TIP	-0.44	0.02	4.5	B2	74LS221	LS221	TT4	D7
+	D7(11)      |	 TIP	-0.54	0.02	2.1	-CLR2	74LS221	LS221	TT4	D7
+	B6(2)       |	 TI	1.60	0.04	4.5	T1	8131	8131	TT1	C5
+	B6(4)       |	 TI	1.60	0.04	3.0	T2	8131	8131	TT1	C5
+	B6(6)       |	 TI	1.60	0.04	3.0	T3	8131	8131	TT1	C5
+	B5(4)       |	 TI	1.60	0.04	4.0	T2	8131	8131	TT1	C7
+	B6(12)      |	 TI	1.60	0.04	3.0	T5	8131	8131	TT1	C5
+	B6(10)      |	 TI	1.60	0.04	3.0	T4	8131	8131	TT1	C5
+	B6(14)      |	 TI	1.60	0.04	3.0	T6	8131	8131	TT1	C5
+	B5(2)       |	 TI	1.60	0.04	3.0	T1	8131	8131	TT1	C7
+	D3(3+)      |	 TI	-6.40	0.16	6.5	STRB	74 25	25	TT3	C3
+	D3(11+)     |	 TI	-6.40	0.16	4.0	STRB	74 25	25	TT3	D6
+	D2(4+)      |	 TI	-0.80	0.04	3.0	-SET1	74LS74	LS74	TT3	B5
+	E2(4+)      |	 TI	-0.80	0.04	3.5	-SET1	74LS74	LS74	TT3	D2
+	F2(15)      |	 TI	-1.60	0.04	4.5	-C	9334	9334	TT6	A5
+	E2(13+)     |	 TI	-1.20	0.06	4.0	-CLR2	74LS74	LS74	TT4	B7
+	D2(10+)     |	 TI	-0.80	0.04	4.0	-SET2	74LS74	LS74	TT3	C5
+			-11.42/0.00		89.1					      NO DRIVE	____ 1
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+INPUT H
+OUTPUT L
+	C6(2+)      \	 TO	8.00	-0.40			74LS04	LS04	TT1	A4
+	C3(5+)      |	 TISP	-0.36	0.02	6.5		74LS02	LS02	TT1	A6
+	C3(2+)      |	 TISP	-0.36	0.02	3.0		74LS02	LS02	TT1	B4
+			-0.72(0.04)/8.00(-0.40)	9.5
+INPUT L	H5(10)      \	 TIP	-0.36	0.02			74LS27	LS27	TT7	A6
+	H5(5)       |	 TIP	-0.36	0.02	3.5		74LS27	LS27	TT5	B5
+	C6(1+)      |	 TIP	-0.36	0.02	7.0		74LS04	LS04	TT1	A4
+	C7(10)      |	 TO	16.00	-0.40	3.5	OUT3	DM8837I	8837I0O	TT1	A2
+	A5(5)       |	 TIP	-0.36	0.02	5.5		74LS27	LS27	TT2	A5
+	B1(9)       |	 TI	-1.60	0.04	8.0	DIS A	8838	8838	TT2	D3
+	C1(9)       |	 TI	-1.60	0.04	3.5	DIS A	8838	8838	TT2	B3
+			-4.64(0.16)/16.00(-0.40)	31.0
+INT ENB H
+	H1(4)       .	 TI	-0.36	0.02		1C2	74LS153	LS153	TT2	A5
+	E2(5+)      |	 TO	8.00	-0.40	6.0	Q1	74LS74	LS74	TT3	D2
+			-0.36(0.02)/8.00(-0.40)
+INT RQ H
+	C6(13+)     \	 TIP	-0.36	0.02			74LS04	LS04	TT3	D5
+	C2(4+)      |	 TO	8.00	-0.40	7.0		74LS02	LS02	TT3	D3
+	D2(13+)     |	 TI	-1.20	0.06	4.5	-CLR2	74LS74	LS74	TT3	C5
+			-1.56(0.08)/8.00(-0.40)	11.5
+LINE 0 20 MA DATA
+	P3(7)       .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	C5(6)       |	 TO	16.00	-0.40	10.0	OUT6	DM8837I	8837IO	TT8	A3
+			0.00/16.00
+LINE 0 20 MA IN +
+	P3(2)       .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	F10(15)     |	 I	0.00	0.00	5.5		BLANK2	D	TT8	A2
+	F10(16)     |	 I	0.00	0.00	2.1		BLANK2	R	TT8	A2
+	D9(1)       |	 I	0.00	0.00	5.0		6IN16	OPTO	TT8	A3
+			0.00/0.00		12.6					      NO DRIVE	____ 1
+LINE 0 20 MA IN -
+	P3(3)       .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	F10(1)      |	 I	0.00	0.00	6.0		BLANK2	R	TT8	A2
+	F10(2)      |	 I	0.00	0.00	2.1		BLANK2	D	TT8	A2
+	D9(2)       |	 I	0.00	0.00	5.5		6IN16	OPTO	TT8	A3
+			0.00/0.00		13.6					      NO DRIVE	____ 1
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+LINE 0 20 MA OUT +
+	P3(12)      \	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	F9(1)       |	 I	0.00	0.00	5.5		8IN16	CLD	TT8	A7
+	C9(15)      |	 I	0.00	0.00	6.5		6IN16	OPTO	TT8	A6
+			0.00/0.00		12.0					      NO DRIVE	____ 1
+LINE 0 20 MA OUT -
+	P3(11)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	F9(16)      |	 I	0.00	0.00	5.0		8IN16	CLD	TT8	A7
+			0.00/0.00							      NO DRIVE	____ 1
+LINE 0 20 MA RCV RTN									   ONE PIN RUN	____ 0
+	P3(4)     	 I	0.00	0.00			50PIN	50PIN	TT10	A6    NO DRIVE	____ 1
+LINE 0 20 MA RCV SRC
+	P3(1)       .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	B9(16)      |	 I	0.00	0.00	9.0		BLANK2	R	TT8	A1
+			0.00/0.00							      NO DRIVE	____ 1
+LINE 0 20 MA XMIT SRC									   ONE PIN RUN	____ 0
+	P3(10)    	 I	0.00	0.00			50PIN	50PIN	TT10	A6    NO DRIVE	____ 1
+LINE 0 20 MA XMIT SRC +									   ONE PIN RUN	____ 0
+	B9(3)     	 I	0.00	0.00			BLANK2	R	TT8	B7    NO DRIVE	____ 1
+LINE 0 CRL
+	E8(34)      .	 TIP	-1.60	0.01		CRL	UART	TR1602	TT7	B1
+	E5(8+)      |	 TO	8.00	-0.40	5.5		74LS04	LS04R	TT5	C7
+			-1.60(0.01)/8.00(-0.40)
+LINE 0 DRR
+	F7(12)      .	 TO	8.00	-0.40		-2Y0	74LS139	LS139	TT5	A7
+	E8(18)      |	 TIP	-1.60	0.01	7.0	DRR	UART	TR1602	TT7	B1
+			-1.60(0.01)/8.00(-0.40)
+LINE 0 EIA DATA
+	P3(5)       .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	H9(13)      |	 TO	16.00	-0.40	4.0	OUT 1	75154	75154	TT8	A4
+			0.00/16.00
+LINE 0 EIA IN
+	P3(8)       .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	H9(4)       |	 I	0.00	0.00	5.0	IN 1	75154	75154	TT8	A4
+			0.00/0.00							      NO DRIVE	____ 1
+LINE 0 EIA OUT
+	P3(9)       .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	H10(6+)     |	 O	0.00	0.00	6.0	OUT B	1488	1488O	TT8	B2
+			0.00/0.00
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+LINE 0 RRC
+	P2(1)       .	 I	0.00	0.00			50PIN	50PIN	TT6	A8
+	E8(17)      |	 TIP	-1.60	0.01	10.0	RRC	UART	TR1602	TT7	B1
+			-1.60/0.00							      NO DRIVE	____ 1
+LINE 0 SFD/RRD
+	E8(16)      \	 TIP	-1.60	0.01		SFD	UART	TR1602	TT7	B1
+	E8(4)       |	 TIP	-1.60	0.01	4.0	RRD	UART	TR1602	TT7	B1
+	E3(4)       |	 TO	8.00	-0.40	9.0	-1Y0	74LS139	LS139	TT5	A2
+			-3.20(0.02)/8.00(-0.40)	13.0
+LINE 0 THRL
+	E8(23)      .	 TIP	-1.60	0.01		THRL	UART	TR1602	TT7	B1
+	E3(12)      |	 TO	8.00	-0.40	10.0	-2Y0	74LS139	LS139	TT5	C2
+			-1.60(0.01)/8.00(-0.40)
+LINE 0 TRC
+	P2(3)       .	 I	0.00	0.00			50PIN	50PIN	TT6	A8
+	E8(40)      |	 TIP	-1.60	0.01	7.0	TRC	UART	TR1602	TT7	B1
+			-1.60/0.00							      NO DRIVE	____ 1
+LINE 0 UART IN
+	P3(6)       .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	E8(20)      |	 TIP	-1.60	0.01	7.5	RI	UART	TR1602	TT7	B1
+			-1.60/0.00							      NO DRIVE	____ 1
+LINE 0 UART OUT
+	H2(3+)      \	 TIP	-0.36	0.02			74LS04	LS04R	TT8	B2
+	H10(4+)     |	 TIS	-1.00	0.01	12.0	IN1 B	1488	1488O	TT8	B2
+	E8(25)      |	 TO	1.60	-0.20	9.0	TRO	UART	TR1602	TT7	B1
+			-1.36(0.03)/1.60(-0.20)	21.0
+LINE 1 20 MA DATA
+	P3(19)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	C5(10)      |	 TO	16.00	-0.40	10.0	OUT3	DM8837I	8837I0O	TT8	C3
+			0.00/16.00
+LINE 1 20 MA IN +
+	P3(14)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	F10(14)     |	 I	0.00	0.00	6.5		BLANK2	R	TT8	C2
+	F10(13)     |	 I	0.00	0.00	2.1		BLANK2	D	TT8	D2
+	D9(6)       |	 I	0.00	0.00	5.0		6IN16	OPTO	TT8	D3
+			0.00/0.00		13.6					      NO DRIVE	____ 1
+LINE 1 20 MA IN -
+	P3(15)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	F10(3)      |	 I	0.00	0.00	7.0		BLANK2	R	TT8	C2
+	F10(4)      |	 I	0.00	0.00	2.1		BLANK2	D	TT8	D2
+	D9(7)       |	 I	0.00	0.00	6.0		6IN16	OPTO	TT8	D3
+			0.00/0.00		15.1					      NO DRIVE	____ 1
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+LINE 1 20 MA OUT +
+	P3(24)      \	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	F9(5)       |	 I	0.00	0.00	6.5		8IN16	CLD	TT8	C7
+	C9(10)      |	 I	0.00	0.00	6.5		6IN16	OPTO	TT8	C6
+			0.00/0.00		13.0					      NO DRIVE	____ 1
+LINE 1 20 MA OUT -
+	P3(23)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	F9(12)      |	 I	0.00	0.00	6.0		8IN16	CLD	TT8	C7
+			0.00/0.00							      NO DRIVE	____ 1
+LINE 1 20 MA RCV RTN									   ONE PIN RUN	____ 0
+	P3(16)    	 I	0.00	0.00			50PIN	50PIN	TT10	A6    NO DRIVE	____ 1
+LINE 1 20 MA RCV SRC
+	P3(13)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	B9(15)      |	 I	0.00	0.00	9.0		BLANK2	R	TT8	C1
+			0.00/0.00							      NO DRIVE	____ 1
+LINE 1 20 MA XMIT SRC									   ONE PIN RUN	____ 0
+	P3(22)    	 I	0.00	0.00			50PIN	50PIN	TT10	A6    NO DRIVE	____ 1
+LINE 1 20 MA XMIT SRC +									   ONE PIN RUN	____ 0
+	B9(4)     	 I	0.00	0.00			BLANK2	R	TT8	D7    NO DRIVE	____ 1
+LINE 1 CRL
+	E5(10+)     .	 TO	8.00	-0.40			74LS04	LS04R	TT5	C7
+	B8(34)      |	 TIP	-1.60	0.01	9.0	CRL	UART	TR1602	TT7	B3
+			-1.60(0.01)/8.00(-0.40)
+LINE 1 DRR
+	F7(11)      .	 TO	8.00	-0.40		-2Y1	74LS139	LS139	TT5	A7
+	B8(18)      |	 TIP	-1.60	0.01	10.0	DRR	UART	TR1602	TT7	B3
+			-1.60(0.01)/8.00(-0.40)
+LINE 1 EIA DATA
+	P3(17)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	H9(12)      |	 TO	16.00	-0.40	4.5	OUT 2	75154	75154	TT8	C4
+			0.00/16.00
+LINE 1 EIA IN
+	P3(20)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	H9(5)       |	 I	0.00	0.00	5.5	IN 2	75154	75154	TT8	C4
+			0.00/0.00							      NO DRIVE	____ 1
+LINE 1 EIA OUT
+	P3(21)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	H10(3+)     |	 O	0.00	0.00	6.5	OUT A	1488	1488/1O	TT8	D2
+			0.00/0.00
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+LINE 1 RRC
+	P2(5)       .	 I	0.00	0.00			50PIN	50PIN	TT6	A8
+	B8(17)      |	 TIP	-1.60	0.01	13.0	RRC	UART	TR1602	TT7	B3
+			-1.60/0.00							      NO DRIVE	____ 1
+LINE 1 SFD/RRD
+	E3(5)       \	 TO	8.00	-0.40		-1Y1	74LS139	LS139	TT5	A2
+	B8(4)       |	 TIP	-1.60	0.01	11.0	RRD	UART	TR1602	TT7	B3
+	B8(16)      |	 TIP	-1.60	0.01	4.0	SFD	UART	TR1602	TT7	B3
+			-3.20(0.02)/8.00(-0.40)	15.0
+LINE 1 THRL
+	E3(11)      .	 TO	8.00	-0.40		-2Y1	74LS139	LS139	TT5	C2
+	B8(23)      |	 TIP	-1.60	0.01	12.0	THRL	UART	TR1602	TT7	B3
+			-1.60(0.01)/8.00(-0.40)
+LINE 1 TRC
+	P2(7)       .	 I	0.00	0.00			50PIN	50PIN	TT6	A8
+	B8(40)      |	 TIP	-1.60	0.01	11.0	TRC	UART	TR1602	TT7	B3
+			-1.60/0.00							      NO DRIVE	____ 1
+LINE 1 UART IN
+	P3(18)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	B8(20)      |	 TIP	-1.60	0.01	12.0	RI	UART	TR1602	TT7	B3
+			-1.60/0.00							      NO DRIVE	____ 1
+LINE 1 UART OUT
+	H2(5+)      \	 TIP	-0.36	0.02			74LS04	LS04R	TT8	D2
+	H10(2+)     |	 TI	-1.00	0.01	12.0	IN A	1488	1488/1O	TT8	D2
+	B8(25)      |	 TO	1.60	-0.20	12.0	TRO	UART	TR1602	TT7	B3
+			-1.36(0.03)/1.60(-0.20)	24.0
+LINE 2 20 MA DATA
+	P3(31)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	C5(12)      |	 TO	16.00	-0.40	9.0	OUT2	DM8837I	8837IO	TT9	A4
+			0.00/16.00
+LINE 2 20 MA IN +
+	P3(26)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	F10(11)     |	 I	0.00	0.00	7.0		BLANK2	D	TT9	A2
+	F10(12)     |	 I	0.00	0.00	2.1		BLANK2	R	TT9	A2
+	D10(1)      |	 I	0.00	0.00	5.0		6IN16	OPTO	TT9	A3
+			0.00/0.00		14.1					      NO DRIVE	____ 1
+LINE 2 20 MA IN -
+	P3(27)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	F10(5)      |	 I	0.00	0.00	7.5		BLANK2	R	TT9	A2
+	F10(6)      |	 I	0.00	0.00	2.1		BLANK2	D	TT9	A2
+	D10(2)      |	 I	0.00	0.00	4.5		6IN16	OPTO	TT9	A3
+			0.00/0.00		14.1					      NO DRIVE	____ 1
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+LINE 2 20 MA OUT +
+	P3(36)      \	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	E9(1)       |	 I	0.00	0.00	8.0		8IN16	CLD	TT9	A7
+	E10(15)     |	 I	0.00	0.00	3.0		6IN16	OPTO	TT9	A6
+			0.00/0.00		11.0					      NO DRIVE	____ 1
+LINE 2 20 MA OUT -
+	P3(35)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	E9(16)      |	 I	0.00	0.00	7.0		8IN16	CLD	TT9	A7
+			0.00/0.00							      NO DRIVE	____ 1
+LINE 2 20 MA RCV RTN									   ONE PIN RUN	____ 0
+	P3(28)    	 I	0.00	0.00			50PIN	50PIN	TT10	A6    NO DRIVE	____ 1
+LINE 2 20 MA RCV SRC
+	P3(25)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	B9(12)      |	 I	0.00	0.00	10.0		BLANK2	R	TT9	A1
+			0.00/0.00							      NO DRIVE	____ 1
+LINE 2 20 MA XMIT SRC									   ONE PIN RUN	____ 0
+	P3(34)    	 I	0.00	0.00			50PIN	50PIN	TT10	A6    NO DRIVE	____ 1
+LINE 2 20 MA XMIT SRC +									   ONE PIN RUN	____ 0
+	B9(7)     	 I	0.00	0.00			BLANK2	R	TT9	B7    NO DRIVE	____ 1
+LINE 2 CRL
+	E5(12+)     .	 TO	8.00	-0.40			74LS04	LS04R	TT5	D8
+	E4(34)      |	 TIP	-1.60	0.01	5.0	CRL	UART	TR1602	TT7	B5
+			-1.60(0.01)/8.00(-0.40)
+LINE 2 DRR
+	F7(10)      .	 TO	8.00	-0.40		-2Y2	74LS139	LS139	TT5	A7
+	E4(18)      |	 TIP	-1.60	0.01	7.0	DRR	UART	TR1602	TT7	B5
+			-1.60(0.01)/8.00(-0.40)
+LINE 2 EIA DATA
+	P3(29)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	H9(11)      |	 TO	16.00	-0.40	5.5	OUT 3	75154	75154	TT9	A4
+			0.00/16.00
+LINE 2 EIA IN
+	P3(32)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	H9(6)       |	 I	0.00	0.00	6.0	IN 3	75154	75154	TT9	A4
+			0.00/0.00							      NO DRIVE	____ 1
+LINE 2 EIA OUT
+	P3(33)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	H10(8+)     |	 O	0.00	0.00	6.5	OUT C	1488	1488O	TT9	B2
+			0.00/0.00
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+LINE 2 RRC
+	P2(9)       .	 I	0.00	0.00			50PIN	50PIN	TT6	A8
+	E4(17)      |	 TIP	-1.60	0.01	6.5	RRC	UART	TR1602	TT7	B5
+			-1.60/0.00							      NO DRIVE	____ 1
+LINE 2 SFD/RRD
+	E4(16)      \	 TIP	-1.60	0.01		SFD	UART	TR1602	TT7	B5
+	E4(4)       |	 TIP	-1.60	0.01	4.0	RRD	UART	TR1602	TT7	B5
+	E3(6)       |	 TO	8.00	-0.40	4.5	-1Y2	74LS139	LS139	TT5	A2
+			-3.20(0.02)/8.00(-0.40)	8.5
+LINE 2 THRL
+	E4(23)      .	 TIP	-1.60	0.01		THRL	UART	TR1602	TT7	B5
+	E3(10)      |	 TO	8.00	-0.40	5.0	-2Y2	74LS139	LS139	TT5	C2
+			-1.60(0.01)/8.00(-0.40)
+LINE 2 TRC
+	P2(11)      .	 I	0.00	0.00			50PIN	50PIN	TT6	A8
+	E4(40)      |	 TIP	-1.60	0.01	6.0	TRC	UART	TR1602	TT7	B5
+			-1.60/0.00							      NO DRIVE	____ 1
+LINE 2 UART IN
+	P3(30)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	E4(20)      |	 TIP	-1.60	0.01	9.0	RI	UART	TR1602	TT7	B5
+			-1.60/0.00							      NO DRIVE	____ 1
+LINE 2 UART OUT
+	H10(10+)    \	 TIS	-1.00	0.01		IN1 C	1488	1488O	TT9	B2
+	H2(9+)      |	 TIP	-0.36	0.02	12.0		74LS04	LS04R	TT9	B2
+	E4(25)      |	 TO	1.60	-0.20	7.5	TRO	UART	TR1602	TT7	B5
+			-1.36(0.03)/1.60(-0.20)	19.5
+LINE 3 20 MA DATA
+	P3(43)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	C5(14)      |	 TO	16.00	-0.40	8.0	OUT1	DM8837I	8837IO	TT9	C4
+			0.00/16.00
+LINE 3 20 MA IN +
+	P3(38)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	F10(9)      |	 I	0.00	0.00	8.0		BLANK2	D	TT9	D2
+	F10(10)     |	 I	0.00	0.00	2.1		BLANK2	R	TT9	C2
+	D10(6)      |	 I	0.00	0.00	5.0		6IN16	OPTO	TT9	D3
+			0.00/0.00		15.1					      NO DRIVE	____ 1
+LINE 3 20 MA IN -
+	P3(39)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	F10(7)      |	 I	0.00	0.00	9.0		BLANK2	R	TT9	C2
+	F10(8)      |	 I	0.00	0.00	2.1		BLANK2	D	TT9	D2
+	D10(7)      |	 I	0.00	0.00	4.5		6IN16	OPTO	TT9	D3
+			0.00/0.00		15.6					      NO DRIVE	____ 1
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+LINE 3 20 MA OUT +
+	P3(48)      \	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	E9(5)       |	 I	0.00	0.00	9.0		8IN16	CLD	TT9	C7
+	E10(10)     |	 I	0.00	0.00	3.0		6IN16	OPTO	TT9	C6
+			0.00/0.00		12.0					      NO DRIVE	____ 1
+LINE 3 20 MA OUT -
+	P3(47)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	E9(12)      |	 I	0.00	0.00	8.0		8IN16	CLD	TT9	C7
+			0.00/0.00							      NO DRIVE	____ 1
+LINE 3 20 MA RCV RTN									   ONE PIN RUN	____ 0
+	P3(40)    	 I	0.00	0.00			50PIN	50PIN	TT10	A6    NO DRIVE	____ 1
+LINE 3 20 MA RCV SRC
+	P3(37)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	B9(11)      |	 I	0.00	0.00	11.0		BLANK2	R	TT9	C1
+			0.00/0.00							      NO DRIVE	____ 1
+LINE 3 20 MA XMIT SRC									   ONE PIN RUN	____ 0
+	P3(46)    	 I	0.00	0.00			50PIN	50PIN	TT10	A6    NO DRIVE	____ 1
+LINE 3 20 MA XMIT SRC +									   ONE PIN RUN	____ 0
+	B9(8)     	 I	0.00	0.00			BLANK2	R	TT9	D7    NO DRIVE	____ 1
+LINE 3 CRL
+	H2(2+)      .	 TO	8.00	-0.40			74LS04	LS04R	TT5	D7
+	B4(34)      |	 TIP	-1.60	0.01	10.0	CRL	UART	TR1602	TT7	B7
+			-1.60(0.01)/8.00(-0.40)
+LINE 3 DRR
+	F7(9)       .	 TO	8.00	-0.40		-2Y3	74LS139	LS139	TT5	A7
+	B4(18)      |	 TIP	-1.60	0.01	10.0	DRR	UART	TR1602	TT7	B7
+			-1.60(0.01)/8.00(-0.40)
+LINE 3 EIA DATA
+	P3(41)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	H9(10)      |	 TO	16.00	-0.40	6.0	OUT 4	75154	75154	TT9	C4
+			0.00/16.00
+LINE 3 EIA IN
+	P3(44)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	H9(7)       |	 I	0.00	0.00	7.0	IN 4	75154	75154	TT9	C4
+			0.00/0.00							      NO DRIVE	____ 1
+LINE 3 EIA OUT
+	P3(45)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	H10(11+)    |	 O	0.00	0.00	7.0	OUT D	1488	1488O	TT9	D2
+			0.00/0.00
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+LINE 3 RRC
+	P2(13)      .	 I	0.00	0.00			50PIN	50PIN	TT6	A8
+	B4(17)      |	 TIP	-1.60	0.01	10.0	RRC	UART	TR1602	TT7	B7
+			-1.60/0.00							      NO DRIVE	____ 1
+LINE 3 SFD/RRD
+	E3(7)       \	 TO	8.00	-0.40		-1Y3	74LS139	LS139	TT5	A2
+	B4(4)       |	 TIP	-1.60	0.01	6.5	RRD	UART	TR1602	TT7	B7
+	B4(16)      |	 TIP	-1.60	0.01	4.0	SFD	UART	TR1602	TT7	B7
+			-3.20(0.02)/8.00(-0.40)	10.5
+LINE 3 THRL
+	E3(9)       .	 TO	8.00	-0.40		-2Y3	74LS139	LS139	TT5	C2
+	B4(23)      |	 TIP	-1.60	0.01	7.5	THRL	UART	TR1602	TT7	B7
+			-1.60(0.01)/8.00(-0.40)
+LINE 3 TRC
+	P2(15)      .	 I	0.00	0.00			50PIN	50PIN	TT6	A8
+	B4(40)      |	 TIP	-1.60	0.01	9.0	TRC	UART	TR1602	TT7	B7
+			-1.60/0.00							      NO DRIVE	____ 1
+LINE 3 UART IN
+	P3(42)      .	 I	0.00	0.00			50PIN	50PIN	TT10	A6
+	B4(20)      |	 TIP	-1.60	0.01	12.0	RI	UART	TR1602	TT7	B7
+			-1.60/0.00							      NO DRIVE	____ 1
+LINE 3 UART OUT
+	H10(13+)    \	 TIS	-1.00	0.01		IN1 D	1488	1488O	TT9	D2
+	H2(11+)     |	 TIP	-0.36	0.02	12.0		74LS04	LS04R	TT9	D2
+	B4(25)      |	 TO	1.60	-0.20	11.0	TRO	UART	TR1602	TT7	B7
+			-1.36(0.03)/1.60(-0.20)	23.0
+LINE CTR 2^0 H
+	E7(3)       \	 TO	8.00	-0.40		Q3	74LS193	LS193	TT4	C2
+	F7(3)       |	 TIP	-0.36	0.02	3.5	1 SEL2	74LS139	LS139	TT5	C6
+	F6(1)       |	 TI	-1.60	0.04	4.0	A	DM8599	8599	TT4	B1
+	F7(14)      |	 TIP	-0.36	0.02	3.0	2 SEL1	74LS139	LS139	TT5	A7
+	E3(2)       |	 TIP	-0.36	0.02	7.0	1 SEL1	74LS139	LS139	TT5	A2
+	E3(14)      |	 TIP	-0.36	0.02	4.0	2 SEL1	74LS139	LS139	TT5	C2
+	D1(6)       |	 TI	-0.36	0.02	5.0	1C0	74LS153	LS153	TT2	C5
+			-3.40(0.14)/8.00(-0.40)	26.5
+LINE CTR 2^1 H
+	E7(2)       \	 TO	8.00	-0.40		Q2	74LS193	LS193	TT4	C2
+	F7(2)       |	 TIP	-0.36	0.02	3.5	1 SEL1	74LS139	LS139	TT5	C6
+	F7(13)      |	 TIP	-0.36	0.02	4.0	2 SEL2	74LS139	LS139	TT5	A7
+	F6(15)      |	 TI	-1.60	0.04	4.0	B	DM8599	8599	TT4	B1
+	E3(3)       |	 TIP	-0.36	0.02	6.0	1 SEL2	74LS139	LS139	TT5	A2
+	E3(13)      |	 TIP	-0.36	0.02	4.0	2 SEL2	74LS139	LS139	TT5	C2
+	D1(10)      |	 TI	-0.36	0.02	6.0	2C0	74LS153	LS153	TT2	C5
+			-3.40(0.14)/8.00(-0.40)	27.5
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+OE	E8(15)      .	 TOT	1.60	-0.20		OE	UART	TR1602	TT7	B1
+	B8(15)      |	 TOT	1.60	-0.20	5.5	OE	UART	TR1602	TT7	B3
+	A5(9)       |	 TIP	-0.36	0.02	6.5		74LS27	LS27O	TT2	A3
+	B4(15)      |	 TOT	1.60	-0.20	3.0	OE	UART	TR1602	TT7	B7
+	E4(15)      |	 TOT	1.60	-0.20	5.5	OE	UART	TR1602	TT7	B5
+	D1(3)       |	 TI	-0.36	0.02	6.0	1C3	74LS153	LS153	TT2	C5
+			-0.72(0.04)/1.60(-0.20)	26.5
+OUTPUT 4 H
+	H3(1)       .	 TISP	-0.36	0.02			74LS00	LS00	TT4	A2
+	H3(4)       |	 TISP	-0.36	0.02	3.0		74LS00	LS00	TT4	A2
+	E2(3+)      |	 TI	-0.80	0.04	5.5	CLK1	74LS74	LS74	TT3	D2
+	C3(4+)      |	 TO	8.00	-0.40	5.5		74LS02	LS02	TT1	A6
+	B2(2+)      |	 TISP	-0.36	0.02	4.5		74LS08	LS08	TT1	B3
+	C2(9+)      |	 TISP	-0.36	0.02	4.0		74LS02	LS02	TT4	A4
+			-2.24(0.12)/8.00(-0.40)	22.5
+PE	E8(13)      .	 TOT	1.60	-0.20		PE	UART	TR1602	TT7	B1
+	B8(13)      |	 TOT	1.60	-0.20	5.5	PE	UART	TR1602	TT7	B3
+	A5(11)      |	 TIP	-0.36	0.02	6.5		74LS27	LS27O	TT2	A3
+	B4(13)      |	 TOT	1.60	-0.20	3.0	PE	UART	TR1602	TT7	B7
+	E4(13)      |	 TOT	1.60	-0.20	5.5	PE	UART	TR1602	TT7	B5
+	E1(3)       |	 TI	-0.36	0.02	7.5	1C3	74LS153	LS153	TT2	C5
+			-0.72(0.04)/1.60(-0.20)	28.0
+RCVR ATTN L
+	H6(12)      .	 TI	-0.40	0.02		D2	74LS74	LS74I	TT4	B4
+	H3(11)      |	 TO	8.00	-0.40	6.5		74LS00	LS00	TT4	B3
+			-0.40(0.02)/8.00(-0.40)
+RCVR ATTN SYNC H
+	H6(8)       .	 TO	8.00	-0.40		-Q2	74LS74	LS74I	TT4	B4
+	H5(13)      |	 TIP	-0.36	0.02	4.5		74LS27	LS27	TT4	A6
+			-0.36(0.02)/8.00(-0.40)
+RCVR ENB H
+	F1(4)       \	 TI	-0.36	0.02		1C2	74LS153	LS153	TT2	B5
+	H3(13)      |	 TISP	-0.36	0.02	5.0		74LS00	LS00	TT4	B3
+	E5(4+)      |	 TO	8.00	-0.40	7.5		74LS04	LS04R	TT4	B2
+			-0.72(0.04)/8.00(-0.40)	12.5
+RCVR ERR H
+	A5(6)       \	 TO	8.00	-0.40			74LS27	LS27	TT2	A5
+	A3(5)       |	 TIS	(-1.60)	0.04	5.0		74 38	38	TT2	A7
+	A3(4)       |	 TIS	-1.60	0.04	2.1		74 38	38	TT2	A7
+			-1.60(0.08)/8.00(-0.40)	7.1
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+RR1	E8(12)      \	 TOT	1.60	-0.20		RR1	UART	TR1602	TT7	B1
+	B8(12)      |	 TOT	1.60	-0.20	5.5	RR1	UART	TR1602	TT7	B3
+	B4(12)      |	 TOT	1.60	-0.20	8.0	RR1	UART	TR1602	TT7	B7
+	E4(12)      |	 TOT	1.60	-0.20	5.5	RR1	UART	TR1602	TT7	B5
+	D1(5)       |	 TI	-0.36	0.02	6.0	1C1	74LS153	LS153	TT2	C5
+			-0.36(0.02)/1.60(-0.20)	25.0
+RR2	E8(11)      \	 TOT	1.60	-0.20		RR2	UART	TR1602	TT7	B1
+	B8(11)      |	 TOT	1.60	-0.20	5.5	RR2	UART	TR1602	TT7	B3
+	B4(11)      |	 TOT	1.60	-0.20	9.0	RR2	UART	TR1602	TT7	B7
+	E4(11)      |	 TOT	1.60	-0.20	5.5	RR2	UART	TR1602	TT7	B5
+	D1(11)      |	 TI	-0.36	0.02	7.0	2C1	74LS153	LS153	TT2	C5
+			-0.36(0.02)/1.60(-0.20)	27.0
+RR3	E8(10)      \	 TOT	1.60	-0.20		RR3	UART	TR1602	TT7	B1
+	B8(10)      |	 TOT	1.60	-0.20	5.5	RR3	UART	TR1602	TT7	B3
+	B4(10)      |	 TOT	1.60	-0.20	9.0	RR3	UART	TR1602	TT7	B7
+	E4(10)      |	 TOT	1.60	-0.20	5.5	RR3	UART	TR1602	TT7	B5
+	E1(5)       |	 TI	-0.36	0.02	7.0	1C1	74LS153	LS153	TT2	C5
+			-0.36(0.02)/1.60(-0.20)	27.0
+RR4	E8(9)       \	 TOT	1.60	-0.20		RR4	UART	TR1602	TT7	B1
+	B8(9)       |	 TOT	1.60	-0.20	5.5	RR4	UART	TR1602	TT7	B3
+	B4(9)       |	 TOT	1.60	-0.20	9.0	RR4	UART	TR1602	TT7	B7
+	E4(9)       |	 TOT	1.60	-0.20	5.5	RR4	UART	TR1602	TT7	B5
+	E1(11)      |	 TI	-0.36	0.02	7.0	2C1	74LS153	LS153	TT2	C5
+			-0.36(0.02)/1.60(-0.20)	27.0
+RR5	F1(5)       \	 TI	-0.36	0.02		1C1	74LS153	LS153	TT2	B5
+	E4(8)       |	 TOT	1.60	-0.20	7.0	RR5	UART	TR1602	TT7	B5
+	B4(8)       |	 TOT	1.60	-0.20	5.5	RR5	UART	TR1602	TT7	B7
+	B8(8)       |	 TOT	1.60	-0.20	8.0	RR5	UART	TR1602	TT7	B3
+	E8(8)       |	 TOT	1.60	-0.20	5.5	RR5	UART	TR1602	TT7	B1
+			-0.36(0.02)/1.60(-0.20)	26.0
+RR6	F1(11)      \	 TI	-0.36	0.02		2C1	74LS153	LS153	TT2	B5
+	E4(7)       |	 TOT	1.60	-0.20	7.5	RR6	UART	TR1602	TT7	B5
+	B4(7)       |	 TOT	1.60	-0.20	5.5	RR6	UART	TR1602	TT7	B7
+	B8(7)       |	 TOT	1.60	-0.20	8.0	RR6	UART	TR1602	TT7	B3
+	E8(7)       |	 TOT	1.60	-0.20	5.5	RR6	UART	TR1602	TT7	B1
+			-0.36(0.02)/1.60(-0.20)	26.5
+RR7	H1(5)       \	 TI	-0.36	0.02		1C1	74LS153	LS153	TT2	A5
+	E4(6)       |	 TOT	1.60	-0.20	8.0	RR7	UART	TR1602	TT7	B5
+	B4(6)       |	 TOT	1.60	-0.20	5.5	RR7	UART	TR1602	TT7	B7
+	B8(6)       |	 TOT	1.60	-0.20	8.0	RR7	UART	TR1602	TT7	B3
+	E8(6)       |	 TOT	1.60	-0.20	5.5	RR7	UART	TR1602	TT7	B1
+			-0.36(0.02)/1.60(-0.20)	27.0
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+RR8	H1(11)      \	 TI	-0.36	0.02		2C1	74LS153	LS153	TT2	A5
+	E4(5)       |	 TOT	1.60	-0.20	8.0	RR8	UART	TR1602	TT7	B5
+	B4(5)       |	 TOT	1.60	-0.20	5.5	RR8	UART	TR1602	TT7	B7
+	B8(5)       |	 TOT	1.60	-0.20	7.5	RR8	UART	TR1602	TT7	B3
+	E8(5)       |	 TOT	1.60	-0.20	5.5	RR8	UART	TR1602	TT7	B1
+			-0.36(0.02)/1.60(-0.20)	26.5
+SCNR CLR L
+	H6(13)      \	 TI	-1.20	0.06		-CLR2	74LS74	LS74I	TT4	B4
+	H6(1)       |	 TI	-1.20	0.06	3.5	-CLR1	74LS74	LS74I	TT4	B4
+	H7(13)      |	 TI	-1.20	0.06	3.0	-CLR2	74LS74	LS74	TT4	A4
+	D7(2)       |	 TIP	-0.44	0.02	6.0	B1	74LS221	LS221	TT4	D6
+	D7(3)       |	 TIP	-0.54	0.04	2.1	-CLR1	74LS221	LS221	TT4	D6
+	C6(3+)      |	 TIP	-0.36	0.02	4.5		74LS04	LS04R	TT1	B6
+	C3(10+)     |	 TO	8.00	-0.40	7.0		74LS02	LS02O	TT1	B4
+	E2(10+)     |	 TI	-0.80	0.04	5.5	-SET2	74LS74	LS74	TT4	B7
+	E2(1+)      |	 TI	-1.20	0.06	4.0	-CLR1	74LS74	LS74	TT3	D2
+			-6.94(0.36)/8.00(-0.40)	35.6
+SCNR ENB SYNC H
+	H7(9)       .	 TO	8.00	-0.40		Q2	74LS74	LS74	TT4	A4
+	E6(2)       |	 TIP	-0.44	0.02	4.5	B1	74LS221	LS221	TT4	A5
+			-0.44(0.02)/8.00(-0.40)
+SCNR ENB SYNC L
+	H7(8)       .	 TO	8.00	-0.40		-Q2	74LS74	LS74	TT4	A4
+	H5(1)       |	 TIP	-0.36	0.02	4.5		74LS27	LS27	TT4	A6
+			-0.36(0.02)/8.00(-0.40)
+SCNR STOPPED H
+	H7(3)       .	 TI	-0.80	0.04		CLK1	74LS74	LS74	TT4	A3
+	H1(12)      |	 TI	-0.36	0.02	10.0	2C2	74LS153	LS153	TT2	A5
+	E2(8+)      |	 TO	8.00	-0.40	6.0	-Q2	74LS74	LS74	TT4	B7
+	C2(11+)     |	 TISP	-0.36	0.02	4.5		74LS02	LS02	TT4	B4
+			-1.52(0.08)/8.00(-0.40)	20.5
+SCNR STOPPED L
+	H5(4)       .	 TIP	-0.36	0.02			74LS27	LS27	TT5	B5
+	E2(9+)      |	 TO	8.00	-0.40	9.0	Q2	74LS74	LS74	TT4	B7
+	C2(6+)      |	 TISP	-0.36	0.02	5.5		74LS02	LS02	TT3	D3
+	C3(3+)      |	 TISP	-0.36	0.02	4.0		74LS02	LS02	TT1	B4
+			-1.08(0.06)/8.00(-0.40)	18.5
+SEL 0 L	H5(11)      .	 TIP	-0.36	0.02			74LS27	LS27	TT7	A6
+	B3(4)       |	 TO	8.00	-0.40	9.0	-1Y0	74LS139	LS139	TT1	A3
+			-0.36(0.02)/8.00(-0.40)
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+SEL 2 L	H5(3)       \	 TIP	-0.36	0.02			74LS27	LS27	TT5	B5
+	A5(3)       |	 TIP	-0.36	0.02	9.0		74LS27	LS27	TT2	A5
+	B3(5)       |	 TO	8.00	-0.40	5.5	-1Y1	74LS139	LS139	TT1	A3
+			-0.72(0.04)/8.00(-0.40)	14.5
+SEL 4 L	C3(6+)      .	 TISP	-0.36	0.02			74LS02	LS02	TT1	A6
+	B3(6)       |	 TO	8.00	-0.40	3.5	-1Y2	74LS139	LS139	TT1	A3
+			-0.36(0.02)/8.00(-0.40)
+SEL 6 L											   ONE PIN RUN	____ 0
+	B3(7)     	 TO	8.00	-0.40		-1Y3	74LS139	LS139	TT1	A3
+										   UNUSED EXTRA OUTPUT	____ 0
+SMTR ENB H										   ONE PIN RUN	____ 0
+	F1(12)    	 TI	-0.36	0.02		2C2	74LS153	LS153	TT2	B5    NO DRIVE	____ 1
+SS  WRT 0 L
+	E7(11)      .	 TI	-0.36	0.02		-PE	74LS193	LS193	TT4	C2
+	B3(12)      |	 TO	8.00	-0.40	10.0	-2Y0	74LS139	LS139	TT1	A5
+			-0.36(0.02)/8.00(-0.40)
+SS  WRT 2 L
+	E3(15)      .	 TIP	-0.36	0.02		-2G	74LS139	LS139	TT5	C2
+	B3(11)      |	 TO	8.00	-0.40	6.0	-2Y1	74LS139	LS139	TT1	A5
+			-0.36(0.02)/8.00(-0.40)
+SS  WRT 4 L
+	F6(3)       .	 TI	-1.60	0.04		WE	DM8599	8599	TT4	B1
+	B3(10)      |	 TO	8.00	-0.40	11.0	-2Y2	74LS139	LS139	TT1	A5
+			-1.60(0.04)/8.00(-0.40)
+SS  WRT 6 L
+	F7(1)       .	 TIP	-0.36	0.02		-1G	74LS139	LS139	TT5	C6
+	B3(9)       |	 TO	8.00	-0.40	12.0	-2Y3	74LS139	LS139	TT1	A5
+			-0.36(0.02)/8.00(-0.40)
+SSYN H	D3(5+)      \	 TI	-1.60	0.04			74 25	25	TT3	C3
+	C5(2)       |	 TO	16.00	-0.40	5.5	OUT4	DM8837I	8837I0	TT3	B2
+	C6(11+)     |	 TIP	-0.36	0.02	3.5		74LS04	LS04	TT3	B3
+			-1.96(0.06)/16.00(-0.40)	9.0
+STEP OR STOP H
+	E2(11+)     \	 TI	-0.80	0.04		CLK2	74LS74	LS74	TT4	B7
+	E6(5)       |	 TO	8.00	-0.40	8.0	Q2	74LS221	LS221	TT4	C6
+	A7(5)       |	 TISP	-0.36	0.02	7.5		74LS00	LS00	TT4	A7
+			-1.16(0.06)/8.00(-0.40)	15.5
+STEP SCAN COUNTER L
+	E7(5)       .	 TI	-0.36	0.02		-CD	74LS193	LS193	TT4	C2
+	A7(6)       |	 TO	8.00	-0.40	7.0		74LS00	LS00	TT4	A7
+			-0.36(0.02)/8.00(-0.40)
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+STROBE FLAGS H
+	H7(11)      \	 TI	-0.80	0.04		CLK2	74LS74	LS74	TT4	A4
+	D7(1)       |	 TIP	-0.36	0.02	6.0	-A1	74LS221	LS221	TT4	D6
+	D7(5)       |	 TO	8.00	-0.40	3.0	Q2	74LS221	LS221	TT4	D7
+			-1.16(0.06)/8.00(-0.40)	9.0
+STROBE FLAGS L
+	D7(12)      .	 TO	8.00	-0.40		-Q2	74LS221	LS221	TT4	D7
+	C2(12+)     |	 TISP	-0.36	0.02	9.0		74LS02	LS02	TT4	B4
+			-0.36(0.02)/8.00(-0.40)
+THRE	H3(10)      .	 TISP	-0.36	0.02			74LS00	LS00	TT4	B3
+	E4(22)      |	 TOT	1.60	-0.20	7.0	THRE	UART	TR1602	TT7	B5
+	E8(22)      |	 TOT	1.60	-0.20	7.0	THRE	UART	TR1602	TT7	B1
+	B8(22)      |	 TOT	1.60	-0.20	5.5	THRE	UART	TR1602	TT7	B3
+	B4(22)      |	 TOT	1.60	-0.20	7.0	THRE	UART	TR1602	TT7	B7
+	A1(12)      |	 TIS	-1.60	0.04	6.0		74 38	38	TT7	A7
+			-1.96(0.06)/1.60(-0.20)	32.5				   OUTPUT LOW OVERLOAD	____ 2
+UNIBUS A00 L										      NULL RUN	____ 0
+											     NULL WIRE	____ 0
+UNIBUS A01L
+	EH1         .	 				CON		TT11	B4
+	C7(5)       |	 TI	-0.05	0.05	6.5	IN6	DM8837I	8837I	TT1	A2
+			-0.05/0.00
+UNIBUS A02L
+	EF1         .	 				CON		TT11	B4
+	C7(3)       |	 TI	-0.05	0.05	7.0	IN5	DM8837I	8837I	TT1	A2
+			-0.05/0.00
+UNIBUS A03L
+	EV2         .	 				CON		TT11	B4
+	B7(3)       |	 TI	0.05	0.05	4.5	B2	8131	8131	TT1	C3
+			0.05/0.00
+UNIBUS A04L
+	EU2         .	 				CON		TT11	C4
+	B7(5)       |	 TI	0.05	0.05	4.5	B3	8131	8131	TT1	C3
+			0.05/0.00
+UNIBUS A05L
+	EV1         .	 				CON		TT11	B4
+	B6(1)       |	 TI	0.05	0.05	6.0	B1	8131	8131	TT1	C5
+			0.05/0.00
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+UNIBUS A06L
+	EU1         .	 				CON		TT11	C4
+	B6(3)       |	 TI	0.05	0.05	5.5	B2	8131	8131	TT1	C5
+			0.05/0.00
+UNIBUS A07L
+	EP2         .	 				CON		TT11	C4
+	B6(5)       |	 TI	0.05	0.05	5.0	B3	8131	8131	TT1	C5
+			0.05/0.00
+UNIBUS A08L
+	EN2         .	 				CON		TT11	C4
+	B6(11)      |	 TI	0.05	0.05	5.0	B4	8131	8131	TT1	C5
+			0.05/0.00
+UNIBUS A09L
+	ER1         .	 				CON		TT11	C4
+	B6(13)      |	 TI	0.05	0.05	5.5	B5	8131	8131	TT1	C5
+			0.05/0.00
+UNIBUS A10L
+	EP1         .	 				CON		TT11	C4
+	B6(15)      |	 TI	0.05	0.05	6.0	B6	8131	8131	TT1	C5
+			0.05/0.00
+UNIBUS A11L
+	EL1         .	 				CON		TT11	C4
+	B5(1)       |	 TI	0.05	0.05	6.0	B1	8131	8131	TT1	C7
+			0.05/0.00
+UNIBUS A12L
+	EC1         .	 				CON		TT11	C4
+	B5(3)       |	 TI	0.05	0.05	5.0	B2	8131	8131	TT1	C7
+			0.05/0.00
+UNIBUS A13L
+	EK2         .	 				CON		TT11	C4
+	B5(5)       |	 TI	0.05	0.05	5.0	B3	8131	8131	TT1	C7
+			0.05/0.00
+UNIBUS A14L
+	EK1         .	 				CON		TT11	D4
+	B5(11)      |	 TI	0.05	0.05	6.0	B4	8131	8131	TT1	C7
+			0.05/0.00
+UNIBUS A15L
+	ED2         .	 				CON		TT11	D4
+	B5(13)      |	 TI	0.05	0.05	5.5	B5	8131	8131	TT1	C7
+			0.05/0.00
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+UNIBUS A16L
+	EE2         .	 				CON		TT11	D4
+	B5(15)      |	 TI	0.05	0.05	5.5	B6	8131	8131	TT1	C7
+			0.05/0.00
+UNIBUS A17L
+	ED1         .	 				CON		TT11	D4
+	B7(11)      |	 TI	0.05	0.05	5.0	B4	8131	8131	TT1	C3
+			0.05/0.00
+UNIBUS BBSY L
+	FD1         \	 				CON		TT11	C1
+	C5(3)       |	 TI	-0.05	0.05	9.0	IN5	DM8837I	8837I	TT3	C2
+	A2(8)       |	 TOC	48.00		9.0		74 38	38	TT3	A2
+			-0.05/48.00		18.0
+UNIBUS BG4 IN H
+UNIBUS BG4 OUT H
+	DT2         .	 				CON		TT11	B7
+	DS2         |	 				CON		TT11	B7
+UNIBUS BG5 IN H
+	DP2         \	 				CON		TT11	B7
+	D5(13)      |	 I	0.00	0.00	6.5		BLANK2	R	TT3	B1
+	C7(13)      |	 TI	-0.05	0.05	5.5	IN2	DM8837I	8837IO	TT3	B2
+			-0.05/0.00		12.0
+UNIBUS BG5 OUT H
+	D5(3)       \	 I	0.00	0.00			BLANK2	R	TT3	A7
+	DR2         |	 				CON		TT11	B7
+	A3(8)       |	 TOC	48.00		5.0		74 38	38O	TT3	B7
+			0.00/48.00		12.0
+UNIBUS BG6 IN H
+UNIBUS BG6 OUT H
+	DN2         .	 				CON		TT11	B7
+	DM2         |	 				CON		TT11	B7
+UNIBUS BG7 H										      NULL RUN	____ 0
+											     NULL WIRE	____ 0
+UNIBUS BG7 IN H
+UNIBUS BG7 OUT H
+	DL2         .	 				CON		TT11	C7
+	DK2         |	 				CON		TT11	C7
+UNIBUS BR5 L
+	DF2         .	 				CON		TT11	A4
+	A2(3)       |	 TOC	48.00		4.5		74 38	38	TT3	D7
+			0.00/48.00
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+UNIBUS C1L
+	EF2         .	 				CON		TT11	D4
+	C7(11)      |	 TI	-0.05	0.05	5.5	IN3	DM8837I	8837I0O	TT1	A2
+			-0.05/0.00
+UNIBUS D00L
+	CS2         .	 				CON		TT11	A1
+	B1(1)       |	 TOC	50.00		5.0	BUS3	8838	8838	TT2	D3
+			0.00/50.00
+UNIBUS D01L
+	CR2         .	 				CON		TT11	A1
+	B1(4)       |	 TOC	50.00		4.5	BUS4	8838	8838	TT2	D3
+			0.00/50.00
+UNIBUS D02L
+	CU2         .	 				CON		TT11	A1
+	B1(12)      |	 TOC	50.00		5.5	BUS2	8838	8838	TT2	D3
+			0.00/50.00
+UNIBUS D03L
+	CT2         .	 				CON		TT11	B1
+	B1(15)      |	 TOC	50.00		6.0	BUS1	8838	8838	TT2	D3
+			0.00/50.00
+UNIBUS D04L
+	C1(1)       \	 TOC	50.00			BUS3	8838	8838	TT2	B3
+	A2(11)      |	 TOC	48.00		5.5		74 38	38	TT3	A4
+	CN2         |	 				CON		TT11	B1
+			0.00/48.00		9.0
+UNIBUS D05L
+	CP2         .	 				CON		TT11	B1
+	C1(4)       |	 TOC	50.00		5.5	BUS4	8838	8838	TT2	B3
+			0.00/50.00
+UNIBUS D06L
+	CV2         .	 				CON		TT11	B1
+	C1(12)      |	 TOC	50.00		6.5	BUS2	8838	8838	TT2	B3
+			0.00/50.00
+UNIBUS D07L
+	C1(15)      \	 TOC	50.00			BUS1	8838	8838	TT2	B3
+	A1(3)       |	 TOC	48.00		5.5		74 38	38	TT3	A4
+	CM2         |	 				CON		TT11	B1
+			0.00/48.00		9.0
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+UNIBUS D08 L										   ONE PIN RUN	____ 0
+	CL2       	 				CON		TT11	B1
+UNIBUS D09 L										   ONE PIN RUN	____ 0
+	CK2       	 				CON		TT11	B1
+UNIBUS D10 L										   ONE PIN RUN	____ 0
+	CJ2       	 				CON		TT11	B1
+UNIBUS D11 L										   ONE PIN RUN	____ 0
+	CH1       	 				CON		TT11	C1
+UNIBUS D12 L										   ONE PIN RUN	____ 0
+	CH2       	 				CON		TT11	B1
+UNIBUS D13 L										   ONE PIN RUN	____ 0
+	CF2       	 				CON		TT11	C1
+UNIBUS D14 L										   ONE PIN RUN	____ 0
+	CE2       	 				CON		TT11	C1
+UNIBUS D15L
+	A3(6)       \	 TOC	48.00				74 38	38	TT2	A7
+	CD2         |	 				CON		TT11	C1
+	A1(11)      |	 TOC	48.00		3.5		74 38	38	TT7	A7
+			0.00/48.00		9.0
+UNIBUS INIT L
+	DL1         .	 				CON		TT11	A1
+	C7(1)       |	 TI	-0.05	0.05	9.0	IN4	DM8837I	8837I0	TT1	B2
+			-0.05/0.00
+UNIBUS INTR L
+	FM1         .	 				CON		TT11	A1
+	A2(6)       |	 TOC	48.00		11.0		74 38	38	TT3	A2
+			0.00/48.00
+UNIBUS MSYN L
+	EE1         .	 				CON		TT11	D4
+	B7(13)      |	 TI	0.05	0.05	5.5	B5	8131	8131	TT1	C3
+			0.05/0.00
+UNIBUS NPG H										      NULL RUN	____ 0
+											     NULL WIRE	____ 0
+UNIBUS NPG IN H
+UNIBUS NPG OUT H
+	CB1         .	 				CON		TT11	C7
+	CA1         |	 				CON		TT11	C7
+UNIBUS SACK L
+	FT2         .	 				CON		TT11	D1
+	A3(11)      |	 TOC	48.00		11.0		74 38	38	TT3	C7
+			0.00/48.00
+				T.WLR[WL,DRW]		19-AUG-76  0850
+SIGNAL NAME
+	LOC(PIN#)   Z	TYPE	LOW	HI	INCHES	USE	DIPTYPE	BODY	FILE	POS
+
+UNIBUS SSYN L
+	C5(1)       \	 TI	-0.05	0.05		IN4	DM8837I	8837I0	TT3	B2
+	EJ1         |	 				CON		TT11	D4
+	A3(3)       |	 TOC	48.00		6.5		74 38	38	TT1	B7
+			-0.05/48.00		13.0
+UNIT 2^0 H; GND ON SC0, HI ON SC1							   ONE PIN RUN	____ 0
+	E1(6)     	 TI	-0.36	0.02		1C0	74LS153	LS153	TT2	C5    NO DRIVE	____ 1
+XMTR ATTN L
+	H6(2)       .	 TI	-0.40	0.02		D1	74LS74	LS74I	TT4	B4
+	H3(8)       |	 TO	8.00	-0.40	7.0		74LS00	LS00	TT4	B3
+			-0.40(0.02)/8.00(-0.40)
+XMTR ATTN SYNC H
+	H6(6)       .	 TO	8.00	-0.40		-Q1	74LS74	LS74I	TT4	B4
+	H5(2)       |	 TIP	-0.36	0.02	4.0		74LS27	LS27	TT4	A6
+			-0.36(0.02)/8.00(-0.40)
+XMTR ENB H
+	H3(9)       .	 TISP	-0.36	0.02			74LS00	LS00	TT4	B3
+	E5(2+)      |	 TO	8.00	-0.40	7.0		74LS04	LS04R	TT4	B2
+			-0.36(0.02)/8.00(-0.40)
+
+
+629 TOTAL WIRES
+263 TOTAL RUNS
+3232.5 INCHES OF WIRE
+    

@@ -1,0 +1,1366 @@
+@part(WL,root "SUDS.MSS[A210JN11]")
+@pagefooting(center "W", right "@title(Chapter)")
+@chap(Introduction)
+
+Note: unless the graphics support code for D is present in
+the graphics,  the
+keyboard will @i[not] generate the correct codes for @g(a), @g(b),
+and @g(e) by using the <control>, <meta>, and <meta>-<control>
+combinations.  However, the GDP keytop symbols for @g(a), @g(b) and
+@g(e) @i[will] work.  In addition,  the wirelister may be run
+from an ordinary terminal (or a GDP) by using the apostrophe convention described
+on page @pageref(apostrophes).
+
+
+The wirelister checks out the placement of dips on the board (you
+didn't overlap two of them, did you?), checks the loading
+of signals, and checks for consistency (e.g., two totem-pole
+outputs tied together are detected).  It can produce a number
+of listings depending upon what sort of data you wish
+to reference.  The most important listings are:
+@enter(itemize)
+The wrap list (WLZ) file; this is used by a technician to
+wrap the board.
+
+The routing list (WLR) file; this is used by designers to
+debug the board.
+
+The signal summary (WSS) file; this is a sorted list of the
+signal names, cross-referenced to the drawings.
+
+The stuffing list (STF) file; this is the set of instructions 
+about where to stuff chips in the board.
+
+The wirelist summary (WLU) file; this is used by the MAPLSD
+program (page @pageref(MAPLSD)) to print a picture of the
+dip layout.
+@leave(itemize)
+
+There are numerous other summaries possible, many of which are
+used as input to programs that are unavailable at CMU.
+
+
+@chap(Wirelister commands)
+The extended commands are availble by typing "X" followed
+by the name of the command.
+
+@enter(description)
+
+@label(XBFILES)
+@index(BFILES)@index(XBFILES)
+
+BFILES@\Print a file list for the back panel.
+
+
+@label(XBLIST)
+@index(XBLIST)@index(BLIST)
+
+BLIST@\Writes a back panel wirelist, default extension
+@index(Extension BL)@index(BL extension)
+.BL.
+
+@label(XBMAKALL)
+@index(XBMAKALL)@index(BMAKALL)
+
+BMAKALL@\Like XMAKALL (page @pageref(XMAKALL)) except that it
+also does an XBLIST (page @pageref(XBLIST) and BSUM (page @pageref(XBSUM)).
+
+@label(XBOARDWL)
+@index(XBOARD)@index(BOARD)
+
+BOARD@\Selects the board type.  See section @ref(Boards), page
+@pageref(boards).
+
+
+@label(XBPRINT)
+@index(XBPRINT)
+@index(BPRINT)
+
+BPRINT@\Asks for a signal name, and prints the run information
+on the terminal.  DI@k(ForAll) or ? work as in the "P" commands,
+page @pageref(Pcmds).
+
+@label(XBSIMPLE)
+@index(XBSIMPLE)@index(BSIMPLE)
+
+BSIMPLE@\Writes a
+@index(Extension SMP)@index(SMP extension)
+.SMP file, including all power and NC pins.
+
+
+@label(XBSSEL)
+@index(BSSEL)@index(XBSSEL)
+
+BSSEL@\Like BSUM, except that it is selective; you are asked about
+each category before it is written to the file.
+
+@label(XBSUM)
+@index(BSUM)@index(XBSUM)
+
+BSUM@\Writes a back panel wirelist summary, similar to the
+WLS file for a normal wirelist.  Default extension is
+@index(Extension BS)@index(BS, extension)
+.BS.
+
+@label(XCITYBL)
+@index(XCITYBL)@index(CITYBL)
+@index(City block routing)
+
+CITYBL@\Tells the wirelister that all the wires will be wrapped in a 
+cityblock fashion.  It then calculates the wirelengths
+appropriately.
+
+
+@label(XCLEARWL)
+@index(XCLEAR)@index(CLEAR)
+
+CLEAR@\This command is equivalent to "^C@ START<crlf>" except that
+it does not flush an XDSKIN (page @pageref(XDSKINWL)) in progress.
+
+
+@label(XCONSUM)
+@index(CONSUM)@index(XCONSUM)
+
+CONSUM@\Writes a connector-pins-needed summary, default extension
+@index(Extension WCS)@index(WCS extension)
+.WCS.  This lists signals
+in the same format as XSIGSUM (page @pageref(XSIGSUM)) but includes
+only those signals which need to get from one card to another, but
+don't as yet.
+
+@label(XCSTRAP)
+@index(CSTRAP)@index(XCSTRAP)
+
+CSTRAP@\Asks for a card location, if necessary (it should be necessary).
+The writes a file (default extension
+@index(Extension DAT)@index(DAT extension)
+.DAT) which contains the back connector locations which are gotten
+by taking a wild back connector fom this card and finding the
+matching connector on the other card.  This allows pre-placement
+of pins which have been previously assigned to one of a pair
+of cards.  The file is suitable for reading into
+D with the XIPINS (page @pageref(XIPINS)) command.
+
+@label(XDDTWL)
+@index(DDT)@index(XDDT)
+
+DDT@\Enter DDT if it is loaded.
+
+@label(XDEFPPN)
+@index(DEFPPN)@index(XDEFPPN)
+DEFPPN@\Accepts a ppn to use as the default ppn when none is
+specified for an input file.
+
+@index(X-DEFPPN)@index(-DEFPPN)
+@indexentry(key "XDEFPPN-",entry "X-DEFPPN",number)
+@indexentry(key "DEFPPN-",entry "-DEFPPN",number)
+
+-DEFPPN@\Sets the default ppn to [0,0].  The default ppn will
+be 0 unless the filename comes from an indirect file.  In this
+case, the ppn which is the default is the ppn of the indirect
+file.
+
+
+@label(XDSKCONWL)
+@index(DSKCON)@index(XDSKCON)
+
+DSKCON@\If the last XDSKIN (page @pageref(XDSKINWL)) was suspended
+by a XDSKHLD (page @pageref(XDSKHLD)) or an error, this command
+causes the file to be reopened and an appropriate number of characters
+to be skipped to reposition it to where it was.  Obviously if you
+have edited the file somehow in between the XDSKHLD and the 
+XDSKCON, you will be in trouble.  XDSKHLD and XDSKCON are used
+by XSAVE to get around the fact that saving the core image causes
+a RESET UUO to be done.
+
+
+@label(XDSKHLD)
+
+@index(DSKHLD)@index(XDSKHLD)
+
+DSKHLD@\Releases the disk input file used for command input (XDSKIN), but remembers where it was;
+you may use XDSKCON (page @pageref(XDSKCONWL))  to continue.
+
+@label(XDSKINWL)
+@index(DSKIN)@index(XDSKIN)
+
+DSKIN@\Asks for a filename, default extension 
+@index(Extension TXT)@index(TXT extension)
+.TXT.  Takes command input from this file instead of
+the terminal; if any error occurs, input reverts to the
+terminal.
+See also XDSKHLD, XDSKCON, XDSKSKP.
+
+@label(XDSKSKPWL)
+@index(DSKSKP)@index(XDSKSKP)
+
+DSKSKP@\If no file is open, asks for a filename and opens that file.
+Reads to the next line feed, echoing characters as it goes, and
+then asks "STOP?".  If you respond with "Y", followed by a <crlf>,
+skipping stops and control reverts to whomever had it last.  If
+you respond with <escape>, then skipping stops and control reverts
+to the terminal.  Anything else causes the next line to be
+skipped (and echoed) and the sequence then repeats.
+
+
+
+
+@label(XECL)
+@index(ECL)@index(XECL)
+
+ECL@\Sets the default for ECL dips during DIP definition.
+See page @pageref(levels).
+
+@index(-ECL)@index(X-ECL)
+@indexentry(key "XECL-",entry "X-ECL",number)
+@indexentry(key "ECL-",entry "-ECL",number)
+
+-ECL@\Clears the ECL default.
+
+@label(XERRSUM)
+@index(ERRSUM)@index(XERRSUM)
+
+ERRSUM@\Writes an error summary file, default extension
+@index(Extension LES)@index(LES extension)
+.LES, which has each run of some of the categories from the wirelist
+summary output.  This is a binary file which goes back into the
+D program (see page @pageref(LESD)) and allows you to flash the
+runs from each error category.
+
+@label(XEXTENT)
+@index(EXTENT)@index(XEXTENT)
+
+EXTENT@\This sets  the number of paddles to assume to make it to the
+back panel for cards with no location.  It is initialized to 4.
+@index(-EXTENT)@index(X-EXTENT)
+@indexentry(key "XEXTENT-",entry "X-EXTENT",number)
+@indexentry(key "EXTENT-",entry "-EXTENT",number)
+
+-EXTENT@\Resets the default extent (4).
+
+
+@label(XFILES)
+@index(XFILES)@index(FILES)
+
+FILES@\Prints a file list for the card.
+
+@label(XFRACTION)
+@index(XFRACTION)@index(FRACTION)
+
+FRACTION@\Prints out the current resolution of wire lengths in
+fractions of an inch.  Smallest resolution is 1/2 inch.  If the
+resolution is set to any power of 10, e.g., 10, 100, 1000, the
+wire length will print out in decimal inches; if any other value,
+in fractions of an inch.  Fraction reduction will be done when
+possible, but only works well when the denominator is a power of 2.
+Note that the FRACTION value is set to a default board value
+whenever an XBOARD command (page @pageref(XBOARDWL)) is given.
+
+
+
+@label(XHELPWL)
+
+@emphasize[HELP]@\Prints a command summary.
+
+@label(XIERRORWL)
+@index(IERROR)@index(XIERROR)
+
+IERROR@\Enable output of errors on wirelist file input to go to
+a file.  When you do an @g(a)I, @g(b)I, @g(e)I or @g(e)B (pages @pageref(EpsilonBWL) and @pageref(AlphaIWL)) command you will be asked for a filename
+(default extension
+@index(Extension WIE)@index(WIE extension)
+WIE).  This file contains the filename of the file being processed
+and any errors which cannot be indicated later.  If you respond
+with a <crlf> to the WIE filename error prompt, the error messages
+will go to the terminal (as if no XIERROR command had been done).
+
+@indexentry(key "XIERROR-",entry "X-IERROR",number)
+@indexentry(key "IERROR-",entry "-IERROR",number)
+
+@label(XMAKALL)
+@index(XMAKALL)@index(MAKALL)
+
+MAKALL@\Asks for one name and a possible card name, then does
+an @g(a)L, @g(b)L, and @g(e)L (see page @pageref(AlphaLWL)), writing
+three files.
+
+
+
+
+
+@label(XMPART)
+@index(MPART)@index(XMPART)
+
+MPART@\Make master parts list (from .BAC files).
+
+@label(XOLD)
+@index(XOLD)@index(OLD)
+@index(DIPS.DIP)
+
+OLD@\Sets the mode for reading old DIPS.DIP files.
+
+@index(-OLD)@index(X-OLD)
+@indexentry(key "XOLD-",entry "X-OLD",number)
+@indexentry(key "OLD-",entry "-OLD",number)
+
+-OLD@\Clears the OLD mode.
+
+
+@label(XOUTSUM)
+@index(XOUTSUM)@index(OUTSUM)
+
+OUTSUM@\Writes output pin termination summary.
+
+@label(XPAGEWL)
+@index(XPAGE)@index(PAGE)
+
+PAGE@\Allows you to set the number of lines per page for listings;
+default is 52.  
+
+@index(X-PAGE)@index(-PAGE)
+@indexentry(key "XPAGE-",entry "X-PAGE",number)
+@index(X-PAGE)@index(-PAGE)
+
+-PAGE@\Resets to the default page height.
+
+
+@label(XPART)
+@index(XPART)@index(PART)
+@index(PRT extension)@index(Extension PRT)
+@index(Parts list)
+
+PART@\Writes a PRT file which tells for each dip type on a board
+what its part number is and how many are used.
+Used for ordering parts.
+
+@label(XREFERENCE)
+@index(XREFERENCE)@index(REFERENCE)
+
+@emphasize[REFERENCE]@\This enables the feature in the WL files which causes all
+signal names for a wire to appear in each alphabetical
+sorting of each name, but only one of them will have the pin
+information printed.  All the others will print 
+@index(____ REFERENCE)
+@indexentry(key "REFERENCE",entry "____REFERENCE",number)
+'____ REFERENCE' next to the signal with which the pins
+appear.
+
+@index(X-REFERENCE)@index(-REFERENCE)
+@indexentry(key "XREFERENCE-",entry "X-REFERENCE",number)
+@indexentry(key "REFERENCE-",entry "-REFERENCE",number)
+
+-REFERENCE@\Disabless the above mentioned feature.
+
+
+@label(XRESIDENT)
+
+@index(XRESIDENT)@index(RESIDENT)
+
+@emphasize[RESIDENT]@\Reads in a dip definition file and makes the dip definitions
+resident in the core image.  Dip definitions will be retained
+across ^C/START and SAVE operations.  This is the normal mode
+in which the core image is saved; see section @ref(Saving), page
+@pageref(saving).
+
+@index(X-RESIDENT)@index(-RESIDENT)
+@indexentry(key "XRESIDENT-", entry "X-RESIDENT",number)
+@indexentry(key "RESIDENT-", entry "-RESIDENT",number)
+
+@emphasize[-RESIDENT]@\Releases dip definitions so they may be edited.
+A ^C/START or XSAVE sequence will delete the dip definitions.
+You must make dips resident after editing, and after writing
+the new definitions out.  See section @ref(saving), page 
+@pageref(saving).
+
+@label(XROUTE)
+@index(ROUTE)@index(XROUTE)
+
+@emphasize[ROUTE]@\This routes all runs on the specified card and then produces
+@index(WLR extension)@index(Extension WLR)
+a listing (default extension WLR).  The listing is like a WL
+listing except that the pins are ordered and a pseudo Z-level
+is indicated in an extra column.
+This is the commonly used file for debugging the hardware.
+
+@label(XSAVE)
+@index(SAVE)@index(XSAVE)
+
+@emphasize[SAVE]@\Exits to the monitor.  You must then do a
+monitor SAVE command to save the core image (presumably
+with dip definitions resident; see XRESIDENT, page @pageref(XRESIDENT)
+and section @ref(saving), page @pageref(saving)).
+If an XDSKIN operation (page @pageref(XDSKINWL)) is in progress,
+it is suspended during the save and restarted (using XDSKCON,
+page @pageref(XDSKCONWL)) after a START command.  However,
+if the core image is re-run, an explicit DSKCON must be given
+to resume DSKIN execution.
+
+
+
+@label(XSIGSUM)
+@index(XSIGSUM)@index(SIGSUM)
+
+SIGSUM@\Write a signal summary list for the entire wirelist.
+Default extension is
+@index(WSS extension)@index(Extension WSS)
+WSS.  
+
+@label(XSPACESWL)
+@index(XSPACES)@index(SPACES)
+
+SPACES@\Makes spaces in signal names significant.  Affects only the
+@g(a)I (page @pageref(AlphaIWL)) and @g(b)I (page @pageref(BetaIWL))
+commands.
+
+@index(X-SPACES)@index(-SPACES)
+@indexentry(key "XSPACES-", entry "X-SPACES",number)
+@indexentry(key "SPACES-", entry "-SPACES",number)
+
+-SPACES@\Spaces in signal names are not signficant except when
+they separate two digits.  This is the default.
+
+
+@label(XSTATUS)
+@index(XSTATUS)@index(STATUS)
+
+STATUS@\Prints out the current program state, including the
+flags set by XSPACES (page @pageref(XSPACESWL)), REFERENCE
+(page @pageref(XREFERENCE)), etc.
+
+
+
+@label(XSTRAPS)
+@index(XSTRAPS)@index(STRAPS)
+
+STRAPS@\Reads a
+@index(Extension C2C)@index(C2C extension)
+.C2C file which has two card locations on each line separated
+by a tab.  This specifies which cards have their back strap
+connectors strapped together.  A special format allows each
+paddle to be mentioned expltl so you can strap different
+paddles in different directions.  An attempt is made to look
+at each wire which has a back connector on it.
+If it has no name, you lose.  Otherwise, the program finds
+the same named wire on the other card.  If it is found,
+then it tries to match edge pins on this wire with edge
+pins on that wiere.  A match occurs if they are the
+sme pin, or one or both are "wild" specified pins.  This
+allows errors to be avoided when only one card is placed.
+
+@label(XSTUFF)
+@index(XSTUFF)@index(STUFF)
+@index(Extension STF)@index(STF extension)
+
+@emphasize[STUFF]@\Writes a STF file which tells for each dip type on a board
+where it is used (what location).
+This file is used while stuffing chips into the board.
+
+
+@label(XTERMLIST)
+@index(XTERMLIST)@index(TERMLIST)
+
+TERMLIST@\Write terminator test point list.
+
+@label(XTEST)
+@index(XTEST)@index(TEST)
+
+TEST@\Writes a card tester file for P. Petit's simulator.  The
+default extension is
+@index(Extension TST)@index(TST extension)
+.TST.
+
+
+@label(XTTL)
+@index(TTL)@index(XTTL)
+@indexentry(key "XTTL-",entry "X-TTL",number)
+@indexentry(key "TTL-",entry "-TTL",number)
+
+-TTL@\Clears the TTL default.
+This sets the default level for defining dips; see page @pageref(levels).
+
+@label(XUMAKE)
+@index(XUMAKE)@index(UMAKE)
+
+UMAKE@\Writes a file, default extension
+@index(Extension UML)@index(UML extension)
+.UML, which is input to the D program.  It replaces all
+edge pins with generated "U" pins.
+
+@label(XUML)
+@index(UML)@index(XUML)
+
+UML@\Prints a module map for the card you select.  Also prints
+edge signals in boxes for each paddle.  Default extension
+is
+@index(UML extension)@index(Extension UML)
+.UML.
+
+
+
+@label(XWIDTH)
+@index(XWIDTH)@index(WIDTH)
+
+WIDTH@\Allows you to set the page width for output listings.
+
+@index(X-WIDTH)@index(-WIDTH)
+@indexentry(key "XWIDTH-", entry "X-WIDTH",number)
+@indexentry(key "WIDTH-", entry "-WIDTH",number)
+
+-WIDTH@\Resets the width to its default value.
+
+
+@label(XWIREGND)
+@index(WIREGND)@index(XWIREGND)
+
+WIREGND@\Enable wiring of ground pins on dips.
+
+@label(XWLSSEL)
+@index(WLSSEL)@index(XWLSSEL)
+
+WLSSEL@\Like @g(b)L (page @pageref(BetaLWL)) except that it is selective;
+you are asked about each category before it is written on the file.
+
+
+@label(XZLEVEL)
+@index(XZLEVEL)@index(ZLEVEL)
+
+@emphasize[ZLEVEL]@\This produces a technician command file, default
+@index(Extension WLZ)@index(WLZ extension)
+extension WLZ.  It is effectively
+a from to listing for each wire on the board with the Z-level
+information.  First is PWR and GND Z-level 1 and Z-level 2.
+Then signals, Z-level 1 and Z-level 2.
+This is the file which is used as an input to SMECO  
+@index(SMECO input file)
+(Smart Engineering Change Order) page @pageref(smeco).
+
+@leave(description)
+
+@enter(description)
+@label(AlphaBWL)
+@index(@g(a)B, read backpanel wirelist)
+@index(Wirelist, backpanel)@index(Backpanel wirelist)
+@indexentry(key "B@g(a), read backpanel wirelist",entry "@g(a)B, read backpanel wirelist",number)
+@indexentry(key "read backpanel wirelist, B@g(a)",entry "Read backpanel wirelist, @g(a)B",number)
+
+@g(a)B@\Reads a back panel wirelist written with @g(b)W (page @pageref(BetaWWL)), default extension is
+@index(Extension BAC)@index(BAC extension)
+.BAC.  You may now make a backpanel wirelist using the
+X-commands.
+
+
+@label(BetaBWL)
+@index(@g(b)B, read backpanel wirelist)
+@index(Wirelist, backpanel)@index(Backpanel wirelist)
+@indexentry(key "B@g(b), read backpanel wirelist",entry "@g(b)B, read backpanel wirelist",number)
+@indexentry(key "read backpanel wirelist, B@g(b)",entry "Read backpanel wirelist, @g(b)B",number)
+
+@g(b)B@\Reads a .BAC file, but only inputs filename and title
+information, and dip counts for making an
+@index(Extension MPL)@index(MPL extension)
+MPL file.
+
+@label(EpsilonBWL)
+@index(@g(e)B, read BEQ file)
+
+@indexentry(key "B@g(e), read BEQ file",entry "@g(e)B, read BEQ file",number)
+@indexentry(key "read BEQ file, B@g(e)",entry "read BEQ file, @g(e)B",number)
+
+@g(e)B@\Reads a file with the same form as a
+@index(Extension WEQ)@index(WEQ extension)
+.WEQ file, except the default extension is
+@index(Extension BEQ)@index(BEQ extension)
+.BEQ.  It has the same effect on the back panel as a .WEQ
+file has on the card wire list, except that there is
+no problem about card locations since it applies to
+the whole back panel.
+
+@label(AlphaCWL)
+@index(@g(a)C, verify PC wirelist)
+@indexentry(key "C@g(a), verify PC wirelist",entry "@g(a)C, verify PC wirelist",number)
+@indexentry(key "verify PC wirelist, C@g(a)",entry "Verify PC wirelist, @g(a)C",number)
+
+@g(a)C@\Asks for a card location if necessary, then asks for a
+filename.  The default extension is
+@index(Extension WLC)@index(WLC extension).
+The card specified is found in the D wirelist and PC wirelist.
+The two wirelists are compared and an error listing is
+produced.  Make one to find out the format.@\The 
+information from @g(b)C is included in @g(a)C.
+
+@index(@g(b)C, verify PC wirelist)
+@indexentry(key "C@g(b), verify PC wirelist",entry "@g(b)C, verify PC wirelist",number)
+@indexentry(key "verify PC wirelist, C@g(b)",entry "Verify PC wirelist, @g(b)C",number)
+
+@g(b)C@\Asks for a card location if necessary.  Compares D and PC
+wirelists as in @g(a)C, but it checks only if you have placed
+the right dip sockets on the PC card for the dips you are
+using in the logic drawing.  Also checks  that you have
+not pre-assinged an illegal connector pin number.
+This command can be done only after a @g(b)L (see page
+@pageref(BetaLWL) has been done with no errors detected.
+The sorts of errors @g(b)L detects will cause confusion and
+mayhem in @g(b)C.
+
+@label(EpsilonDWL)
+@index(@g(e)D, enter dips submode)
+@index(Dips submode)
+@indexentry(key "D@g(e), enter dips submode",entry "@g(e)D, enter dips submode",number)
+
+@emphasize[@g(e)D]@\Enter dips submode.  Used to define or modify the parameters
+of dip bodies.  See page @pageref(dipsmode).
+
+@label(EWL)
+@index(E, exit wirelister)
+
+@emphasize[E]@\Exit the wirelister.
+
+
+@label(AlphaIWL)
+@index(@g(a)I, input wirelist)
+@indexentry(key "I@g(a), input wirelist",entry "@g(a)I, input wirelist",number)
+@index(Wirelist, input)
+@enter(multiple)
+@emphasize[@g(a)I]@\This command is used to input a wirelist into the wirelister.
+You are asked for a filename and the default extension for the
+@index(Extension WD)@index(WD, extension)
+typed in filename is WD. The file is read, signal names are
+compared with the existing wirelist and a wirelist is built.
+
+@index(@@, wirelist command file flag)
+@index(DIR extension)@index(Extension DIR)
+You can also type in @i(filename) (default extension is DIR)
+which contains a list of files to be read. The DIR file
+should have the filenames on consecutive lines.
+@leave(multiple)
+
+@label(BetaIWL)
+@index(@g(b)I, input wirelist)
+@indexentry(key "I@g(b), input wirelist",entry "@g(b)I, input wirelist",number)
+@index(Wirelist, input)
+
+@g(b)I@\Input a wirelist, default extension
+@index(WPC extension)@index(Extension WPC)
+.WPC, generated by the PC program.
+Same options available as for @g(a)I.
+
+@label(EpsilonIWL)
+@index(@g(e)I, input wirelist)
+@indexentry(key "I@g(e), input wirelist",entry "@g(e)I, input wirelist",number)
+@index(Wirelist, input)
+
+@g(e)I@\Input a wirelist, default extension
+@index(Extension WEQ)@index(WEQ extension)
+.WEQ.  This file contains a number of signal names on each
+line, separated by tabs.  The effect is that each line is
+treated as a wire; thus, you may ground wires, tie them to
+HI, or even to other wires.  Please note that the
+card location of the wirelist you wish to affect must appear
+with the filename just as in @g(a)I.
+
+
+@label(AlphaLWL)
+@index(@g(a)L, wirelist output)
+@indexentry(key "L@g(a), wirelist output",entry "@g(a)L, wirelist output",number)
+@index(Extension WL)@index(WL extension)
+
+@g(a)L@\This produces the wirelist on to a file. The default 
+extension for the file is WL.  The XROUTE command (page @pageref(XROUTE)) should 
+be used instead if Dip Locations are set.
+All unnamed signals are given unique numbers in this file
+which are printed preceded by a #.
+For selective listing by signal name to the terminal, see
+the P and @g(a)P commands, page @pageref(PWL).
+
+
+
+@label(BetaLWL)
+@index(@g(b)L, wirelist output)
+@indexentry(key "L@g(b), wirelist output",entry "@g(b)L, wirelist output",number)
+
+@g(b)L@\This makes several summaries.
+ The default extension for this file
+@index(WLS extension)@index(Extension WLS)
+is WLS.
+@enter(itemize)
+All dip types used in this wire list totalling
+the different body names and total number of sections used.
+
+@index(Ungenerated signals)@index(Signals, ungenerated)
+'Ungenerated Signals'
+
+@index(Unused signals)@index(Signals, unused)
+'Unused Signals'
+
+@leave(itemize)
+
+@label(EpsilonLWL)
+@indexentry(key "L@g(e), wirelist output",entry "@g(e)L, wirelist output",number)
+@index(@g(e)L, wirelist output)
+
+@emphasize[@g(e)L]@\This is a listing file
+which is sorted by dip number.  Under each dip number is listed
+the signals connected to each pin.  At the end of the listing,
+the edge connector fingers are listed in alphabetical order
+along with signal connected to each.
+This is a good file to look at for errors.
+In addition, this file is used as input to the MAPLSD program,
+page @pageref(MAPLSD), which plots a layout of the dip bodies.
+@index(Extension WLU)@index(WLU extension)
+The default extension for this file WLU. 
+To get selective output to the terminal, see the @g(b)P command,
+page @pageref(BetaPWL).
+
+
+@label(AlphaNWL)
+@index(@g(a)N, wirelist title)
+@index(Wirelist title, @g(a)N)
+@emphasize[@g(a)N]@\This asks for a WIRE LIST TITLE? The string you type will be 
+used on listings involving this wire list.
+
+@label(PWL)
+@label(PCMDS)
+
+@index(P, wirelist)@index(Wirelist, P)
+
+P@\Prints the signal name; prints the information that would be
+generated using @g(a)L (page @pageref(AlphaLWL)) except that
+the output is to the terminal.
+
+@label(AlphaPWL)
+@index(@g(a)P, wirelist)
+@indexentry(key "P@g(a), wirelist",entry "@g(a)P, wirelist",number)
+@indexentry(key "Wirelist, P@g(a)",entry "Wirelist, @g(a)P",number)
+
+@g(a)P@\Same as P, except that it prompts for the signal name.
+
+@label(BetaPWL)
+@index(@g(b)P, wirelist)
+@indexentry(key "P@g(b), wirelist",entry "@g(b)P, wirelist",number)
+@indexentry(key "Wirelist, P@g(b)",entry "Wirelist, @g(b)P",number)
+
+@g(b)P@\Asks for a card location if necessary.  Then asks for
+a dip or connector location.  The prints the information
+for that listing as it would have been created by an
+@g(e)L command, see page @pageref(EpsilonLWL).
+
+@index(@g(e)P, wirelist)
+
+@indexentry(key "P@g(e), wirelist",entry "@g(e)P, wirelist",number)
+@indexentry(key "Wirelist, P@g(e)",entry "Wirelist, @g(e)P",number)
+@g(e)P@\Asks for a signal name, the does an @g(a)P for this signal
+for every card currently read in.  In addition, if
+@k(ForAll) or ? appears in front of the signal name, high and low
+versions of the signal will be printed.  This also works for
+P and @g(a)P.
+
+@label(BetaWWL)
+@index(@g(a)B, read backpanel wirelist)
+@index(Wirelist, backpanel)@index(Wackpanel wirelist)
+@indexentry(key "W@g(a), write backpanel wirelist",entry "@g(a)W, write backpanel wirelist",number)
+@indexentry(key "write backpanel wirelist, W@g(a)",entry "Write backpanel wirelist, @g(a)W",number)
+@index(Extension BAC)@index(BAC extension)
+
+
+@g(b)W@\Writes a back panel wirelist file from all the cards
+in the default wirelist.  The default extension is
+.BAC.
+
+@index(@@, wirelist command file)
+
+@index(TXT extension)@index(Extension TXT)
+
+@@@\Used for inputing a command file, default extension .TXT.
+Same as XDSKIN<crlf> (page @pageref(XDSKINWL)).
+
+
+
+@leave(description)
+
+@sec(Wirelist generation)
+
+Generating a wirelist can involve many operations.  The typical
+set of operations used a CMU is very small.
+
+
+The typical commands that are used are:
+@enter(description)
+
+@index(@g(a)I, input wirelist)
+@indexentry(key "I@g(a), input wirelist",entry "@g(a)I, input wirelist",number)
+@index(Wirelist, input)
+
+@g(a)I@\Input files to the wirelister.  See page @pageref(AlphaIWL).
+You may use a command file by specifying @@<filename>.  The file
+so named contains the filenames of the DRW files to be used, and
+may be created with the DIRECT command using the /I option:
+@enter(example)
+DI FOOWL.DIR=FOO???.DRW/I
+@leave(example)
+which creates a file containing all those filenames which matched
+the search string FOO???.DRW.  Thus, consistent naming conventions
+for files make life much easier.
+
+@index(WL extension)@index(Extension WL)
+@index(@g(a)L, wirelist output)
+@indexentry(key "L@g(a), wirelist output",entry "@g(a)L, wirelist output",number)
+
+@g(a)L@\Produce a .WL file, see page @pageref(AlphaLWL); mostly at CMU we use XROUTE (page @pageref(XROUTE)).
+
+@index(@g(b)L, wirelist output)
+@indexentry(key "L@g(b), wirelist output",entry "@g(b)L, wirelist output",number)
+
+@index(Extension WLS)@index(WLS extension)
+@g(b)L@\Produce a .WLS file (page @pageref(BetaLWL)).
+
+
+@indexentry(key "L@g(e), wirelist output",entry "@g(e)L, wirelist output",number)
+@index(@g(e)L, wirelist output)
+@index(Extension WLU)@index(WLU extension)
+
+@g(e)L@\Produce a WLU file, a listing sorted by dip number.  A good file to look at
+for errors.  See page @pageref(EpsilonLWL).
+
+@index(@g(a)N, wirelist title)
+@index(Wirelist title, @g(a)N)
+
+@g(a)N@\Asks for a wirelist title.  See page @pageref(AlphaNWL).
+
+
+@index(XPART)@index(PART)
+
+XPART@\Generates a parts list, extension
+@index(Extension PRT)@index(PRT extension)
+.PRT.  See page @pageref(XPART).
+
+@index(XREFERENCE)@index(REFERENCE)
+
+XREFERENCE@\Allows a cross reference of  multiply-named signals.
+See page @pageref(XREFERENCE).
+
+@index(X-REFERENCE)@index(-REFERENCE)
+@indexentry(key "XREFERENCE-",entry "X-REFERENCE",number)
+@indexentry(key "REFERENCE-",entry "-REFERENCE",number)
+
+X-REFERENCE@\Disables XREFERENCE mode.
+
+@index(XROUTE)@index(ROUTE)
+
+XROUTE@\Produces the most common form of the wirelist output,
+the
+@index(WLR extension)@index(Extension WLR)
+.WLR file.  See page @pageref(XROUTE).
+
+@index(SIGSUM)@index(XSIGSUM)
+
+XSIGSUM@\Writes a signal summary file, default extension
+@index(Extension WSS)@index(WSS extension)
+.WSS.  See page @pageref(XSIGSUM).
+
+@index(XSTUFF)@index(STUFF)
+
+XSTUFF@\Writes a
+@index(STF extension)@index(Extension STF)
+.STF file, which contains information on stuffing dips
+into the board.
+
+@index(XZLEVEL)@index(ZLEVEL)
+
+XZLEVEL@\Writes the technician command file
+@index(WLZ extension)@index(Extension WLZ).
+.WLZ.  This is used to wrap the board.  See page @pageref(XZLEVEL).
+This file is also used as input to
+@index(SMECO)
+SMECO, page @pageref(SMECO).
+
+@leave(description)
+
+Here is a typical command file.  The FOO.DIR file contains the
+names of all the WD files.  The file below is called FOO.TXT, and
+all occurrences of FOO should be replaced with a filename appropriate
+to your wirelist:
+@enter(example)
+XREFERENCE
+'I@@FOO
+'NFOO-type wirelist title
+'LFOO
+''LFOO
+'''LFOO
+XROUTE
+FOO
+XZLEVEL
+FOO
+XSTUFF
+FOO
+@leave(example)
+
+
+@sec(The wirelist database)
+@subsec(Protocol for updating)
+@label(saving)
+@index(DIPS.DIP)
+
+The W program maintains the wirelist database.  This database contains
+the information required to map physical pin numbers to default
+pin numbers (i.e., when you have several bodies in a single dip),
+check loading rules, etc.
+
+The wirelist database @i[must] be maintained carefully.  It is
+easy to screw up and lose lots of your editing.  The
+following sequence of commands must be followed exactly or
+you will probably lose your edit.
+
+@enter(example)
+@u[.]RU W
+@u[*]@r[@g(e)]D
+@u[*]X-RESIDENT
+@u[*]			<do your editing>
+@u[*]WDIPS.DIP		<must do this!>
+@u[*]XRESIDENT
+@u[*]XSAVE
+@leave(example)
+
+If you fail to do the W command to some file, e.g., DIPS.DIP,
+you will lose your edits when the XRESIDENT command reads
+DIPS.DIP back in!
+
+@subsec(Dips submode commands)@label(dipsmode)
+
+
+@enter(description)
+@index(@@, dips submode)@index(Dips submode, @@)
+@@@\Same as "XDSKIN<crlf>", see page @pageref(XDSKINWL).
+
+
+
+@label(DipsC)
+@index(C, dips submode)@index(Dips submode, C)
+@index(Copying Dip definition)
+
+@emphasize[C]@i<dipname>@\Copy definition of @i<dipname>.@\Asks for a
+new @i<dipname>; if it already exists you are asked if you wish to
+replace it.  It will then ask for a loading conversion factor. 
+This wants something of the form @i<integer> or @i<integer>/@i<integer>.
+@i[It cannot understand floating point!  If you want the loading
+factor to be 0.8, you must specify it as 4/5!].  The table
+below gives the conversion factors for converting one type of
+dip to another.  The user is cautioned about LSTTL conversions,
+since the sink current of most LSTTL is actually twice what is 
+expected (8ma as opposed to 4ma if a straight loading conversion
+is done).  Note that this means that converting @i[to] LSTTL
+will result in under-rated sink current, and converting @i[from]
+LSTTL will give an over-rated sink current.
+
+@enter(example,leftmargin -8)
+		Desired TTL family
+@index(LSTTL to TTL conversion)
+@index(TTL to STTL conversion)
+@index(TTL to HTTL conversion)
+@index(TTL to LTTL conversion)
+@index(TTL to LSTTL conversion)
+@index(STTL to TTL conversion)
+@index(STTL to HTTL conversion)
+@index(STTL to LTTL conversion)
+@index(STTL to LSTTL conversion)
+@index(HTTL to TTL conversion)
+@index(HTTL to STTL conversion)
+@index(HTTL to LTTL conversion)
+@index(HTTL to LSTTL conversion)
+@index(LTTL to TTL conversion)
+@index(LTTL to STTL conversion)
+@index(LTTL to HTTL conversion)
+@index(LTTL to LSTTL conversion)
+@index(LSTTL to STTL conversion)
+@index(LSTTL to HTTL conversion)
+@index(LSTTL to LTTL conversion)
+Current TTL
+family
+        TTL      STTL      HTTL      LTTL      LSTTL
+
+TTL     1         5/4       5/4       1/2       1/4
+
+STTL    4/5       1         1         2/5       1/5
+
+HTTL    4/5       1         1         2/5       2/5
+
+LTTL    2         5/2       5/2       1         1
+
+LSTTL   4         5         5/2       1         1  
+
+@leave(example)
+
+@label(DipsD)
+@index(D, dips submode)@index(Dips submode, D)
+@index(DIPS.DIP, deleting entry)@index(Deleting Dip definition)
+
+@emphasize[D]@i<dipname>@\Deletes the definition of @i<dipname>.
+If @i<dipname> is empty, you get DDT if it is loaded.
+
+@label(DipsE)
+@index(E, dips submode)@index(Dips submode, E)
+
+@emphasize[E]@\Exit to top mode.
+
+@label(DipsI)
+@index(DIPS.DIP, reading)@index(I, dips submode)@index(Dips submode, I)
+@index(Reading DIPS.DIP)
+
+@emphasize[I]@i<filename>@\Input a dip file into the internal data structure.
+If the filename is omitted, the last one used for an I, W or
+N command is used.  The name starts out as 
+@index(DIPS.DIP)
+DIPS.DIP[@i<library>], but a particular saved version of W may
+have a different one set.  The default extension is
+@index(Extension DIP)@index(DIP extension)
+.DIP.
+
+@label(DipsL)
+@index(L, dips submode)@index(Dips submode, L)
+@emphasize[L]@\Asks for a filename, and writes a file
+of all dip definitions (default extension 
+@index(Extension LSD)@index(LSD extension)
+@index(DIPS.LSD, writing)
+.LSD).  This lists all the dip definitions in sorted order,
+and is also used by the MAPLSD program (page @pageref(maplsd)).
+
+
+
+@label(DipsM)
+@index(Editing Dip definition)@index(Modifying Dip definition)
+@index(Dip definition, creating)
+@index(Dip definition, modifying)
+@index(M, dips submode)@index(Dips submode, M)
+
+@enter(multiple)
+@emphasize[M]@i<dipname>@\Modify the definition of @i<dipname>.
+If no definition exists, a new one is created; you are
+asked for the number of pins.  Give a number followed by
+a @i<crlf>.
+A heading line is typed, and @i[echoing is turned off].  This seems
+silly, but that is how the program works.  The cursor is
+positioned at the PIN# column and now awaits commands.
+To get out of this mode and return to command level, type
+a @i<crlf> instead of a pin number.  The "*" may still be
+indented, but that's because the@i <crlf> didn't echo.  The
+following commands are available:
+@enter(description)
+@label(DipsEA)
+@index(Automatic mode, dip editing)
+@index(A, dip editing)@index(Dip editing, A)
+A<cr>@\Specifies that you wish to enter automatic numbering mode.
+After you terminate work on pin @i<n> with a <crlf>, you are
+automatically positioned at pin <n+1>.  To get out of automatic
+mode, either type <escape> or finish the last pin in the dip.
+
+
+@label(DipsEL)
+@index(L, dip editing)@index(Dip editing, L)
+L<cr>@\Automatically copies all columns to the left of the LOAD
+column when you type @i<n><tab>.
+
+@i<n><crlf>@\Types the information for pin @i<n>
+
+@i<n>@emphasize[<tab>]@\Types the information for pin @i<n> and then tabs
+to the "TYPE" column.  You can now change any or all of the data
+items for this pin.  Type <cr> to fill in the rest of the line
+with what was already there.  Type <tab> to get to the next
+column.  Bad format is filtered out, and only good data is
+echoed when <tab> is typed.  To leave a column unchanged, just
+type <tab>.  Note that <backspace> works in case you think you
+made a mistake and want to back up over what you just typed.
+However,  since echoing is turned off this is sometimes hard
+to guess about.  Apparently this crockitude is left over from
+the days of the model 33 TTY!
+
+@label(DipsEP)
+@index(P, dip editing)@index(Dip editing, P)
+
+P<cr>@\Automatically copies all columns to the left of the PS
+column when you type @i<n><tab>.
+
+@index(S, dip editing)@index(Dip editing, S)
+S<cr>@\Automatically copies all columns to the left of the SECTION
+column when you type @i<n><tab>
+
+@index(T, dip editing)@index(Dip editing, T)
+
+T<cr>@\Automatically copies all columns to the left of the TYPE
+column when you type @i<n><tab>.
+@leave(description)
+
+@index(TYPE, field of dip definition)
+The TYPE field specifies the nature of the pin function.  The
+type may be optionally prefixed with the character
+"E" for ECL or "T" for TTL.
+@index(ECL levels)@index(TTL levels)
+@enter(description)
+@index(TYPE I, input)
+@index(I, pin type)
+
+I@\Input pin.  Requires drive; must be connected if section is used.
+
+@index(TYPE IP, input pullup)
+@index(IP, pin type)
+
+IP@\Input pin with internal pullup (TTL) or pulldown (ECL).  Does not require drive and need not be connected..
+
+@index(IS, pin type)
+@index(TYPE IS, input load sharing)
+
+IS@\Input pin with load sharing.  Requires drive; must be connected if
+section is used.
+
+@index(ISP, pin type)
+@index(TYPE ISP, input load sharing)
+
+ISP@\Input pin with load sharing and internall pullup (TTL) or pulldown (ECL).
+Does not require drive and need not be connected.
+
+@index(O, pin type)
+@index(TYPE O, output)
+
+O@\Output pin; standard output configuration assumed (e.g., totem-pole
+for TTL).  Two TTL output pins may not be connected.
+
+@index(OT, pin type)
+@index(TYPE OT, output three-state)
+@index(Tri-state output)
+@index(Three-state output)
+
+OT@\Output pin, three-state.  More than one three-state output pin
+may appear in a run.
+
+@index(OC, pin type)
+@index(TYPE OC, open-collector)
+@index(Open-collector output)
+
+OC@\Output pin, open-collector.  More than one open-collector output
+pin may appear on a run.
+
+
+@index(OP, pin type)
+@index(TYPE OP, pullup output)
+@index(Pullup output)
+
+OP@\Output pin with internal pullup resistor.  More than one of these
+may appear on a run, intermixed with OC types.  Proper loading will
+be computed.
+
+@index(TYPE P, power)
+@index(P, power run)
+@index(Power pin)
+
+P@\Power connection pin (Vcc for TTL).
+
+PWR@\Power connection pin; same as P.
+
+@index(G, pin type)
+@index(TYPE G, ground)
+@index(Ground pin)
+
+G@\Ground connection pin.
+
+@index(N, pin type)
+@index(TYPE N, unconnected pin)
+@index(Unconnected pin)
+
+N@\Unconnected pin.  Wires run to unconnected pins will be flagged.
+Note that in some cases this is ok, but some dips will blow up
+if their "NC" pins have signals on them.
+
+NC@\Same as N; unconnected pin.
+
+
+@index(TYPE Z, terminator)
+@index(Terminator)
+@index(Z, pin type)
+
+Z@\Terminator.
+@leave(description)
+
+In addition, an "F" suffix may be added to an output to mark it as
+a flipflop output.  This has special effects in handling of signal names.
+
+@label(levels)
+If the XECL (page @pageref(XECL)) or XTTL (page @pageref(XTTL)) commands
+have been given, the "E" or "T" prefix is automatically assumed.
+Otherwise, the signal is considered "neutral" with respect to
+ECL or TTL levels@foot<This information, it is reputed, lives
+in TYPTAB in WLDIP.FAI and the table following TYPTAB, in case
+desperation with the dip editor forces you to the ultimate
+documentation.>.
+
+@index(USE column)
+The USE column is for comments useful to the person debugging the
+hardware.  The USE information appears in the wirelist files 
+so that the purpose of the pin may be determined without having
+to go back to the TTL data book and look at the pictures.
+If the USE field begins with the prefix "CLK", the wirelister
+will take note of the fact, but no one@foot<Certainly not TAG, on
+21-Jan-75.> knows what it does about this.
+
+@index(PS column)
+The PS column is an aribtrary integer which you assign to indicate
+which pins share loads.  This is used to compute the high-level
+loading of signal lines in TTL.  Give the same number to all pins
+which share with each other.
+
+@index(SECTION column)
+The SECTION column is used to assign body pins ("default pin numbers")
+to physical pins of a DIP.  The section information is of the form:
+@enter(example)
+<default pin> / <section> {,<subsection>~@+[*]
+@leave(example)
+
+The equivalent pins in different sections are specified by having
+equal logical pin numbers.  The subsection number is used with the
+section number to describe a dip with more than one level
+of structure, e.g., a 10100 ECL dip with four identical sections, and
+where one pin in each section is tied to a common enable line.  In
+this case, the four gates sharing the common enable line are considered
+to be in section 0, and a separate subsection number for each
+gate.  Section and subsection numbers must be sequentially assigned,
+and must be distinct, i.e., a number used as a section designator
+must not also be used to number a subsection.  If you are confused,
+check out the definitions of gates like the DM8837, shown
+on page @pageref(dm8837).  If you 
+are still confused, the previous manual invites you to
+ask Tom Gafford, and if still confused, or don't know who or
+where he is, it offers the very good advice to contact Dick
+Helliwell around 3a.m. and harass him because it is all his fault.
+
+@leave(multiple)
+@label(DipsN)
+@index(N, dips submode)@index(Dips submode, N)@index(DIPS.DIP, respecifying)
+
+@emphasize[N]@i<filename>@\Prints the current filename for
+I (page @pageref(DipsI)) and W (page @pageref(DipsW))  commands, or if the optional filename is given,
+changes the filename used for future commands.
+
+
+
+@label(DipsP)
+@index(P, dips submode)@index(Dips submode, P)
+
+@emphasize[P]@i<dipname>@\Print the definition of @i<dipname> on
+the terminal.  This is usually useful before you are about to
+edit the dip.
+
+@label(DipsR)
+@index(R, dips submode)@index(Dips submode, R)
+
+R@i<dipname>@\Renames @i<dipname> to a new name.  You will be asked
+for the new name.
+
+@label(DipsS)
+@index(S, dips submode)@index(Dips submode, S)
+
+S@i<dipname>@\Sets the part number string for @i<dipname>
+
+@label(DipsW)
+@index(W, dips submode)@index(Dips submode, W)
+@index(DIPS.DIP, writing)
+
+@emphasize[W]@i<filename>@\Writes the internal data structure onto
+a file.  If the filename is omitted, the last one used for an
+I, W or N command is used.  
+
+@leave(descriptioN)
+
+@subsec(Examples of DIP definitions)
+@label(Dipexamples)
+@enter(example)
+74 00	14 PINS
+PIN #	TYPE	LOW	HI	USE	PS	SECTION(S)
+1	TISP	-1.60	0.04		1	1/0
+2	TISP	-1.60	0.04		1	2/0
+3	TO	16.00	-0.80			3/0
+4	TISP	-1.60	0.04		2	1/1
+5	TISP	-1.60	0.04		2	2/1
+6	TO	16.00	-0.80			3/1
+7	G
+8	TO	16.00	-0.80			3/2
+9	TISP	-1.60	0.04		3	2/2
+10	TISP	-1.60	0.04		3	1/2
+11	TO	16.00	-0.80			3/3
+12	TISP	-1.60	0.04		4	2/3
+13	TISP	-1.60	0.04		4	1/3
+14	TV	5.00V	22.00MA	
+@hinge()
+
+DM8837	16 PINS
+@label(dm8837)
+PIN #	TYPE	LOW	HI	USE	PS	SECTION(S)
+1	IP	-0.05	0.05	BUS 1		1/0
+2	TO	16.00	-0.40	OUT 1		2/0
+3	IP	-0.05	0.05	BUS 2		1/1
+4	TO	16.00	-0.40	OUT 2		2/1
+5	IP	-0.05	0.05	BUS 3		1/2
+6	TO	16.00	-0.40	OUT 3		2/2
+7	TIP	-3.20	0.08	DSAB A		3/0,1,2
+8	G
+9	TIP	-3.20	0.08	DSAB B		3/3,4,5
+10	TO	16.00	-0.40	OUT 4		2/3
+11	IP	-0.05	0.05	BUS 4		1/3
+12	TO	16.00	-0.40	OUT 5		2/4
+13	IP	-0.05	0.05	BUS 5		1/4
+14	TO	16.00	-0.40	OUT 6		2/5
+15	IP	-0.05	0.05	BUS 6		1/5
+16	V	5.00V	60.00MA	VCC
+@leave(example)
+
+@sec(MAPLSD and MAP)@label(MAPLSD)
+MAP is the prototype of the MAPLSD program.  The MAPLSD program
+is a core image which contains a set of DIP definitions, and
+reads a drawing file containing the names
+of the dips sorted in order (WLU files).  This file  
+is produced by the @g(e)L command in W, page @pageref(EpsilonLWL).
+The output of MAPLSD  is
+a map of all the dip locations.
+
+There should be a MAPLSD program already existing on [E210DP00].
+If it isn't there, you will have to create one from the MAP
+program.  You will also have to create a new MAPLSD program
+any time you have added new DIP definitions to the wirelist
+database.
+
+To create a MAPLSD program, you must first produce an LSD file
+@index(LSD extension)@index(Extension LSD)
+by using the L command in dips submode of W (page @pageref(DipsL)).
+Then run MAP[E210DP00] according to the following protocol:
+@enter(example)
+@u[.]RU MAP[E210DP00]
+@u[LSD file?] DIPS.LSD
+@u[#### ... ####]
+@u[Save this core image when it exits]
+@u[EXIT]
+@u[.]SAV 
+@leave(example)
+
+The program automatically changes its name to MAPLSD, so it will
+have the correct name for the SAVE command.
+
+The version of MAPLSD, when run, will produce the map from the list
+of files.
+@enter(example)
+@u[.]RU MAPLSD
+@u[WLU file: ]FOO
+@u<Output file: [FOO.MAP]> <crlf>
+@u[EXIT]
+@leave(example)
+To print the map on the XGP, use the XGP command file
+@index(MAP.CMD)
+MAP.CMD[X335DP00].
+
+@enter(example)
+@u[.]R LOOK
+@u[*]@@MAP[X335DP00]
+@u[**]...
+@u[*]FOO.MAP
+@leave(example)
+
+@sec(SMECO)@label(SMECO)
+
+<Richard Swan volunteered to write something here>
+
+  

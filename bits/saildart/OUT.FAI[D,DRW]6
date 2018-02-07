@@ -1,0 +1,1854 @@
+COMMENT    VALID 00013 PAGES
+C REC  PAGE   DESCRIPTION
+C00001 00001
+C00002 00002	VERSION(OUT,7)
+C00008 00003	TYPES
+C00011 00004			BODIES, CALL POINT SUBR (D,PC)
+C00014 00005			POINT SUBR (D,PC)
+C00019 00006			SETS, END STUFF (D,PC)
+C00026 00007	'WD'	'WPC'	BODIES, CALL WIRE SUBRS
+C00033 00008			WIRES, WRITE SIGNAL NAME AND PIN INFO
+C00039 00009			WIRES, RECUR
+C00043 00010	'RIN'		WRITE FILE FOR INPUT TO WAGNER'S ROUTER SYSTEM
+C00049 00011			ROUTER OUTPUT SUBRS
+C00056 00012			TABLES FOR ROUTER OUTPUT
+C00058 00013	
+C00059 ENDMK
+C;
+VERSION(OUT,7)
+;'DRW'	'PC'	LIBRARIES, BODY DEFS (D)
+EWRITE:	MOVEI T,1
+	LSH T,@MODE
+	TDNE T,[MD,<ALLEDM!>ANYALT]
+	JRST PERRET
+	MOVE T,AUTOWM
+	MOVEM T,AUTOWN
+	MOVSI T,EXTFIL
+	PUSHJ P,SETLST		;set output file name
+	 JRST DWRITE		; none there so get one
+	SETZM SETFLG		;file name is set, set write only flag
+	JRST WRITEE
+
+DWRITE:	SETZM SETFLG
+DWRITS:	MOVEI T,1
+	LSH T,@MODE
+	TDNE T,[MD,<ALLEDM!>ANYALT]
+	JRST PERRET
+	MOVSI T,EXTFIL
+	PUSHJ P,SETNAM		;READ FILENAME AND STORE IN FILNAM
+	POPJ P,			;NONE, LET HIM OUT.
+WRITEE:	ENTPPN
+	MOVEM P,PERRSAV		;USE THIS TO GET OUT FROM LOWER LEVELS.
+	INIT DAT,10
+	'DSK   '
+	XWD IOHD,0
+	JRST [	OUTSTR [ASCIZ/CAN'T GET DISK!
+/]
+		POPJ P,]
+	MOVEI T,IOBUF		;USE THIS BUFFER SO WE DON'T WASTE SPACE
+	EXCH T,.JBFF
+	OUTBUF DAT,2
+	MOVEM T,.JBFF		;PUT .JBFF BACK
+MD,<	MOVE B,FILNAM
+	HLLZ C,FILEXT
+	SKIPN D,FILPPN
+	DSKPPN D,
+	PUSHJ P,LNAMCK	;CHECK NAME
+	JRST LIBUSE
+>;MD
+	PUSHJ P,EXIST		;DOES IT EXIST?
+	POPJ P,			;HE DOESN'T WANT TO OVERWRITE
+	OUTSTR[ASCIZ/WRITING /]
+	MOVEI A,FILNAM
+	JSR FPRINT		;go output sixbit file name 
+DEC,<
+	SKIPN	THEREXISTS
+	JRST	NOBAK
+	PJOB	T,		;GET JOB #
+	IDIVI	T,=100		;MAKE TMP FILE NAME
+	IDIVI	TT,=10
+	LSH	T,6
+	ADD	T,TT
+	LSH	T,6
+	ADD	T,TTT
+	ADD	T,['DRW000']
+	MOVSM	T,TMPNAM
+	MOVSI	T,'TMP'
+	MOVEM	T,TMPEXT
+	MOVSI	T,100000		;MIN PROT.
+	MOVEM	T,TMPEXT+1
+	MOVE	T,FILPPN
+	MOVEM	T,TMPPPN
+	ENTER	DAT,TMPNAM
+	SKIPA
+	JRST	WRITEG		;ALL SET
+	CLOSE	DAT,		;ENTER FAILED, TRY WITHOUT BAK
+	OUTSTR	[ASCIZ /, /]
+	MOVEI	A,TMPNAM
+	JSR	FPRINT
+	OUTSTR	[ASCIZ / ENTER FAILED.
+GO ON WITHOUT BACKUP FILE?/]
+	SETZM	THEREXISTS
+	CLRBFI
+	INCHRW C
+	CAIN C,15
+	INCHRW C
+	OUTSTR	[ASCIZ /
+/]
+	CAIE	C,"Y"
+	CAIN	C,"y"
+	JRST	NOBAK
+	RELEASE	DAT,
+	POPJ	P,
+NOBAK:
+>;DEC
+	MOVE T,FILPPN
+	ENTER DAT,FILNAM	;MAKE A FILE
+	JRST [	RELEASE DAT,
+		OUTSTR [ASCIZ/, ENTER FAILED.
+/]
+		POPJ P,]
+WRITEG:	OUTSTR[ASCIZ/
+/]
+	MOVEM T,FILPPN
+	SKIPE SETFLG			;IF WRITING SET ONLY,
+	 JRST NLSTUP			;DON'T UPDATE LAST NAME
+	MOVEM T,LSTPPN
+	MOVE T,FILNAM
+	MOVEM T,LSTNAM
+	PUSHJ P,FILEUP		;UPDATE DISPLAY
+MD,<	DATE T,
+	HRLZM T,DRWDAT
+	MSTIME T,
+	IDIVI T,=1000*=60	;TO MINUTES
+	HRRM T,DRWDAT
+	MOVE T,FILNAM
+	MOVEM T,DRWNAM
+	MOVE T,FILPPN
+	MOVEM T,DRWPPN
+>;MD
+NLSTUP:
+MPC,<	SETZM MXPADN		;CLEAR MAX PAD # SEEN
+	TLNE SID,FRONT		;ALREADY ON FRONT SIDE?
+	JRST DOWRT		;YES, GO ON
+	SWITCH			;GET THERE (swap ponpnt & ponpn2)
+	PUSHJ P,DOWRT		;WRITE FILE
+	SWITCH			;BACK WHERE WE WERE
+	POPJ P,
+
+DOWRT:
+>;MPC
+	MOVEI TTT,IOVER		;get ioversion #
+	PUSHJ P,WORDOUT		; output it
+	PUSHJ P,WRTBRD		;output board type.
+MD,<	SKIPN LIBLST		;EASY IF NO LIBRARIES
+	JRST PUTLB0
+	PUSHJ P,CDFMRK		;CLEAR DEFINITION MARK BITS
+	SKIPN A,DBODPN		;NOW LOOK AT BODIES
+	JRST PUTLB0
+	MOVSI TT,DTMP1		;THIS IS TEMP MARK BIT
+UTYP1:	HLRZ T,(A)
+	SKIPN SETFLG		;WRITING SET ONLY?
+	JRST UTYP4		;NO
+	HLRZ TTT,1(T)
+	MOVE TTT,1(TTT)		;GET BODY BITS
+	TLNN TTT,BTMP1		;IS IT IN THE SET?
+	JRST UTYP5		;NO
+UTYP4:	HRRZ T,1(T)
+	HLRZ T,1(T)
+	HLRZ T,(T)
+	IORM TT,(T)		;TURN ON MARK BIT
+UTYP5:	HRRZ A,(A)
+	JUMPN A,UTYP1
+	MOVE A,BODPNT
+UTYP2:	HLRZ T,(A)
+	JUMPE T,UTYP3		;ONLY LIBRARY BODIES
+	HLRZ T,1(A)
+	JUMPE T,UTYP3		;ONLY ONES ALREADY IN
+	HLRZ T,(T)
+	HLRZ T,(T)
+	TRNN T,DTMP1		;BODY USED?
+	JRST UTYP3		;NO
+	HRRZ TT,(A)		;TYPE NAME
+	PUSHJ P,WSTR
+UTYP3:	HRRZ A,1(A)
+	JUMPN A,UTYP2
+PUTLB0:	PUSHJ P,WRTZERO		;END OF USED TYPE NAMES
+	SKIPN A,LIBLST		;ANY LIBRARIES?
+	JRST ENDLIB
+PUTLIB:	HLRZ T,(A)
+	HRRZ TT,(T)
+	TRNN TT,TOPLVL		;ONLY WRITE OUT TOP LEVEL POINTERS
+	JRST PUTLB1
+	MOVE TTT,1(A)
+	PUSHJ P,WORDOUT
+	MOVE TTT,(T)
+	PUSHJ P,WORDOUT
+	MOVE TTT,1(T)
+	PUSHJ P,WORDOUT
+PUTLB1:	HRRZ A,(A)
+	JUMPN A,PUTLIB
+ENDLIB:	PUSHJ P,WRTZERO		;MARK END OF LIBRARIES
+;TYPES
+	HRRZ T,BODPNT		;POINTER TO TYPES
+	JUMPE T,TYPDON
+WRTTYP:	HLRZ TT,(T)		;CHECK LIBRARY POINTER
+	JUMPN TT,SKPTYP		;SKIP THIS TYPE IF FROM LIBRARY
+	HRRZ TT,(T)		;POINTER TO TYPE NAME
+	PUSHJ P,WSTR
+	HLRZ TT,1(T)		;POINTER TO POINTERS TO PINS,LINES,TEXT.
+	HLRZ TTT,(TT)		;DEF LOC OFFSET AND BITS POINTER
+	HLLZ TTT,(TTT)		;BITS
+	TLZ TTT,DTMP1!FOUNDL	;DON'T WRITE TEMP BITS INTO FILE
+	PUSHJ P,WORDOUT		;RIGHT HALF IS UNUSED AS YET
+	HLRZ TTT,(TT)
+	MOVE TTT,1(TTT)		;DEF LOC OFFSET
+	PUSHJ P,WORDOUT
+	HLRZ TTT,(TT)
+	HRRZ TTT,(TTT)
+	SKIPE TTT
+	SKIPA TTT,1(TTT)
+	MOVEI TTT,400000
+	PUSHJ P,WORDOUT
+	HRRZ TT,(TT)		;POINTER TO PINS
+	JUMPE TT,PNDON		;NONE MAYBE.
+TYPPIN:	MOVE TTT,1(TT)		;LOC OF PIN.
+	PUSHJ P,WORDOUT		;WRITE IT
+	HLRZ TTT,(TT)		;OUT PIN ID
+	MOVE TTT,(TTT)		;GET BITS,,PIN ID
+	PUSHJ P,WORDOUT
+	HLRZ TTT,(TT)
+	MOVE TTT,1(TTT)		;NOW PIN POS,,PIN NAME
+	PUSHJ P,WORDOUT
+	HRRZ TT,(TT)
+	JUMPN TT,TYPPIN		;LIST ENDS WITH 0
+PNDON:	PUSHJ P,WRTMARK		;MARK END OF PINS
+	HLRZ TT,1(T)		;POINTER TO POINTERS TO.....
+	HRRZ TT,1(TT)		;POINTER TO LINES
+	JUMPE TT,LINDON		;NO LINES MAYBE
+TYPLIN:	MOVE TTT,1(TT)		;LOC OF POINT.
+	PUSHJ P,WORDOUT		;WRITE IT
+	HRRZ TT,(TT)
+	JUMPN TT,TYPLIN		;ENDS WITH 0
+LINDON:	PUSHJ P,WRTMARK		;MARK END OF LINES
+	HLRZ A,1(T)		;POINTER TO POINTERS.......
+	HLRZ A,1(A)		;POINTER TO TEXT
+	PUSHJ P,WRTPRP
+SKPTYP:	HRRZ T,1(T)		;NEXT TYPE
+	JUMPN T,WRTTYP
+TYPDON:	PUSHJ P,WRTZERO		;MARK END OF TYPES
+>;MD
+	PUSHJ P,MACOUT		;OUTPUT SPECIAL MACROES TO FILE
+
+;		BODIES, CALL POINT SUBR (D,PC)
+
+	SKIPN T,DBODPN		;POINTER TO BODIES IN DRAWING?
+	JRST BODDON		;NONE
+WRTBOD:	HLRZ TT,(T)
+	SKIPN SETFLG		;WRITING SET ONLY?
+	JRST WRTBD1		;NO
+	HLRZ TTT,1(TT)
+	MOVE TTT,1(TTT)		;BODY BITS
+	TLNN TTT,BTMP1		;IN OUR SET?
+	JRST WRTBD2
+WRTBD1:	MOVE TTT,1(T)		;LOC OF BODY
+	PUSHJ P,WORDOUT
+MPC,<	PUSH P,TT
+	HLRZ TT,1(TT)
+	HRRZ TT,1(TT)
+	PUSHJ P,TWSTR
+	POP P,TT
+>;MPC
+	HLRZ TTT,(TT)		;ORIENTATION
+	ANDI TTT,7
+	HLRZ TT,1(TT)
+MD,<
+	HRRZ TT,(TT)
+	JUMPE TT,NLCYET
+	TRO TTT,400000		;MARK AS HAVING DIP NUMBER
+	PUSHJ P,WORDOUT
+	HLRZ TTT,(TT)
+	MOVE TTT,(TTT)
+	PUSHJ P,WORDOUT
+	MOVE TTT,1(TT)
+	PUSHJ P,WORDOUT
+	HLRZ TTT,(TT)
+	MOVE TTT,1(TTT)
+NLCYET:	PUSHJ P,WORDOUT
+	HLRZ TT,(T)
+	HLRZ TTT,1(TT)
+	HLL TTT,1(TTT)
+	HLR TTT,(TTT)
+	TLZ TTT,FOUNDB!BTMP1
+	PUSHJ P,WORDOUT		;WRITE BITS AND BID
+	HRRZ TT,1(TT)		;TYPE POINTER
+	HRRZ TT,(TT)		;POINTER TO NAME OF TYPE
+	PUSHJ P,WSTR		;WRITE IT (PHEW!)
+	HLRZ A,(T)
+	HLRZ A,1(A)
+	HRRZ A,1(A)
+	PUSHJ P,WRTPRP
+>;MD
+MPC,<	HRL TTT,(TT)		;NUMBER LETTER
+	PUSHJ P,WORDOUT
+	HLRZ TTT,(T)		;POINTER TO BODY IN TTT
+	HLRZ TTT,1(TTT)
+	HLL TTT,1(TTT)
+	HLR TTT,(TTT)		;BITS,,ID
+	PUSHJ P,WORDOUT		;OUTPUT BODY ID
+	HLRZ TT,(T)		;GET BACK POINTER
+	HRRZ TT,1(TT)		;POINTER TO TYPE DESCRIPTION
+	HLRZ TTT,(TT)		;POINTER TO NUMBER OF PINS IN TYPE
+	CAIE TTT,2		;2 PIN DIP?
+	JRST ISN2PN
+	HRRZ TT,1(TT)
+	HRL TTT,1(TT)		;GET PIN SEPERATION (/2)
+ISN2PN:	PUSHJ P,WORDOUT		;WRITE IT
+>;MPC
+WRTBD2:	HRRZ T,(T)		;NEXT BODY
+	JUMPN T,WRTBOD		;ENDS WITH 0
+BODDON:	PUSHJ P,WRPNTS
+MPC,<
+	SWITCH
+	PUSHJ P,WRPNTS
+	SWITCH
+>;MPC
+	JRST PNTDON
+;		POINT SUBR (D,PC)
+WRPNTS:	PUSHJ P,WRTMARK		;MARK END OF BODIES
+	SKIPN T,PONPNT
+	POPJ P,
+WRTPNT:	MOVEI TTT,(T)		;POINTER TO POINT IN TTT
+	PUSHJ P,SCHKID		;CHECK IF POINT SHOULD GO OUT
+	JRST WRTPN1		;NOT IN OUR SET
+	MOVE TTT,1(T)		;LOC OF POINT
+	PUSHJ P,WORDOUT
+	MOVEI TTT,(T)
+	PUSHJ P,PUTID		;PUT OUT POINT ID
+	HLRZ TT,(T)		;POINTER TO POINTERS TO PIN BODY AND UP, LEFT, ETC.
+	HLRZ A,1(TT)		;POINTER TO NEIGHBORS
+MD,<
+	HLRZ TTT,(A)		;UP
+	PUSHJ P,SPUTID
+	HRRZ TTT,(A)		;DOWN
+	PUSHJ P,SPUTID
+	HLRZ TTT,1(A)		;LEFT
+	PUSHJ P,SPUTID
+	HRRZ TTT,1(A)		;RIGHT
+	PUSHJ P,SPUTID
+>;MD
+MPC,<
+	JUMPE A,WRTNE4
+WRTNE1:	MOVEI B,2
+WRTNE2:	XCT (B)[HLRZ TTT,(A)
+		HRRZ TTT,1(A)
+		HLRZ TTT,1(A)]
+	JUMPE TTT,WRTNE3
+	PUSHJ P,SPUTID
+WRTNE3:	SOJGE B,WRTNE2
+	HRRZ A,(A)
+	JUMPN A,WRTNE1
+WRTNE4:	PUSHJ P,WRTZERO
+>;MPC
+	HRRZ B,1(TT)
+	MOVE TTT,1(B)		;GET BITS AND PIN OR PAD NUMBER
+MPC,<	AND TTT,[XWD FRONT!FEEDTH!PLANES!ISPIN!CPIN,-1]		>
+MD,<	AND TTT,[XWD FIXTXT!FIXCON!FIXRHT!ISPIN!CPIN!CPNBTS,-1]	>
+	PUSHJ P,WORDOUT		;WRITE THEM
+MPC,<	HRRZ TTT,TTT
+	CAMLE TTT,MXPADN
+	MOVEM TTT,MXPADN
+>;MPC
+	HLRZ TT,(B)
+	JUMPE TT,[PUSHJ P,WRTZERO
+		JRST NOTEXT]
+	HRRZ TTT,(TT)
+	HLRZ TTT,(TTT)		;SIZE OF TEXT
+	PUSHJ P,WORDOUT
+	MOVE TTT,1(TT)
+	PUSHJ P,WORDOUT		;CONSTANT OFFSET
+	HRRZ TT,(TT)
+	PUSHJ P,WSTR
+NOTEXT:
+MD,<	MOVE TT,1(B)
+	TLNN TT,CPIN		;CONNECTOR PIN?
+	JRST NOCPIN
+	HRRZ TT,(B)		;CPIN BLOCK POINTER
+	MOVE TTT,(TT)		;NLNLLN
+	PUSHJ P,WORDOUT
+	MOVE TTT,1(TT)		;X,Y CONSTANT OFFSET
+	PUSHJ P,WORDOUT
+NOCPIN:
+>;MD
+MPC,<	HLRZ TTT,(T)
+	HLRZ TTT,(TTT)		;FEED THROUGH POINTER IF ANY
+	MOVE B,1(B)
+	TLNN B,FEEDTH
+	MOVEI TTT,0
+	PUSHJ P,SPUTID		
+>;MPC
+WRTPN1:	HRRZ T,(T)		;NEXT POINT
+	JUMPN T,WRTPNT		;ENDS WITH 0
+	POPJ P,
+
+SPUTID:	PUSHJ P,SCHKID		;CHECK IF IN OUR SET (OR WRITING WHOLE DRAWING)
+	JRST WRTZERO
+PUTID:	JUMPE TTT,WORDOUT
+	PUSHJ P,GETID
+	JRST WORDOUT
+
+;GETID
+;CALL WITH:
+;	TTT	POINTER TO POINT
+;RETURNS WITH
+;	TTT	POINT ID
+GETID:	HLRZ TTT,(TTT)
+	PUSH P,TT
+	HRRZ TT,1(TTT)
+	HLL TT,1(TT)
+	TLNE TT,ISPIN
+	JRST PINID		;PINS ARE HARDER
+	POP P,TT
+	HRRZ TTT,(TTT)
+	POPJ P,
+
+PINID:	HLRZ TTT,(TTT)
+	HLRZ TTT,(TTT)
+	HLRZ TTT,1(TTT)
+	HLRZ TTT,(TTT)
+	HRRZ TT,(TT)
+MD,<	HLRZ TT,(TT)
+	HRL TTT,(TT)		;PIN ID
+>;MD
+MPC,<	HLL TTT,(TT)	>	;PC PIN ID IS PIN #
+	POP P,TT
+	POPJ P,
+
+SCHKID:	JUMPE TTT,CPOPJ1
+	SKIPN SETFLG
+	JRST CPOPJ1		;WRITING WHOLE DRAWING
+	PUSH P,T		;GET A REGISTER
+	HLRZ T,(TTT)
+	HRRZ T,1(T)
+	HLL TTT,1(T)
+	TLNE TTT,ISPIN		;PIN OR POINT
+	JRST SCHKI1
+	POP P,T
+	TLNE TTT,1
+	AOS (P)			;IN OUR SET, SKIP
+	POPJ P,
+
+SCHKI1:	HLRZ T,(TTT)
+	HLRZ T,(T)		;BODY POINTER
+	HLRZ T,(T)
+	HLRZ T,1(T)
+	HLL TTT,1(T)
+	POP P,T
+	TLNE TTT,BTMP1		;IS IT IN OUR SET?
+	AOS (P)			;YES, SKIP
+	POPJ P,
+;		SETS, END STUFF (D,PC)
+PNTDON:	PUSHJ P,WRTMARK		;MARK END OF POINTS
+	SKIPN A,SETPNT		;POINTER TO SETS
+	JRST NOSETS		;NONE
+WRTSET:	SKIPE SETFLG		;WRITING ALL SETS, OR
+	CAMN A,SETFLG		;OR IS THIS THE SET WE WANT?
+	CAIA			;YES
+	JRST WASNUL
+	HLRZ B,(A)		;POINTER TO SET
+NULCHK:	SKIPE 1(B)		;ANYTHING HERE?
+	JRST ISNNUL
+	HRRZ B,(B)
+	JUMPN B,NULCHK
+	JRST WASNUL
+
+ISNNUL:	MOVE TTT,1(A)		;CENTER OF SET
+	PUSHJ P,WORDOUT
+SETBOD:	HLRZ TTT,1(B)		;POINTER TO BODY
+	JUMPE TTT,.+2
+	PUSHJ P,BODID		;WRITE BODY ID
+	HRRZ B,(B)		;NEXT
+	JUMPN B,SETBOD
+	PUSHJ P,WRTZERO		;MARK END OF BODIES
+	HLRZ B,(A)		;POINTER TO SET
+STPNT:	HRRZ TTT,1(B)		;POINTER TO POINT
+	JUMPE TTT,NOSPNT	;NONE?
+	PUSHJ P,PUTID
+NOSPNT:	HRRZ B,(B)		;NEXT
+	JUMPN B,STPNT
+	PUSHJ P,WRTZERO		;MARK END OF POINTS
+WASNUL:	HRRZ A,(A)		;NEXT SET
+	JUMPN A,WRTSET		;LOOP
+NOSETS:
+MD,<
+	PUSHJ P,WRTMARK		;END OF SETS
+FOR I IN(TAUTHOR,TIT1,TIT2)
+<	MOVE TT,I
+	PUSHJ P,TWSTR
+>
+	MOVE TTT,CRDLOC
+	PUSHJ P,WORDOUT		;WRITE PERM CARD LOC!
+FOR I IN(TREV,TMODULE,TVARIABLE,TPREFIX,TPROJ,TPAGE,TOF,TDCODE,SITE1,SITE2)
+<	MOVE TT,I
+	PUSHJ P,TWSTR
+>
+DEC,<
+	MOVE TT,TNXTHI
+	PUSHJ P,TWSTR
+FOR @$ I IN(DRN,CHK,ENG)
+<	SKIPN TTT,I$NAM
+	JRST NOW$I
+	PUSHJ P,WORDOUT
+	MOVE TTT,I$NAM+1
+	PUSHJ P,WORDOUT
+	MOVE TTT,I$NAM+3
+NOW$I:	PUSHJ P,WORDOUT
+>
+>;DEC
+>;MD
+MPC,<	MOVEI TTT,400001	;END OF SETS (NEW TYPE OF END MARKER)
+	PUSHJ P,WORDOUT
+	MOVE TTT,CRDLOC		;LOCATION OF CARD
+	PUSHJ P,WORDOUT
+	MOVE TTT,CRDNAM
+	PUSHJ P,WORDOUT
+	HLLZ TTT,CRDEXT
+	PUSHJ P,WORDOUT
+	MOVE TTT,CRDPPN
+	PUSHJ P,WORDOUT
+	PUSHJ P,MXPADP		;PRINT MAX PAD TYPE
+>;MPC
+	MOVEI T,20
+	PUSHJ P,WRTZERO
+	SOJG T,.-1
+DEC,<	SKIPN	THEREXISTS		;WRITING TMP FILE?
+	JRST BAKXIT
+	CLOSE	DAT,		;YES, DO SOME RENAMING
+	MOVE	A,FILNAM
+	MOVSI	B,'BAK'
+	SETZ	C,
+	MOVE	D,FILPPN
+	LOOKUP	DAT,A
+	JRST	BAKDON		;NO BAK FILE TO DELETE
+	PUSHJ	P,CHKPPN
+	JRST	BAKDON
+	SETZ	A,
+	RENAME	DAT,A		;DELETE OLD BAK FILE
+	OUTSTR	[ASCIZ /CAN'T DELETE BAK FILE!
+/]
+BAKDON:	CLOSE	DAT,
+	MOVE	A,FILNAM
+	HLLZ	B,FILEXT
+	SETZ	C,
+	MOVE	D,FILPPN
+	LOOKUP	DAT,A
+	JRST	BAKOK		;NO DRW FILE TO RENAME TO BAK
+	PUSHJ	P,CHKPPN
+	JRST	BAKOK
+	AND	C,[77000,,0]	;UNPROTECT THE BAK FILE
+	MOVSI	B,'BAK'
+	MOVE	D,FILPPN
+	RENAME	DAT,A
+MD,<	OUTSTR	[ASCIZ /CAN'T RENAME DRW TO BAK!
+/]
+>;MD
+MPC,<	OUTSTR	[ASCIZ /CAN'T RENAME PC TO BAK!
+/]
+>;MPC
+BAKOK:	CLOSE	DAT,
+	MOVE	A,TMPNAM
+	HLLZ	B,TMPEXT
+	SETZ	C,
+	MOVE	D,FILPPN
+	LOOKUP	DAT,A
+	JRST	[OUTSTR [ASCIZ /CAN'T FIND THE TMP FILE!
+/]
+		JRST .+1]
+	RENAME	DAT,FILNAM
+	OUTSTR	[ASCIZ /CAN'T RENAME TMP TO DRW!
+/]
+BAKXIT:
+>;DEC
+	RELEASE DAT,
+	POPJ P,
+
+DEC,<
+CHKPPN:	MOVE	TTT,[3,,T]
+	MOVEI	T,DAT
+	PATH TTT,
+	JRST CPOPJ1		;IF NO PATHS, MUST HAVE RIGHT FILE
+	CAMN	TTT,FILPPN
+	AOS	(P)
+	POPJ	P,
+>;DEC
+
+WRTBRD:	SKIPGE TT,BRDTYPE	;HERE TO WRITE OUT BOARD TYPE
+	JRST WRTZERO		;NO BOARD SPECIFIED, WRITE A ZERO
+	HRRZ TT,BNAMES(TT)
+WASCIZ:	MOVE TTT,(TT)		;HERE WRITE OUT ASCIZ STRING
+	PUSHJ P,WORDOUT
+	TRNN TTT,376
+	 POPJ P,
+	AOJA TT,WASCIZ
+
+WSTR1:	TRNN TTT,377		;Better not end with a nul byte !
+	 JRST FUCKUP		; Call fuckup, and don't return here!
+WSTR:	MOVE TTT,1(TT)		;get a word of ascii string
+	PUSHJ P,WORDOUT
+	HRRZ TT,(TT)		;get pointer to next word of string
+	JUMPN TT,WSTR1		; if it's not nil get the next word
+	TRNE TTT,377		;if the last byte is nul
+	PUSHJ P,WRTZERO		; write a zero
+	POPJ P,			;  and return
+
+TWSTR:	JUMPN TT,WSTR		;WRITE STRING
+WRTZERO:TDZA TTT,TTT		;clear out any bits,(movei ttt,0)
+WRTMARK:MOVEI TTT,400000
+WORDOUT:SOSG IOHD+2
+	OUT DAT,
+	CAIA
+	JRST OUTERR
+	IDPB TTT,IOHD+1
+	POPJ P,
+
+BODID:	HLRZ TTT,(TTT)
+	HLRZ TTT,1(TTT)
+	HLRZ TTT,(TTT)
+	JRST WORDOUT
+
+OUTERR:	OUTSTR [ASCIZ/OUTPUT ERROR.
+SHALL I CLOSE THE FILE (Y OR N)?/]
+	INCHRW T
+	CAIE T,"Y"
+	CAIN T,"y"
+	RELEASE DAT,
+	RELEASE DAT,3
+	MOVE P,PERRSAV		;GET BACK GOOD POINTER
+NODEC,<	HALT CPOPJ	>
+DEC,<	JRST TODDT	>
+
+;WRTPRP - WRITE BODY OR BODY DEF PROPERTIES/TEXT
+;CALL WITH BODY OR BODY DEF PROPERTY/TEXT LIST IN A
+
+WPROP1:	HLRZ B,(A)
+	JUMPE B,WPROP2
+	HRRZ TT,(B)
+	SKIPN 1(TT)		;BUG TRAP, DON'T WRITE NULL STRINGS
+	JRST WPROP2
+	PUSHJ P,WSTR
+	HLRZ TT,(B)
+	PUSHJ P,TWSTR
+	HRRZ TTT,(B)
+	HLRZ TTT,(TTT)
+	PUSHJ P,WORDOUT
+	MOVE TTT,1(A)
+	PUSHJ P,WORDOUT
+	MOVE TTT,1(B)
+	PUSHJ P,WORDOUT
+WPROP2:	HRRZ A,(A)
+WRTPRP:	JUMPN A,WPROP1
+	JRST WRTZERO
+;'WD'	'WPC'	BODIES, CALL WIRE SUBRS
+XLBITS__3		;3 BITS OF SIGNIFICANCE IN X
+YLBITS__2		;2 IN Y
+			;TO WIRE LISTER TO LOCATE BODY
+MPC,<
+HP,<
+INLWLS: setom inlflg		;This will be an inner layer
+	setzm filnam		; and we will insist on a filename
+	jrst wir.0
+>;hp
+>;MPC
+EWLIST:	MOVSI T,EXTWIR
+	PUSHJ P,SETLST		;WILL SKIP IF REMEMBERED NAME
+WIRE:	SETZM FILNAM
+MPC,<HP,< setzm inlflg	>>	;for normal wirelists, clear inner-layer flag
+WIR.0:	MOVEM P,PERRSAV
+	SKIPE FILNAM
+	JRST GOTWNM
+	TLNN M,DSKACT!MACACT
+	OUTSTR[ASCIZ/WIRE LIST /]
+	MOVSI T,EXTWIR
+	PUSHJ P,SETNAM		;SET WIRE LIST FILENAME
+	POPJ P,			;LET HIM OUT
+GOTWNM:	ENTPPN
+	INIT DAT,10
+	'DSK   '
+	XWD IOHD,0
+	JRST [	OUTSTR[ASCIZ/CAN'T GET DISK!
+/]
+		POPJ P,]
+	MOVEI T,IOBUF
+	EXCH T,.JBFF
+	OUTBUF DAT,2
+	MOVEM T,.JBFF
+	PUSHJ P,EXIST		;DOES IT EXIST?
+	POPJ P,			;DOESN'T WANT TO OVERWRITE IT
+	OUTSTR[ASCIZ/WRITING /]
+	MOVEI A,FILNAM
+	JSR FPRINT
+	ENTER DAT,FILNAM
+	JRST [	RELEASE DAT,
+		OUTSTR[ASCIZ/, ENTER FAILED.
+/]
+		POPJ P,]
+	OUTSTR[ASCIZ/
+/]
+MD,<	MOVEI TTT,WDVER	>
+MPC,<	MOVEI TTT,WPCVER>
+	PUSHJ P,WORDOUT		;WRITE WIRE LIST FILE VERSION #
+	HLLZ TTT,CRDLOC
+	PUSHJ P,WORDOUT
+MD,<
+DEC,<	PUSHJ P,POLCHK	>	;CALCULATE AND PRINT POLARITY ERRORS
+	HRRZ TTT,FNDNUM		;NUMBER OF ERRORS STORED HERE
+	PUSHJ P,WORDOUT		;PUT INTO FILE (LH 0)
+	MOVE TTT,DRWDAT
+	PUSHJ P,WORDOUT
+	SKIPN TTT,DRWNAM
+	MOVE TTT,FILNAM
+	PUSHJ P,WORDOUT
+	MOVE TTT,DRWPPN
+	PUSHJ P,WORDOUT
+FOR I IN(TREV,TMODULE,TVARIABLE,TPREFIX,TAUTHOR,TIT1,TIT2,TPROJ,TPAGE,TOF)
+<	MOVE TT,I
+	PUSHJ P,TWSTR
+>
+	PUSHJ P,WRTBRD		;WRITE THE BOARD TYPE
+	PUSHJ P,ITSET		;CALC SIZE OF DRAWING
+NODEC,<	MOVE T,MAXX
+	SUB T,MINX
+	LSH T,-XLBITS		;MAKE 8 SECTIONS EACH WAY
+	ADDI T,1
+	MOVEM T,MAXX
+	MOVE T,MINY
+	SUB T,MAXY
+	ASH T,-YLBITS
+	SUBI T,1
+	MOVEM T,MINY
+>;NODEC
+DEC,<
+	MOVN T,WTAB+DINDEX	;WIDTH OF D-SIZE DWG
+	ASH T,-XLBITS-2		;DIVIDE BY 4, MAKE XLBITS ^^2 SECTIONS
+	SUBI T,1
+	EXCH T,MAXX
+	ADD T,MINX
+	MOVE TT,WTAB+DINDEX
+	ASH TT,-2
+	ADD T,TT
+	ASH T,-1
+	ADDI T,1
+	MOVEM T,MINX		;DEC COORD 0,0 IN LOWER RT
+	MOVE T,HTAB+DINDEX
+	ASH T,-YLBITS-2
+	ADDI T,1
+	EXCH T,MINY
+	ADD T,MAXY
+	MOVE TT,HTAB+DINDEX
+	ASH TT,-2
+	SUB T,TT
+	ASH T,-1
+	ADDI T,1
+	MOVEM T,MAXY
+>;DEC
+>;MD
+MPC,<	PUSHJ P,WRTBRD	
+HP,< 	skipn inlflg	>	;If inner layer, do not emit bodies
+>;MPC
+	 SKIPN A,DBODPN		;If there are not bodies, don't look for them
+	  JRST NOBODS
+WBODLP:
+MPC,<
+	HLRZ TT,(A)
+	HLRZ T,1(TT)
+	HRRZ TTT,1(TT)
+	MOVE TTT,(TTT)
+	HLR TTT,(T)
+	PUSHJ P,WORDOUT		;# OF PINS,,BID
+	MOVE TTT,1(T)		;BODY BITS IN LH
+	HRR TTT,(T)		;LOC IN RH
+	PUSHJ P,WORDOUT		;AND WRITE IT
+	HRRZ TT,1(T)
+	PUSHJ P,TWSTR
+>;MPC
+MD,<
+	HLRZ T,(A)		;BODY DATA BLOCK
+	HRRZ T,1(T)		;BODY DEF
+	HRRZ T,(T)		;BODY NAME POINTER
+	MOVE TT,1(T)		;GET BODY NAME
+	CAMN TT,[ASCIZ/GND/]	;GROUND BODIES ARE IGNORED
+	JRST FLUBDY
+HP,<	CAMN TT,[ASCIZ/VCC/]	;VCC BODIES IGNORED, TOO
+	 JRST FLUBDY
+>;HP
+	PUSHJ P,FNDDIP		;FIND DIP TYPE
+	JRST NOFLUB		;NONE
+	HLRZ T,(T)
+	HRRZ T,(T)
+	MOVE T,1(T)		;FIRST WORD OF DIP NAME
+	CAME T,[NULNAM]		;EITHER KIND OF IGNORED BODY?
+	CAMN T,[CABNAM]		;THIS TOO
+	JRST FLUBDY
+NOFLUB:	PUSHJ P,APPXY		;CALC APPROX X AND Y
+	HLRZ TT,(A)
+	HLR TTT,1(TT)
+	HLR TTT,(TTT)
+	PUSHJ P,WORDOUT		;APPROX LOC AND BID
+	HLRZ T,1(TT)
+	HRRZ TTT,(T)		;LOC BLOCK POINTER
+	JUMPE TTT,WDNBLC
+	HLRZ TTT,(TTT)
+	MOVE TTT,(TTT)
+WDNBLC:	PUSHJ P,WORDOUT
+	HLLZ TTT,1(T)		;BODY BITS
+	PUSHJ P,WORDOUT
+	HRRZ TT,1(TT)
+	HRRZ TT,(TT)
+	PUSHJ P,WSTR		;NAME OF BODY
+	HLRZ TT,(A)
+	HLRZ B,1(TT)
+	HRRZ B,1(B)
+	JUMPN B,WLPRP1
+	HRRZ B,1(TT)
+	HLRZ B,1(B)
+	HLRZ B,1(B)
+	JUMPE B,NWLPRP
+WLPRP1:	HLRZ C,(B)
+	SKIPE C
+	SKIPA C,B
+	HRRZ C,1(B)
+	HLRZ T,(C)
+	HLRZ TT,(T)
+	JUMPE TT,WLPRP2
+	PUSHJ P,WSTR
+	HRRZ TT,(T)
+	PUSHJ P,WSTR
+WLPRP2:	HRRZ B,(B)
+	JUMPN B,WLPRP1
+NWLPRP:	PUSHJ P,WRTZERO
+FLUBDY:
+>;MD
+	HRRZ A,(A)
+	JUMPN A,WBODLP
+NOBODS:	PUSHJ P,WRTZERO
+	SETZM WDOLST		;CLEAR DO LIST
+	MOVSI C,3		;DONE BITS
+	SKIPE A,PONPNT
+	PUSHJ P,CLRBTS		;CLEAR THE DONE BIT
+MPC,<
+	SKIPE A,PONPN2
+	PUSHJ P,CLRBTS
+	SKIPE A,PONPN2
+	PUSHJ P,DOWIRE
+>;MPC
+	SKIPE A,PONPNT
+	PUSHJ P,DOWIRE
+	PUSHJ P,WRTZERO		;FLAG END WITH NULL WIRE
+	PUSHJ P,WRTZERO		;AND NO PINS
+	RELEASE DAT,
+	POPJ P,
+
+CLRBTS:	HLRZ B,(A)
+	HRRZ B,1(B)
+	ANDCAM C,1(B)		;TURN OFF BIT
+	HRRZ A,(A)
+	JUMPN A,CLRBTS
+	POPJ P,
+
+APPXY:	HLRE T,1(A)		;X PART
+	SUB T,MINX
+	IDIV T,MAXX
+	SKIPN MAXX
+	MOVEI T,1(XLBITS-1)-1
+	SKIPGE T
+	SETZ T,
+	CAIL T,1XLBITS
+	MOVEI T,1XLBITS-1
+	HRRE TT,1(A)		;Y PART
+	SUB TT,MAXY
+	IDIV TT,MINY
+	SKIPN MINY
+	MOVEI TT,1(YLBITS-1)-1
+	SKIPGE TT
+	SETZ TT,
+	CAIL TT,1YLBITS
+	MOVEI TT,1YLBITS-1
+	ADDI TT,1
+	DPB TT,[POINT 9,TTT,8]	;Y PART IS LETTER(ROW)
+	ADDI T,1
+	DPB T,[POINT 9,TTT,17]	;X PART IS NUMBER(COLUMN)
+	POPJ P,
+;		WIRES, WRITE SIGNAL NAME AND PIN INFO
+DOWIRE:	HRLM A,(P)		;Save pointer to point list in stack
+	SETZM RUNBIT		;Clear 'special RUN BITS' accumulator
+	TLZ WFLAG
+	MOVE H,[1,,WDOSTR]	;BIT TO TEST, ROUTINE TO CALL
+	MOVE T,A
+	PUSHJ P,RECUR1		;Have we visited this point before ?
+	PUSHJ P,RECCHK		;CHECK FOR RECUR
+	TLNE WFLAG		;WRITE 0 IF ANY SIGNALS OUT NOW
+	PUSHJ P,WRTZERO
+	MOVE H,[2,,WDOPNT]
+	HLRZ T,(P)
+	PUSHJ P,RECUR1		;TEST AND PUT IN LIST
+	PUSHJ P,RECCHK		;CHECK FOR RECUR
+	TLNN WFLAG		;IF NOTHING PUT OUT
+	JRST NOWRUN		;THEN NO BITS OR END MARK
+	PUSHJ P,WRTZERO		;MARK END OF WIRE
+	MOVE TTT,RUNBIT		;GET RUN BITS
+	PUSHJ P,WORDOUT		;WRITE THEM
+NOWRUN:	HLRZ A,(P)
+	HRRZ A,(A)
+	JUMPN A,DOWIRE
+	POPJ P,
+
+; This routine is called by RECCHK, which enters at either WDOSTR or
+;  WDOSTR+1
+WDOSTR:	JFCL			;ALWAYS DO THIS PART
+	PUSHJ P,WACSET		;NORMALLY ENTER HERE
+MPC,<	LDB TT,[POINT 3,D,6]	;Extract just the plane connection bits
+	JUMPE TT,WRECUR		;IF NO PLANE CONNEX, JUST RECUR
+	MOVE TTT,(TT)[	0	;Power plane connection; signal name is:
+			ASCIZ/GND/
+			ASCIZ/VCC/
+			ASCIZ/VCC2/
+			ASCIZ/VCC3/
+			ASCIZ/PLN4/
+			ASCIZ/PLN5/
+			ASCIZ/PLN6/]
+	PUSHJ P,WORDOUT
+	TLO WFLAG		;NOTE SOMETHING PUT OUT
+	JRST WRECUR
+>;MPC
+MD,<	TLNN D,ISPIN		;IS THIS ON A BODY?
+	JRST NGBODY
+	HLRZ TT,(B)		;HERE WE FART AROUND FOR PANOFSKY!!!!
+	HLRZ TTT,(TT)
+	HRRZ TTT,1(TTT)
+	HRRZ TTT,(TTT)
+	MOVE TTT,1(TTT)
+	CAMN TTT,[ASCIZ/GND/]	;BODIES NAMED GND GENERATE SIGNAL NAME GND
+	 JRST [	TLO WFLAG
+		PUSHJ P,WORDOUT
+		JRST NGBODY]
+HP,<	CAMN TTT,[ASCIZ/VCC/]	;BODIES NAMED VCC GENERATE SIGNAL NAME VCC
+	 JRST [	TLO WFLAG
+		PUSHJ P,WORDOUT
+		JRST NGBODY]
+>;HP
+	PUSH P,A
+	MOVE A,TT
+	PUSHJ P,FNDDIP
+	JRST [	POP P,A
+		JRST NGBODY]
+	POP P,A
+	HLRZ T,(T)
+	HRRZ T,(T)
+	MOVE TTT,1(T)
+	CAME TTT,[CABNAM]
+	 JRST NGBODY
+	MOVEI TTT,CABBDY
+	IORM TTT,RUNBIT		;TURN ON CABBDY IN RUNBITS
+NGBODY:	HLRZ TT,(C)
+	JUMPE TT,WRECUR		;ANY TEXT?
+	HRRZ TT,(TT)		;SKIP OVER OFFSET
+	SKIPN TTT,1(TT)		;REALLY SOMETHING THERE? *** BUG TRAP
+	 JRST WRECUR		;NO
+	AND TTT,[774000,,0]
+	CAMN TTT,[ASCIZ/;/]
+	JRST WRECUR		;FLUSH SIGNALS THAT ARE JUST COMMENTS
+	PUSHJ P,WSTR		;WRITE SIGNAL NAME
+	TLO WFLAG
+	JRST WRECUR
+>;MD
+
+; Set up accumulators for WDOSTR or WDOPNT:
+; At entry, A/ pointer to XY block of point
+; At exit,  B/ pointer to point_type block
+;	    C/ pointer to bits,,pin block
+;	    D/ bits,,pin_number
+WACSET:	HLRZ B,(A)
+	HRRZ C,1(B)
+	MOVE D,1(C)
+	POPJ P,
+
+WDOPNT:	JRST JRECUR		;THIS IS AN "OTHER" PIN, JUST RECUR ON IT
+	PUSHJ P,WACSET		;Type 1 entry here
+	TLNN D,ISPIN		;Is this a body pin
+	 JRST WCPIN		; No, check if a connector pin
+MD,<	HLRZ TT,(B)		;HERE WE FART AROUND FOR PANOFSKY!!!!
+	HLRZ TTT,(TT)
+	HRRZ TTT,1(TTT)
+	HRRZ TTT,(TTT)
+	MOVE TTT,1(TTT)
+	CAMN TTT,[ASCIZ/GND/]
+	JRST WRECUR
+HP,<	CAMN TTT,[ASCIZ/VCC/]
+	 JRST WRECUR
+>;HP
+	PUSH P,A
+	MOVE A,TT
+	PUSHJ P,FNDDIP
+	JRST [	POP P,A
+		JRST NCNBDY]
+	POP P,A
+	HLRZ T,(T)
+	HRRZ T,(T)
+	MOVE TT,1(T)
+	CAME TT,[CABNAM]	;BODIES NAMED CABLE DO THIS
+	CAMN TT,[NULNAM]	;IGNORE APPEARANCE BODIES
+	JRST WRECUR		;WAS A PIN, BUT WE ARE IGNORING IT
+NCNBDY:
+>;MD
+	TLON WFLAG
+	PUSHJ P,WRTZERO		;FINISH SIGNAL NAMES
+	HLRZ TT,(B)
+	HLRZ TT,(TT)
+	HLRZ TT,1(TT)
+	HLRZ TTT,(TT)		;BODY ID
+	PUSHJ P,WORDOUT		;WRITE BODY ID
+MD,<	HRRZ TT,(C)
+	HLRZ TT,(TT)
+	HRRZ TTT,1(C)
+	SKIPN TTT		;DO WE HAVE PIN NAME EXPLICITLY?
+	HRRZ TTT,1(TT)		;NO, USE DEFAULT
+	HRL TTT,(TT)
+	PUSHJ P,WORDOUT		;WRITE PIN ID,,PIN NAME
+	MOVE TTT,1(C)
+	TRZE TTT,-1		;ANY EXPLICIT PIN?
+	TLZA TTT,DEFPIN		;YES, MAKE SURE DEFPIN OFF
+	TLO TTT,DEFPIN		;NO, SET DEFAULTED BIT
+	PUSHJ P,WORDOUT		;BITS,,0
+>;MD
+MPC,<	HRRZ TTT,(C)
+	HLRZ TTT,(TTT)
+	HRL TTT,TTT
+	PUSHJ P,WORDOUT		;PIN ID,,PIN NAME
+>;MPC
+	JRST WRECUR
+
+WCPIN:	TLNN D,CPIN		;Is this a connector pin ?
+	 JRST WRECUR		;NOTHING TO PUT OUT, JUST RECUR
+mpc,<
+hp,<	skipn inlflg		;Is this an inner layer wirelist?
+	 jrst wftst		; No, skip NC connector pin elimination
+	tlne wflag		;Have we put anything out ?
+	 jrst wftst		; Yes, put this out, too
+	skipn wdolst		;Nothing yet.  Is there more list ?
+	 jrst wrecur		; No. just exit without mentioning this CPIN
+wftst:
+>;hp
+>;mpc
+	TLON WFLAG		;Set flag, so we remember to do run_bits
+	 PUSHJ P,WRTZERO	; and if it was 0, write separator word
+	HRR D,(C)
+MD,<	MOVS TTT,(D)	>
+MPC,<	HRLZ TTT,(D)	>
+	PUSHJ P,WORDOUT		;Put out connector description
+MD,<	PUSHJ P,APPXY		;CALC APPROX X AND Y FOR CONNECTOR PIN
+	HLR TTT,(A)
+	HRR TTT,(TTT)		;PID
+>;MD
+MPC,<	HLRZ TTT,(A)
+	HRRZ TTT,(TTT)
+>;MPC
+	PUSHJ P,WORDOUT
+MD,<	HLLZ TTT,1(C)		;GET BITS
+	PUSHJ P,WORDOUT		;WRITE BITS,,0
+>;MD
+	JRST WRECUR
+
+JRECUR:	PUSHJ P,WACSET
+;	JRST WRECUR		;FALL INTO WRECUR
+;		WIRES, RECUR
+MD,<
+WRECUR:	HLRZ B,1(B)		;Fetch pointer to neighbors block
+	HLRZ T,(B)		;neighbor below?
+	JUMPE T,.+2
+	 PUSHJ P,RECUR1
+	HRRZ T,(B)		;Another neighbors block?
+	JUMPE T,.+2
+	 PUSHJ P,RECUR1
+	HLRZ T,1(B)		;A neighbor to left ?
+	JUMPE T,.+2
+	 PUSHJ P,RECUR1
+	HRRZ T,1(B)		;A neighbor to right ?
+	JUMPE T,.+2
+	 PUSHJ P,RECUR1
+	TLNN D,ISPIN		;Is this a pin?
+	 JRST RECCHK		;NO, DONE
+	HRRZ T,(C)		;Yes, get pointer to pin block
+	HLRZ T,(T)		; and isolate the PIN NAME,,PIN ID
+	HRL T,1(T)
+	HRR T,(T)		;  ending with them in T
+	HLRZ A,(A)		;PIN DATA BLOCK
+	HLRZ B,(A)		;BODY POINTER
+	HLRZ B,(B)		;BODY DATA BLOCK
+	JRST WIRPN1
+
+WIRPIN:	HLRZ B,(A)
+	HRRZ C,1(B)
+	HRRZ TT,(C)
+	HLRZ TT,(TT)
+	HRL TT,1(TT)
+	HRR TT,(TT)
+	XOR TT,T
+	JUMPE TT,WIRPN1		;DON'T DO US
+	TLNN TT,-1		;SAME PIN NAME?
+	 JRST WPINFN		;YES
+WIRPN1:	HRRZ A,(B)
+	JUMPN A,WIRPIN
+	JRST RECCHK
+
+WPINFN:	MOVE T,A
+	PUSHJ P,RECUR0
+>;MD
+MPC,<
+WRECUR:	HLRZ T,(B)		;Fetch Body or Feedthru pointer
+	TLNN D,ISPIN		;IS IT A BODY PIN?
+	 JRST TSTFED		; No, check if it is a feedthru
+	HRRZ TTT,(C)		; Yes.  Fetch pointer to pin block
+	JRST WIRPN1
+
+WIRPIN:	CAMN T,A		;Is this the point we are looking for
+	 JRST WIRPN1		; No, follow pin_link list
+	HLRZ TT,(T)		; Yes, check if the pointer
+	HRRZ TT,1(TT)		;  to the pin block is the same
+	HRRZ TT,(TT)		;   as the one we want
+	CAMN TT,TTT
+	 JRST WPINFN		;Found the right one!
+WIRPN1:	HLRZ T,(T)		;Follow pin_link list to
+	HRRZ T,(T)		; next pin in body definition 
+	JUMPN T,WIRPIN		;(there must be one)
+	OUTSTR[ASCIZ/CAN'T FIND PIN ON OTHER SIDE.
+/]
+	PUSHJ P,FUCKUP
+	JRST NOFED
+
+WPINFN:	PUSHJ P,RECUR0		;Record the entry in WDOLST
+	JRST NOFED
+
+TSTFED:	TLNE D,FEEDTH		;Is this a plain point
+	 PUSHJ P,RECUR1		; No, a feedthrough.  Record in list
+NOFED:	HLRZ B,1(B)
+	JUMPE B,RECCHK		;Is there a neighbors block?
+WIRNE1:	MOVEI C,2		; Yes, scan it.
+WIRNE2:	XCT(C)[HLRZ T,(B)	;------------------+
+		HLRZ T,1(B)	;                  |
+		HRRZ T,1(B)]	;		   |
+	JUMPE T,.+2		;		   |
+	 PUSHJ P,RECUR1		;Mark neighbor	   |
+	SOJGE C,WIRNE2		;------------------+
+	HRRZ B,(B)		;Follow neighbor list link
+	JUMPN B,WIRNE1		;  and if more, scan that block, too.
+;	  Fall into RECCHK if no more neighbors
+>;MPC
+; This routine handles an entry on the built-up WDOLST
+;  It always returns to P+1, either directly, or through a handler
+RECCHK:	SKIPN T,WDOLST		;Is there still any WDOLST to search
+	 POPJ P,		;No, just exit
+	SKIPN A,1(T)		;Is second word of entry NIL
+	 JRST DORCR0		; Yes, must be an entry in LH of first word
+	HRRZ TT,(T)		; No, unlink this entry
+	MOVEM TT,WDOLST		;  from WDOLST
+	FSTRET(T)		;   and return it to the free pool
+	JRST 1(H)		;Call the handler at secondary entry
+
+DORCR0:	HLRZ A,(T)		;Fetch the pointer in LH of first word
+	HRRZ TT,(T)		; and unlink the WDOLST entry
+	MOVEM TT,WDOLST
+	FSTRET(T)		;  returning the freed block to the free pool
+	JRST (H)		;Call the handler at primary entry
+
+RECUR0:	PUSHJ P,RECURB		;If we have not visited this point before,
+	 HRLM T,(TT)		; record pointer to XY block (type 0 entry)
+	POPJ P,
+
+RECUR1:	PUSHJ P,RECURB		;If we have not visited this point before,
+	 MOVEM T,1(TT)		; record pointer to XY block (type 1 entry)
+	POPJ P,
+
+; At entry,	T/ pointer to point XY block
+;		H/ bit to test,,address of handler (this halfword unused here)
+; Returns to  P+1/ if tested bit was not set.  Set it, and get a new block
+;		    of free storage, and link it on the WDOLST.
+;		   In this case, return with TT/ pointer to new WDOLST block
+;	      P+2/ if tested bit was already set.
+RECURB:	HLRZ TT,(T)		;Chase pointers through link block
+	HRRZ TT,1(TT)		; to get TT/ ptr to point_text and bits,,pin#
+	HLLZ TTT,1(TT)		;  and TTT/ bits
+	TDOE TTT,H		;Test-and-set bit specified in LH of H
+	 JRST CPOPJ1		;  return to P+2 if it was already set
+	HLLM TTT,1(TT)		;Return altered BITS to memory
+	GETFS(TT)		;Get a new block, pointed to by TT
+	SETZM 1(TT)		; Clear second word
+	EXCH TT,WDOLST		;  and link new block at head of WDOLST
+	HRRZM TT,@WDOLST	;   then link the rest of list to this block
+	MOVE TT,WDOLST
+	POPJ P,
+;'RIN'		WRITE FILE FOR INPUT TO WAGNER'S ROUTER SYSTEM
+;X VALUE GREATER THAN 256 INDICATES SOLDER SIDE INSTEAD OF COMPONENT SIDE
+MPC,<
+WAG,<
+UML,<
+WRTRTE:	RELEASE	DAT,
+WROUTE:	SKIPN	WIRLST
+	JRST	[OUTSTR	[ASCIZ/No wirelist loaded!
+/]
+		POPJ	P,]
+WRTRT1:	OUTSTR	[ASCIZ/For ROUTE data, what (.RIN) /]
+	MOVSI	T,EXTRIN
+	PUSHJ 	P,SETNAM	;Ask user if the default name is OK
+	 POPJ	P,
+	ENTPPN			;Open the file
+	INIT	DAT,0
+	'DSK   '
+	XWD	IOHD,0
+	 JRST	[OUTSTR	[ASCIZ/Can't get disk!
+/]
+		 JRST	WRTRT1]
+	PUSHJ	P,EXIST		;Check it
+	 JRST	WRTRTE
+	OUTSTR	[ASCIZ/Writing /]
+	MOVEI	A,FILNAM
+	JSR	FPRINT
+	ENTER	DAT,FILNAM
+	 JRST	[OUTSTR	[ASCIZ/, ENTER failed!
+/]
+		 JRST	WRTRTE]
+	OUTSTR	[ASCIZ/
+/]
+	MOVEI	T,IOBUF
+	EXCH	T,.JBFF
+	OUTBUF	DAT,2
+	MOVEM	T,.JBFF
+	TLNN	M,DSKACT!MACACT
+	 OUTSTR	[ASCIZ/Pass existing wires/]
+	PUSHJ	P, YORN		;Demand YES or NO answer
+	 JFCL			; Waffle (escape...treat as NO)
+	 TLZA	WFLAG		; No
+	  TLO	WFLAG		; Yes
+	TLNN	M,DSKACT!MACACT	; Should we put out this prompt?
+	 OUTSTR[ASCIZ/Pass connector pins/]; Yes, interactive.
+	PUSHJ	P, YORN		; Demand reply
+	 JFCL			; ESCAPE is same as NO
+	 TLZA	ASK		; No
+	  TLO	ASK		; Yes
+;This little ditty is for Wayne
+	tlnn    ask		;did he answer with a yes
+	 jrst notyes		;no!
+	TLNN	M,DSKACT!MACACT	;yes, Should we let him know
+	 OUTSTR[ASCIZ/Ok then, I'll Pass connector pins
+/]				; Yes, interactive.
+
+notyes:	MOVEI	T,ROUYMM*ROUSCL
+	MOVEM	T,MINY
+	MOVEI	T,ROUXMM*ROUSCL
+	MOVEM	T,MINX
+	PUSHJ	P,UNMARK	;Clear any 'visited' bits in the drawing
+	MOVE	C,WIRLST	;Start at the beginning of the WIRELIST
+	MOVEI	G,1		; with signal number of 1
+WRTRT2:	HRRZ	D,1(C)		;Check each signal for VCC, GND, NC, or HI
+WRTTX1:	MOVEI	E,NPASLN	;NUMBER OF ENTRIES IN TABLE
+WRTTX4:	HLRZ	A,1(D)		;Does this pin have a name?
+	JUMPE	A,WRTTX3	; No
+	ADD	A,[POINT 7,1]	; Yes, compare the name with
+	MOVE	B,NOPASS(E)	;  one of the NOPASS names.
+	PUSHJ	P,SIGMAT	;Is this signal one of them?
+	 JRST	WRTTX5		; Not this one, try next table entry
+	 JFCL			;EQUIVALENT IS CLOSE ENOUGH
+	OUTSTR	@NOPASS(E)
+	OUTSTR	[ASCIZ/ run not passed
+/]
+	JRST	WRTTX2		;Count this signal, but don't put it out
+WRTTX5:	SOJGE	E,WRTTX4	;If more table entries, check again
+
+WRTTX3:	HRRZ	D,(D)		;Pin unlabeled, or didn't match, try
+	JUMPN	D,WRTTX1	; next pin in net, if there is one
+
+	HRRZ	B,1(C)		;It is OK to pass this net
+WRTRT3:	HRRZ	A,1(B)		;GET CON HACK STUFF
+	JUMPE	A,WRTNOC	;Is this a 'wild' connector connection
+	LDB	T,[POINT 6,A,23];++ hack: this should invoke a BOARD routine
+	CAILE	T,4		;FOONLY BOARDS HAVE 4 PADDLES!
+	 SKIPA	T,[ROUXMB]
+	MOVEI	T,ROUXMT
+	TRNE	A,76
+	 ADDI	T,SIDDIF
+	PUSHJ	P,WRTDEC	;Write X, Y, sig_number 
+	MOVEI	T,ROUANY	;CODE FOR "ANY" CONNECTOR PIN
+	PUSHJ	P,WRTDEC
+	MOVE	T,G		;SIGNAL NUMBER
+	PUSHJ	P,WRTDEC
+	PUSHJ	P,WCRLF
+WRTNOC:	HLRZ	A,(B)		;Get pointer to pin XY block
+	JUMPE	A,.+2		;If point is in PC drawing,
+	 PUSHJ	P,WRTXY		; output X, Y, and signal_number
+	HRRZ	B,(B)		;Follow WIRELIST link to next pin
+	JUMPN	B,WRTRT3	; unless there isn't another
+
+WRTTX2:	ADDI	G,1		; Count this signal,
+	HRRZ	C,(C)		;  fetch link to next, and
+	JUMPN	C,WRTRT2	;   loop until wirelist is exhausted
+
+	TLNN	ASK		;Are we supposed to pass connector pins?
+	 JRST	PREPS3		;If not, nothing to do here
+	MOVEI	G,NEVERC	;SIGNAL # FOR NEVER CONNECT HERE
+nohp,<	TLNN	M,DSKACT!MACACT	;Prompt user?
+	 OUTSTR	[ASCIZ/Pass predetermined DEC POWER and GROUND connector pins/]
+	PUSHJ	P,YORN
+	 JRST	PREPS2		;Escape, treat as NO
+	 JRST	PREPS2		;No
+	MOVSI	C,-PRECLN	;Yes
+	SETZM	NUMBER
+PREPAS:	MOVE	T,PRECON(C)
+	MOVEM	T,LETTER
+	PUSHJ	P,LOOK		;FIND CONNECTOR PIN
+	JRST	PREPS1
+	MOVE	A,T
+	PUSHJ	P,WRTXY
+PREPS1:	AOBJN	C,PREPAS
+>;nohp
+PREPS2:	TLNN	WFLAG		;Should we pass existing wires?
+	 JRST	PREPS3		;No
+	SKIPE	A,PONPNT	;Yes, pass assigned connector pins, too
+	 PUSHJ	P,WRTUCN
+	SKIPE	A,PONPN2	; from both sides of the board
+	 PUSHJ	P,WRTUCN
+
+;Next, write out the unused connector pins.
+PREPS3:	MOVEI	G, UNUCON	;No signals on these pins, so say 9000
+	SKIPE	A,PONPNT
+	 PUSHJ	P,WRTBCN	;Write out blank connector pins
+	SKIPE	A,PONPN2
+	 PUSHJ	P,WRTBCN	; on both sides of the board
+
+	MOVEI	G, NEVERC	;Finally, write out all unused pins
+	TLNE	SID,FRONT	;We have only marked pins one the front
+	 SKIPA	A, PONPNT	; so get pointer to that side
+	MOVE	A, PONPN2	;  depending on which side is editable
+	JUMPE	A, WPNEND
+WRTPIN:	PUSHJ	P, WRTXY	;Write one X, Y, sig_number record
+	HRRZ	A, (A)		; and follow the list, until
+	JUMPN	A, WRTPIN	; there is no more
+
+WPNEND:	SETZ	T,
+	PUSHJ	P,WRTDEC
+	PUSHJ	P,WRTDEC
+	PUSHJ	P,WRTDEC	;3 0'S TO END PINS
+	PUSHJ	P,WCRLF
+	TLNN	WFLAG		;Should we pass existing wires?
+	 JRST	OUTLIN		; No, just the outline
+	OUTSTR	[ASCIZ/Passing existing wires!
+/]
+	PUSHJ	P,UNMARK	;Clear all the 'visited' bits again
+	MOVEI	G,1		;Start with circuit number 1, and
+	MOVE	C,WIRLST	; look down the wirelist (it must be there)
+NET.B:	HRRZ	B, 1(C)		;   for nets with preplaced wires
+NET.S:	JUMPE	B, NET.NX	;WHILE more points in this net
+	HLRZ	A,(B)		; DO chase down any preplaced wires
+	PUSHJ	P,FINDXY	; that start on component side.
+	MOVE	TT,1(A)		;Get X,,Y of this pin, to find 2nd pin block
+	HLRZ	A,(A)		;Get pointer to body_point type block
+	HLRZ	A,(A)		; and then to body XY_block (or 0)
+	JUMPE	A, NET.PN	;If there is no body ptr, this must be a CPIN.
+N.PFLW:	HLRZ	T,(A)		; and to body (or point) definition block
+	HRRZ	A,(T)		;  and finally pointer to pin XY_block
+	JUMPE	A, NET.PN	; If no more list, we are through
+	CAME	TT, 1(A)	;Is this pin block at the right X,,Y ?
+	 JRST	N.PFLW		; No, get the next list element
+	HLRZ	T,(A)		;Get pointer to pin type_block
+	HRRZ	T,1(T)		; and so to bits,,pin_number block
+	MOVE	TTT,1(T)		;Get BITS field
+	TLNE	TTT,1		;Has this point been visited before ?
+	 JRST	N.PFLW		; Yes, we must have just been here
+	PUSHJ	P, FINDXY	; No, find any preplaced stuff attached here
+
+NET.PN:	HRRZ	B, (B)		;Get link to the next point in net
+	JRST	NET.S		; and repeat both-sides examination
+
+NET.NX:	ADDI	G, 1		;Count this net
+	HRRZ	C, (C)		; and follow the wirelist
+	JUMPN	C, NET.B	;  until there is no more
+
+	MOVEI	G,NEVERC	;Output random traces as circuit 1023
+	SKIPN	A,PONPNT	; from list of points
+	 JRST	W.SOLD		;  unless there is none
+W.COMP:	PUSHJ	P,FINDXY	;Find stuff connected to this point
+	HRRZ	A,(A)		; and then the next, until done
+	JUMPN	A,W.COMP	;  [marked points will be skipped over]
+
+W.SOLD:	SKIPN	A,PONPN2	;Don't forget stuff on solder side
+	 JRST	OUTLIN		; unless there isn't any
+W.SSID:	PUSHJ	P,FINDXY	;Find stuff connected to this point
+	HRRZ	A,(A)		; and then the next, until done
+	JUMPN	A,W.SSID	;  [marked points will be skipped over]
+
+OUTLIN:	SETZ	C,		;Set initial vector end to null
+	HRRZ	A,CRDLST	;Output card outline (minus a border)
+	JUMPE	A,NOWIRF	; as circuit 1023 too, unless none
+
+OTL.LP:	MOVE	T, 1(A)		;Fetch a point description
+	TRNE	T, 1		;Is vector to here visible ?
+	 JRST	O.INV		; No, get next
+	SETZ	H,		;Clear out-of bounds flags
+	PUSHJ	P,OTL.SC	;Scale the new point coordinates
+	MOVEM	T, B		; and save the unclipped pair
+	HLRE	TT, T		;Isolate X value
+	CAIGE	TT, ROUXMB	;Is it legal for router ?
+	 TRO	H, 1		; Set new-X-under bit
+	CAILE	TT, ROUXMT
+	 TRO	H, 2		; Set New-X-over bit
+	HRRE	TT, T		;Isolate Y coordinate
+	CAIGE	TT, ROUYMB
+	 TRO	H, 4		; Set new-Y-under bit
+	CAILE	TT, ROUYMT
+	 TRO	H, 10		; Set new-Y-over bit
+	HLRE	TT, C		;Isolate old X value
+	CAIGE	TT, ROUXMB
+	 TRO	H, 20		; Set old-X-under bit
+	CAILE	TT, ROUXMT
+	 TRO	H, 40		; Set old-X-over bit
+	HRRE	TT, C		;Isolate old Y coordinate
+	CAIGE	TT, ROUYMB
+	 TRO	H, 100		; Set old-Y-under bit
+	CAILE	TT, ROUYMT
+	 TRO	H, 200		; Set old-Y-over bit
+	TRNN	H, 17		;New point out of limits?
+	 JRST	NEW.IN		;No, check for old
+	TRNE	H, 360		;Yes, old point also out ?
+	 JRST	OTL.NX		; Yes, just get next point in outline
+
+;Case I ... Old point inside, new point outside:
+	TRNE	H, 1		;Was new X under ?
+	 HRLI	T, ROUXMB	; Yes, clip to Xmin
+	TRNE	H, 2		;Was it over ?
+	 HRLI	T, ROUXMT	; Yes, clip to Xmax
+	TRNE	H, 4		;Was new Y under ?
+	 HRRI	T, ROUYMB	; Yes, clip to Ymin
+	TRNE	H, 10		;Was it over ?
+	 HRRI	T, ROUYMT	; Yes, clip to Ymax
+	PUSH	P, T		;Save clipped coordinates of new point
+	MOVE	T, C		;Emit coordinates of old point
+	PUSHJ	P,WRT.WD
+	MOVE	T, (P)		;Get copy of clipped new coordinates
+	PUSHJ	P, WRT.WD	;Emit coordinates of this point
+	MOVEI	T, NEVERC
+	PUSHJ	P, WRTDEC	;Append circuit number
+	PUSHJ	P, WCRLF	; and end output record
+	MOVSI	T, SIDDIF	;Duplicate the segment on the solder side
+	ADD	T, C
+	PUSHJ	P, WRT.WD	;First the old point,
+	POP	P, TT		; then pop clipped new point off stack
+	MOVSI	T, SIDDIF	; adjust X for other side,
+	ADD	T, TT
+	PUSHJ	P, WRT.WD	;  and write it out
+	MOVEI	T, NEVERC
+	PUSHJ	P,WRTDEC
+	PUSHJ	P,WCRLF
+	JRST	OTL.NX
+
+;Case II ... New point inside
+NEW.IN:	MOVE	T, C
+	TRNN	H, 360		;Is old point in bounds also
+	 JRST	O.SEGW		; Yes, just write the segment
+	TRNE	H, 20		;Was old X under ?
+	 HRLI	T, ROUXMB	; Yes, clip to Xmin
+	TRNE	H, 40		;Was it over ?
+	 HRLI	T, ROUXMT	; Yes, clip to Xmax
+	TRNE	H, 100		;Was old Y under ?
+	 HRRI	T, ROUYMB	; Yes, clip to Ymin
+	TRNE	H, 200		;Was it over ?
+	 HRRI	T, ROUYMT	; Yes, clip to Ymax
+O.SEGW:	PUSH	P, T		;Save clipped old coordinates
+	PUSHJ	P, WRT.WD	;Write it out
+	MOVE	T, B		; followed by new point
+	PUSHJ	P, WRT.WD
+	MOVEI	T, NEVERC	; followed by signal number
+	PUSHJ	P, WRTDEC
+	PUSHJ	P, WCRLF
+	MOVSI	T, SIDDIF	;Duplicate the segment on the solder side
+	POP	P, TT		; First pop clipped old point off stack
+	ADD	T, TT		;  adjust X for the other side
+	PUSHJ	P, WRT.WD	;  and write it out.
+	MOVSI	T, SIDDIF	; Then adjust X of new point for other side,
+	ADD	T, B
+	PUSHJ	P, WRT.WD	;  and write it out
+	MOVEI	T, NEVERC
+	PUSHJ	P, WRTDEC
+	PUSHJ	P,WCRLF
+	JRST	OTL.NX
+
+O.INV:	TRZ	T, 1		;Invisible vector, 
+	PUSHJ	P, OTL.SC	; scale this point anyway
+	MOVE	B, T		; and make it the new point
+OTL.NX:	MOVE	C, B		; Make new coordinates old
+	HRRZ	A,(A)		; Follow the linked list
+	JUMPN	A, OTL.LP	;  until there is no more
+
+NOWIRF:	SETZ	T,
+	PUSHJ	P,WRTDEC	;END WITH 5 ZEROES
+	PUSHJ	P,WRTDEC
+	PUSHJ	P,WRTDEC
+	PUSHJ	P,WRTDEC
+	PUSHJ	P,WRTDEC
+	PUSHJ	P,WCRLF		;END ALL WIRES
+	RELEASE	DAT,		;CLOSE OUTPUT
+	POPJ	P,
+
+;This routine clears all the 'visited' bits on a drawing.
+UNMARK:	MOVSI	C,1		;Clear the 'visited' bit in BITS field
+	SKIPE	A,PONPNT	; for all points on both sides 
+	 PUSHJ	P,CLRBTS	;  of the board
+	SKIPE	A,PONPN2
+	 PUSHJ	P,CLRBTS
+	POPJ	P,
+
+;This routine is called recursively to find the neighbors of
+; a point, and write out descriptions of the line segments
+; connecting it to its neighbors.  This amounts to a tree
+; traversal.
+;At entry, A/ pointer to point XY block
+;	   B/ pointer to net_list pin block
+;	   C/ pointer to net_list net block
+;	   G/ signal number
+;At exit,  these registers are undisturbed, and any points
+; beyond this one are marked, and the connecting line segments
+; have been output.
+FINDXY:	HLRZ	T, (A)		;Get pointer to point_type block
+	HRRZ	TT, 1(T)	; and get pointer to descriptor block
+	MOVE	TTT,1(TT)	;Get BITS,,pin/pad word from descriptor
+	TLOE	TTT,1		;Test/set the 'visited' bit
+	 POPJ	P,		; If we have been here, exit
+	MOVEM	TTT,1(TT)	;Save BITS,,pin/pad
+	TLNN	TTT, FEEDTH	;Is this a feed through?
+	 JRST	F.NGBR		; No
+	HLRZ	TT, (T)		;Fetch pointer to opposite side XYblock
+	HLRZ	TTT, (TT)	;Check if the neighbor has
+	HRRZ	TTT, 1(TTT)	; already been visited
+	MOVE	TTT, 1(TTT)	;  [flag in BITS,,pin/pad]
+	TLNE	TTT, 1		;Is the neighbor already marked ?
+	 JRST	F.NGBR		; Yes, we have been there before
+	PUSH	P, T		; No, save pointer to point_type block
+	PUSH	P, A		;  and to our XY block,
+	MOVE	A, TT		;   point to XYblock of partner feedthru 
+	PUSHJ	P, FINDXY	;    and follow the trail through the board
+	PUSHJ	P, WRTXYC	;Write X,Y of other side of board
+	POP	P, A		; recover address of our XY block
+	PUSHJ	P,WRTXYC	;   and write X,Y on this side
+	MOVEI	T, (G)		;Write circuit number to finish record
+	PUSHJ	P, WRTDEC	; and then look for neighbors on this side
+	PUSHJ	P,WCRLF		;  after recovering pointer
+	POP	P, T		;   to point_type block
+F.NGBR:	HLRZ	TT, 1(T)	;Get pointer to neighbors block
+	JUMPE	TT, F.EXIT	; [exit if no neighbors]
+	PUSH	P, A		;Save pointer to this point
+FIND0:	MOVEI	D, 2		;Init counter of neighbor fields
+FINDN:	XCT	(D)[HLRZ A, (TT); Examine a neighbor pointer
+		    HLRZ A, 1(TT)
+		    HRRZ A, 1(TT)]
+	JUMPE	A, F.NEXT	;If nil, no neighbor here
+	HLRZ	T, (A)		;Check if the neighbor has
+	HRRZ	T, 1(T)		; already been visited
+	MOVE	T, 1(T)		;  [flag in BITS,,pin/pad]
+	TLNE	T, 1		;Is the neighbor already marked ?
+	 JRST	F.NEXT		; Yes, consider another one
+	PUSH	P, TT		;Save pointer to neighbor block
+	PUSH	P, D		; and index into it
+	PUSHJ	P, FINDXY	;  and recurse
+	POP	P, D
+	MOVE	TT, -1(P)	;Recover address of our XY block
+	MOVE	T, 1(TT)	;Get our X,,Y
+	MOVE	TT, T		; and create a copy for calculation
+	ADJUST	(SUB,TT,<1(A)>)	; of deltaX, deltaY for 0,90,45 check
+	TLNE	TT, -1		;Is either delta = 0?
+	 TRNN	TT, -1
+	  JRST	F.OUT		;Yes, this line is at 0 or 90 degrees
+	HRRE	TTT, TT		;Separate the two
+	HLRE	TT, TT		; deltas
+	CAMN	TT, TTT		;Are they the same?
+	 JRST	F.OUT		; Yes, this is a 45 degree line
+	MOVN	TT, TT		;Is one the negative of the other
+	CAMN	TT, TTT
+	 JRST	F.OUT		; Yes, it is a -45 degree line
+	 jrst [
+	   pushj p,shwmov
+	   OUTSTR[ASCIZ/Sorry, DKM's Router gets upset if you pass him an
+existing diagonal route that is not at 45 degrees! (I marked it for you.)
+/]
+	   jrst .+1
+		]
+	JRST	F.POP
+
+F.OUT:	PUSHJ	P, WRTXYC	;Output X,Y of neighbor point
+	MOVE	A, -1(P)	;Recover pointer to initial point
+	PUSHJ	P, WRTXYC	; and output X,Y of it.
+	MOVEI	T, (G)		;Write circuit number
+	PUSHJ	P, WRTDEC
+	PUSHJ	P, WCRLF	; and finish record
+F.POP:	POP	P, TT		;Recover pointer to neighbor block
+F.NEXT:	SOJGE	D, FINDN	; and examine next
+	HRRZ	TT, (TT)	;Get pointer to next neighbor block
+	JUMPN	TT, FIND0	; and examine it, if it exists
+	POP	P, A		;Recover pointer to this point
+F.EXIT:	POPJ	P,		; and return to whoever called us
+
+;		ROUTER OUTPUT SUBRS
+
+;This routine scales an X,,Y pair for the Wagner router
+; At entry, T/ X,,Y pair
+; At exit,  T/ scaled X,,Y pair
+;	   TT/ remainder from scaling Y
+;	  TTT/ remainder from scaling X
+OTL.SC:	PUSH	P,T		;Save the unscaled pair
+	HLRE	T,T		; and isolate the unscaled X coordinate
+	ADD	T,MINX
+	IDIVI	T,ROUSCL	;Scale X coordinate
+	CAILE	TT, ROUSCL/2	; and round
+	 ADDI	T, 1
+	MOVEM	TT, TTT		;Save X remainder
+	HRLM	T,(P)		; and tuck scaled X into stack for return
+	HRRE	T,(P)		;Isolate Y coordinate
+	ADD	T,MINY		; add offset
+	IDIVI	T,ROUSCL	;Scale it for router
+	CAILE	TT, ROUSCL/2	; and round
+	 ADDI	T, 1
+	HLL	T,(P)		;Merge with scaled X coordinate
+	ADJSP	P,-1		;Pop the temporary off the stack
+	POPJ	P,		; and return, with remainders in TT, TTT
+
+;This routine writes one scaled X,,Y pair out to the .RIN file
+;
+;At entry, T/  scaled X,,Y word
+;At exit,  T/  unchanged
+;     TT,TTT/  clobbered
+WRT.WD:	PUSH	P,T		;Save X,,Y on stack
+	HLRE	T,T		; and isolate X
+	PUSHJ	P,WRTDEC
+	HRRE	T,(P)		;Fetch Y coordinate, and 
+	PUSHJ	P,WRTDEC
+	POP	P,T		;Return scaled X,,Y pair
+	POPJ	P,
+
+;This routine writes an X,Y,sig_number record for each connector
+; pin which has a signal attached to it.
+;At entry, A/pointer to first point XY block in PONPNT list
+;At exit,  A,T,TT,TTT/  clobbered
+WRTUCN:	HLRZ TT,(A)		;Get ptr to pin type block
+	HRRZ T,1(TT)		; and ptr to point descriptor block
+	MOVE T,1(T)		;  and BITS,,pin/pad word
+	TLNN T,CPIN		;Is this a connector pin?
+	 JRST WRTUCM		; No
+	HLRZ TT,1(TT)		;Get ptr to neighbors block
+	 JUMPE TT,WRTUCM	; No neighbors block, ergo no neighbors
+WRTUCO:	SKIPE 1(TT)		;IF second word is non-0
+	 JRST WRTUCP		; we have neighbors
+	SKIPN TT,(TT)		; ELSE IF both words are 0,
+	 JRST WRTUCM		;  no more neighbors
+	TLNN TT,-1		;      ELSE IF left half-word is zero,
+	 JRST WRTUCO		;        check the linked neighbor block
+WRTUCP:	PUSHJ P,WRTXY		;This pin is connected to something
+WRTUCM:	HRRZ A,(A)		;Follow linked list of points,
+	JUMPN A,WRTUCN		; until we have seen them all
+	POPJ P,
+
+
+;This routine writes an X, Y, signal_number record for each 'blank'
+; connector pin.
+;At entry,  A/ pointer to point list
+;At exit,   A,T,TT,TTT/  clobbered
+WRTBCN:	HLRZ T,(A)		;Get pointer to point_type block
+	HRRZ T,1(T)		; and to descriptor
+	MOVE TT,1(T)		;Fetch descriptor
+	TLON TT,1		; Test-and-set 'visited' bit
+	TLNN TT,CPIN		;  Connector pins only on this side
+	 JRST WRBCNN
+	MOVEM TT,1(T)		;Mark this pin as written out
+	PUSHJ P,GOCON		; and declare it unassigned
+WRBCNN:	HRRZ A,(A)		;Follow the linked list of points
+	JUMPN A,WRTBCN		; until there is no more
+	POPJ P,
+
+;This routine writes out a record describing a pin to be connected
+; by the router, provided the pin has not been previously visited,
+; as shown by the 'visited' flag in BITS,,pin/pad word of descriptor
+;At entry, A/ pointer to point XY block
+;At exit,  T,TT,TTT/ clobbered
+WRTXY:	HLRZ T,(A)		;Get address of point_type block
+	HRRZ T,1(T)		; and of descriptor block
+	MOVE TT,1(T)		;  and fetch BITS,,pin/pad word
+	TLOE TT,1		;Test-and-set 'visited' bit
+	 POPJ P,		; and exit if already done
+	MOVEM TT,1(T)		;Remember that we have been here
+	TLNN TT,ISPIN		;Check if this is a body pin
+	 JRST GOCON		; No, check for connector pin
+	PUSHJ P, WRTXYC		; Yes, fetch X,,Y coordinate word, and scale,
+	MOVE T,G		;  bound, and write the coordinates followed
+	PUSHJ P,WRTDEC		;  by circuit number, letting WCRLF return
+	JRST WCRLF		;  for us.
+
+GOCON:	TLNE ASK		;Are we supposed to output connector pins
+	 TLNN TT,CPIN		; and is this one ?
+	  POPJ P,		;  No, or No.
+	MOVE T,1(A)		;  Yes, get X,,Y coordinates
+	PUSHJ P, OTL.SC		;   scale them, and output, without 
+	PUSHJ P, WRTXYS		;   complaining about off-grid values
+	MOVE T,G		; followed by circuit number
+	ADDI T,CNOFFS		;  plus large constant
+	CAILE T,=9999		;   complaining if too many signals
+	 OUTSTR [ASCIZ/ Too many signals for ROUTE.  Sorry./]
+	PUSHJ P,WRTDEC
+	JRST WCRLF
+
+;This routine writes two I4 fields, describing the X,Y coordinates of a
+; given point.  There are two entries: WRTXYC, and WRTXYS
+;At entry, A/ pointer to point XY block (used to decide side point is on)
+; if entry is to WRTXYS, then T/ scaled X,,Y pair
+;At exit,  T,TT,TTT/ clobbered
+WRTXYC:	move	t, 1(a)		;Fetch X,,Y pair
+	pushj	p, otl.sc	; and scale them, rounding
+	ior	tt, ttt		;Combine remainders
+	skipe	tt		; and complain if either is nonzero
+	 pushj	off.gd
+WRTXYS:	hlre	tt, t		;Extract signed X coordinate
+	caige	tt, ROUXMB	; and bound it
+	 pushj	p, underx
+	caile	tt, ROUXMT
+	 pushj	p, overx
+	hrre	tt, t		;Extract signed Y coordinate
+	caige	tt, ROUYMB	; and bound it
+	 pushj	p, undery
+	caile	tt, ROUYMT
+	 pushj	p, overy
+	hlrz	tt, (a)		;Chase links to BITS,,pin/pad
+	hrrz	tt, 1(tt)
+	move	tt, 1(tt)
+	tlnn	tt, front	;Is this point on the SOLDER side ?
+	 pushj	p, [hlre  tt, t	; Yes, extract scaled X, and add side offset
+		    addi  tt, siddif
+		    hrlm  tt, t
+		    popj  p,]
+	pushj	p, wrt.wd	;Write out the bounded X,,Y pair
+
+	popj	p,		; and return
+
+OVERX:	hrli	t, ROUXMT
+	jrst	out.cm
+
+UNDERX:	hrli	t, ROUXMB
+	jrst	out.cm
+
+OVERY:	hrri	t, ROUYMT
+	jrst	out.cm
+
+UNDERY:	hrri	t, ROUYMB
+out.cm:	pushj	p, shwmov
+	OUTSTR	[ASCIZ/Point outside ROUTER limits.  I marked it for you.
+/]
+	POPJ P,
+
+off.gd: pushj	p, shwmov
+	OUTSTR	[ASCIZ/Pin off ROUTER grid, I marked it for you and told the
+ROUTER it was on the nearest grid.
+/]
+	popj	p,
+
+
+;This routine writes one number in I4 format.
+; At entry, T/ number to output
+; At exit,  T/ 0 if number fit into I4 field; quotient otherwise
+;	    TT,TTT/ clobbered
+WRTDEC:	MOVEI TTT,4
+WRTDC1:	IDIVI T,=10
+	HRLM TT,(P)
+	SOJLE TTT,.+2
+	 PUSHJ P,WRTDC1		;Recursively call ourselves
+	HLRZ TTT,(P)
+	ADDI TTT,60
+	JRST WORDOUT
+
+;This routine writes a CR and LF on the output stream
+WCRLF:	MOVE TTT,IOHD+2
+	CAIG TTT,2		;Two or more characters?
+	 SETZM IOHD+2		; No, force output
+	MOVEI TTT,15		;Stuff a CRLF on the end
+	PUSHJ P,WORDOUT
+	MOVEI TTT,12
+	JRST WORDOUT		; and let WORDOUT return for us
+
+
+;This routine marks a point that needs looking at later by the
+; user.  It is called when points are off-grid, or out of bounds.
+;At entry, A/ pointer to point XY block.
+shwmov:	push p,t
+	push p,tt
+	HLRZ T,(A)
+	HRRZ T,1(T)
+	MOVE TT,1(T)
+	TLO TT,FOUNDP
+	movem tt,1(t)
+	pop p,tt
+	pop p,t
+	popj p,
+
+;		TABLES FOR ROUTER OUTPUT
+;TABLE OF PRESET POWER AND GROUND CONNECTOR PINS
+DEFINE PCON(A,B,C)
+<
+XX1__IFL "A"-"G"<"A";>IFL "A"-"I"<"A"-1;>IFL "A"-"O"<"A"-2;>IFL "A"-"Q"<"A"-3;>"A"-4
+XX1__XX1-100
+XX2__IFL "B"-"G"<"B";>IFL "B"-"I"<"B"-1;>IFL "B"-"O"<"B"-2;>IFL "B"-"Q"<"B"-3;>"B"-4
+XX2__XX2-100
+
+	BYTE(6)0,0,0,XX1-100,XX2-100,C
+>
+
+PRECON:	PCON	A,B,1
+	PCON	A,F,1
+	PCON	A,L,1
+	PCON	A,R,1
+	PCON	A,U,1
+	PCON	A,U,2
+	PCON	A,V,1
+	PCON	A,V,2
+	PCON	B,A,1
+	PCON	B,A,2
+	PCON	B,B,1
+	PCON	B,B,2
+	PCON	B,F,1
+	PCON	B,L,1
+	PCON	B,R,1
+	PCON	B,U,1
+	PCON	C,B,1
+	PCON	C,F,1
+	PCON	C,L,1
+	PCON	C,R,1
+	PCON	C,U,1
+	PCON	C,U,2
+	PCON	C,V,1
+	PCON	C,V,2
+	PCON	D,A,1
+	PCON	D,A,2
+	PCON	D,B,1
+	PCON	D,B,2
+	PCON	D,F,1
+	PCON	D,L,1
+	PCON	D,R,1
+	PCON	D,U,1
+PRECLN__.-PRECON
+
+;TABLE OF SIGNALS NOT TO PASS TO THE ROUTER
+NOPASS:	[<ASCII/VCC/>
+		ASCIZ/VCC/]
+	[<ASCII/GND/>
+		ASCIZ/GND/]
+	[<ASCII/HI/>
+		ASCIZ/HI/]
+	[<ASCII/NC/>
+		ASCIZ/NC/]
+NPASLN__.-NOPASS-1
+	XLIST
+>;UML
+>;WAG
+>;MPC
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
